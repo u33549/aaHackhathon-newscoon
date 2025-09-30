@@ -16,7 +16,6 @@ connectDB();
 const apiKeyAuth = require('./middleware/apiKeyAuth');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var rssNewsRouter = require('./routes/rssNews');
 
 var app = express();
@@ -33,7 +32,6 @@ app.use(cookieParser());
 
 // API rotaları
 app.use('/api', indexRouter);
-app.use('/api/users', usersRouter);
 
 // Haber API'leri için API anahtarı doğrulama middleware'ini ekle
 app.use('/api/news', apiKeyAuth, rssNewsRouter);
