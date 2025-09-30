@@ -31,6 +31,14 @@ const rssNewsSchema = new mongoose.Schema({
   image: {
     type: String
   },
+  category: {
+    type: String,
+    enum: {
+      values: ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'],
+      message: 'Kategori sadece şunlardan biri olabilir: gundem, dunya, ekonomi, spor, analiz, kultur'
+    },
+    required: [true, 'Kategori alanı zorunludur']
+  },
   isInAnyStack: {
     type: Boolean,
     default: false

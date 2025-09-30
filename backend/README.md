@@ -132,6 +132,7 @@ GET /api/news
 - `pubDate`: Yayın tarihine göre filtreleme. Değer direkt tarih olabilir veya `pubDate[gt]=2023-01-01` gibi büyük/küçük karşılaştırmalar yapılabilir.
 - `isInAnyStack`: "true" veya "false" değeri alır. Bir yığında olup olmadığına göre filtreleme yapar.
 - `isUsable`: "true" veya "false" değeri alır. Kullanılabilir olup olmadığına göre filtreleme yapar.
+- `category`: Haberin kategorisine göre filtreleme yapar. Değerler: "gundem", "dunya", "ekonomi", "spor", "analiz", "kultur".
 - `limit`: Dönecek maksimum haber sayısı. Varsayılan olarak limit yok (-1).
 
 **Dönen Değer:**
@@ -390,6 +391,7 @@ DELETE /api/news/guid/:guid
   description: String,     // Haber açıklaması (zorunlu)
   pubDate: String,         // Yayın tarihi (zorunlu)
   image: String,           // Haber görseli (opsiyonel)
+  category: String,        // Haber kategorisi (zorunlu) - Değerler: ["gundem","dunya","ekonomi","spor","analiz","kultur"]
   isInAnyStack: Boolean,   // Yığında olup olmadığı (varsayılan: false)
   isUsable: Boolean,       // Kullanılabilir olup olmadığı (varsayılan: true)
   createdAt: Date,         // Oluşturulma zamanı (otomatik oluşturulur)

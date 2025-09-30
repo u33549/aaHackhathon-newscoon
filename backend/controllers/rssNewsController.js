@@ -3,7 +3,7 @@ const RssNews = require('../models/RssNews');
 // Tüm haberleri getir (filtreleme ve limitlemeli)
 exports.getAllNews = async (req, res) => {
   try {
-    const { pubDate, isInAnyStack, isUsable, limit = -1 } = req.query;
+    const { pubDate, isInAnyStack, isUsable, category, limit = -1 } = req.query;
 
     // Filtreleme koşullarını oluştur
     const filter = {};
@@ -29,6 +29,11 @@ exports.getAllNews = async (req, res) => {
     // isUsable filtresi (boolean değere dönüştür)
     if (isUsable !== undefined) {
       filter.isUsable = isUsable === 'true';
+    }
+
+    // kategori filtresi
+    if (category) {
+      filter.category = category;
     }
 
     // Sorguyu oluştur ve sırala (en yeni haberleri önce getir)
