@@ -12,6 +12,9 @@ dotenv.config();
 const connectDB = require('./config/db');
 connectDB();
 
+// API anahtarı doğrulama middleware'i
+const apiKeyAuth = require('./middleware/apiKeyAuth');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var rssNewsRouter = require('./routes/rssNews');
@@ -31,7 +34,9 @@ app.use(cookieParser());
 // API rotaları
 app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/news', rssNewsRouter);
+
+// Haber API'leri için API anahtarı doğrulama middleware'ini ekle
+app.use('/api/news', apiKeyAuth, rssNewsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

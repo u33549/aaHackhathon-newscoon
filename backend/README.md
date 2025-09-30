@@ -6,10 +6,12 @@ Bu proje, MongoDB ve Express.js kullanılarak geliştirilen bir RSS haber API'si
 
 - [Kurulum](#kurulum)
 - [Yapılandırma](#yapılandırma)
+- [API Güvenliği](#api-güvenliği)
 - [Kullanım](#kullanım)
 - [API Endpoint'leri](#api-endpointleri)
   - [Haber API'leri](#haber-apileri)
   - [Kullanıcı API'leri](#kullanıcı-apileri)
+- [API Fonksiyonları ve Kullanımları](#api-fonksiyonları-ve-kullanımları)
 - [Veri Modeli](#veri-modeli)
 - [Filtreleme ve Sınırlama](#filtreleme-ve-sınırlama)
 - [Lisans](#lisans)
@@ -37,6 +39,7 @@ npm install
 NODE_ENV=development
 PORT=3000
 MONGO_URI=mongodb://localhost:27017/aahackathon
+API_KEY=your-secret-api-key
 ```
 
 4. MongoDB'nin çalıştığından emin olun.
@@ -51,8 +54,37 @@ npm start
 
 Uygulama aşağıdaki yapılandırma dosyalarını kullanır:
 
-- `.env`: Ortam değişkenleri (MongoDB URI, port, ortam)
+- `.env`: Ortam değişkenleri (MongoDB URI, port, ortam, API anahtarı)
 - `config/db.js`: MongoDB bağlantı ayarları
+
+## API Güvenliği
+
+Bu API, okuma ve yazma işlemleri için farklı yetkilendirme düzeyleri uygular:
+
+- **Okuma İşlemleri (GET)**: Herkes tarafından erişilebilir. Kimlik doğrulama gerekmez.
+- **Yazma İşlemleri (POST, PUT, DELETE)**: Sadece geçerli API anahtarına sahip kullanıcılar tarafından erişilebilir.
+
+### API Anahtarı Kullanımı
+
+Yazma işlemleri için isteklerinize `x-api-key` header'ı eklemeniz gerekmektedir:
+
+```
+x-api-key: your-secret-api-key
+```
+
+Örnek (cURL ile):
+
+```bash
+# GET isteği - API anahtarı gerekmez
+curl http://localhost:3000/api/news
+
+# POST isteği - API anahtarı gerekir
+curl -X POST \
+  http://localhost:3000/api/news \
+  -H 'Content-Type: application/json' \
+  -H 'x-api-key: your-secret-api-key' \
+  -d '{"guid": "unique-id", "title": "Haber Başlığı", ...}'
+```
 
 ## Kullanım
 
