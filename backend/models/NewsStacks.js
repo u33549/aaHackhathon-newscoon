@@ -8,18 +8,12 @@ const newsStacksSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    required: [true, 'Açıklama alanı zorunludur'],
     trim: true
   },
   news: [{
-    id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'RssNews',
-      required: true
-    },
-    guid: {
-      type: String,
-      required: true
-    }
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RssNews'
   }],
   isApproved: {
     type: Boolean,
@@ -37,10 +31,6 @@ const newsStacksSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
 }, {
   timestamps: true

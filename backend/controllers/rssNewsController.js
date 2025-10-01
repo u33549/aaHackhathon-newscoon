@@ -1,4 +1,5 @@
 const RssNews = require('../models/RssNews');
+const NewsStacks = require('../models/NewsStacks');
 
 // Tüm haberleri getir (filtreleme ve limitlemeli)
 exports.getAllNews = async (req, res) => {
@@ -259,25 +260,34 @@ exports.deleteNews = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        error: 'Haber bulunamadı'
+        message: 'Haber bulunamadı'
       });
     }
 
-    await news.deleteOne();
+    // Önce bu haberi içeren tüm stacklerden kaldır
+    await NewsStacks.updateMany(
+      { news: req.params.id },
+      { $pull: { news: req.params.id } }
+    );
+
+    // Sonra haberi sil
+    await RssNews.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,
+      message: 'Haber başarıyla silindi ve tüm stacklerden kaldırıldı',
       data: {}
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Sunucu hatası'
+      message: 'Haber silinemedi',
+      error: error.message
     });
   }
 };
 
-// GUID ile haberi sil
+// GUID'ye göre haberi sil
 exports.deleteNewsByGuid = async (req, res) => {
   try {
     const news = await RssNews.findOne({ guid: req.params.guid });
@@ -285,20 +295,29 @@ exports.deleteNewsByGuid = async (req, res) => {
     if (!news) {
       return res.status(404).json({
         success: false,
-        error: 'Haber bulunamadı'
+        message: 'Haber bulunamadı'
       });
     }
 
-    await news.deleteOne();
+    // Önce bu haberi içeren tüm stacklerden kaldır
+    await NewsStacks.updateMany(
+      { news: news._id },
+      { $pull: { news: news._id } }
+    );
+
+    // Sonra haberi sil
+    await RssNews.findOneAndDelete({ guid: req.params.guid });
 
     res.status(200).json({
       success: true,
+      message: 'Haber başarıyla silindi ve tüm stacklerden kaldırıldı',
       data: {}
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Sunucu hatası'
+      message: 'Haber silinemedi',
+      error: error.message
     });
   }
 };

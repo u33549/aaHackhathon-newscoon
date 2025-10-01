@@ -348,7 +348,7 @@ PUT /api/news/guid/:guid
 DELETE /api/news/:id
 ```
 
-**Açıklama:** ID'ye göre haberi siler.
+**Açıklama:** ID'ye göre haberi siler ve otomatik olarak tüm haber yığınlarından da kaldırır.
 
 **URL Parametreleri:**
 - `id`: Haberin MongoDB ID'si
@@ -357,6 +357,7 @@ DELETE /api/news/:id
 ```json
 {
   "success": true,
+  "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
   "data": {}
 }
 ```
@@ -367,7 +368,7 @@ DELETE /api/news/:id
 DELETE /api/news/guid/:guid
 ```
 
-**Açıklama:** GUID'ye göre haberi siler.
+**Açıklama:** GUID'ye göre haberi siler ve otomatik olarak tüm haber yığınlarından da kaldırır.
 
 **URL Parametreleri:**
 - `guid`: Haberin benzersiz GUID değeri
@@ -376,6 +377,7 @@ DELETE /api/news/guid/:guid
 ```json
 {
   "success": true,
+  "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
   "data": {}
 }
 ```
@@ -479,12 +481,8 @@ POST /api/stacks
   "title": "Haber Yığını Başlığı",
   "description": "Haber yığınının açıklaması",
   "news": [
-    {
-      "id": "609e1e24a12a452a3c4c5e21"
-    },
-    {
-      "id": "609e1e24a12a452a3c4c5e22"
-    }
+    "609e1e24a12a452a3c4c5e21",
+    "609e1e24a12a452a3c4c5e22"
   ],
   "isApproved": false,
   "tags": ["politika", "gündem"],
