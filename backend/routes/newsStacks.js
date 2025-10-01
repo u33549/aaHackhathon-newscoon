@@ -1,5 +1,6 @@
-const express = require('express');
-const router = express.Router();
+var express = require('express');
+var router = express.Router();
+
 const {
   getAllNewsStacks,
   getNewsStackById,
@@ -10,25 +11,25 @@ const {
   removeNewsFromStack
 } = require('../controllers/newsStacksController');
 
-// GET /api/stacks - Tüm haber yığınlarını getir
+// Tüm haber yığınlarını getir (GET /api/stacks)
 router.get('/', getAllNewsStacks);
 
-// GET /api/stacks/:id - ID'ye göre haber yığını getir
+// ID'ye göre haber yığını getir (GET /api/stacks/:id)
 router.get('/:id', getNewsStackById);
 
-// POST /api/stacks - Yeni haber yığını oluştur
+// Yeni haber yığını oluştur (POST /api/stacks)
 router.post('/', createNewsStack);
 
-// PUT /api/stacks/:id - Haber yığını güncelle
+// Haber yığını güncelle (PUT /api/stacks/:id)
 router.put('/:id', updateNewsStack);
 
-// DELETE /api/stacks/:id - Haber yığını sil
+// Haber yığını sil (DELETE /api/stacks/:id)
 router.delete('/:id', deleteNewsStack);
 
-// POST /api/stacks/:id/addNews - Haber yığınına haber ekle
+// Haber yığınına haber ekle (POST /api/stacks/:id/addNews)
 router.post('/:id/addNews', addNewsToStack);
 
-// POST /api/stacks/:id/removeNews - Haber yığınından haber çıkar
+// Haber yığınından haber çıkar (POST /api/stacks/:id/removeNews)
 router.post('/:id/removeNews', removeNewsFromStack);
 
 module.exports = router;

@@ -110,7 +110,7 @@ API'yi kullanmak için aşağıdaki endpoint'lere HTTP istekleri gönderebilirsi
 
 | Endpoint | Metod | Açıklama | Parametreler |
 |----------|-------|----------|-------------|
-| `/api/stacks` | GET | Tüm haber yığınlarını listele | `isApproved`, `isFeatured`, `tags`, `limit`, `sortBy`, `sortOrder` |
+| `/api/stacks` | GET | Tüm haber yığınlarını listele | `status`, `isFeatured`, `tags`, `limit`, `sortBy`, `sortOrder` |
 | `/api/stacks` | POST | Yeni haber yığını ekle | - |
 | `/api/stacks/:id` | GET | ID'ye göre haber yığını getir | - |
 | `/api/stacks/:id` | PUT | ID'ye göre haber yığını güncelle | - |
@@ -393,7 +393,7 @@ GET /api/stacks
 **Açıklama:** Veritabanındaki haber yığınlarını filtreli şekilde getirir. Farklı parametrelerle filtrelenebilir ve sınırlandırılabilir.
 
 **Query Parametreleri:**
-- `isApproved`: "true" veya "false" değeri alır. Onaylı haber yığınlarını filtrelemek için kullanılır.
+- `status`: "pending", "approved" veya "rejected" değeri alır. Durum değerine göre haber yığınlarını filtrelemek için kullanılır.
 - `isFeatured`: "true" veya "false" değeri alır. Öne çıkarılan haber yığınlarını filtrelemek için kullanılır.
 - `tags`: Etiketlere göre filtreleme yapar. Birden fazla etiket için virgülle ayırabilirsiniz.
 - `limit`: Dönecek maksimum haber yığını sayısı. Varsayılan olarak limit yok (-1).
@@ -416,7 +416,7 @@ GET /api/stacks
           "guid": "news-guid-1"
         }
       ],
-      "isApproved": true,
+      "status": "approved",
       "viewCount": 150,
       "tags": ["politika", "gündem"],
       "isFeatured": false,
@@ -459,7 +459,7 @@ GET /api/stacks/:id
         "guid": "news-guid-1"
       }
     ],
-    "isApproved": true,
+    "status": "approved",
     "viewCount": 151,
     "tags": ["politika", "gündem"],
     "isFeatured": false
@@ -484,7 +484,7 @@ POST /api/stacks
     "609e1e24a12a452a3c4c5e21",
     "609e1e24a12a452a3c4c5e22"
   ],
-  "isApproved": false,
+  "status": "pending",
   "tags": ["politika", "gündem"],
   "isFeatured": false
 }
@@ -507,7 +507,7 @@ POST /api/stacks
         "guid": "auto-filled-guid"
       }
     ],
-    "isApproved": false,
+    "status": "pending",
     "viewCount": 0,
     "tags": ["politika", "gündem"],
     "isFeatured": false
@@ -531,7 +531,7 @@ PUT /api/stacks/:id
 {
   "title": "Güncellenmiş Başlık",
   "description": "Güncellenmiş açıklama",
-  "isApproved": true,
+  "status": "approved",
   "isFeatured": true,
   "tags": ["gündem", "ekonomi"]
 }
@@ -608,7 +608,7 @@ POST /api/stacks/:id/removeNews
       guid: String         // Haberin GUID'si (zorunlu)
     }
   ],
-  isApproved: Boolean,     // Onay durumu (varsayılan: false)
+  status: String,          // Durum ("pending", "approved", "rejected") (varsayılan: "pending")
   viewCount: Number,       // Görüntülenme sayısı (varsayılan: 0)
   tags: [String],          // Etiketler (opsiyonel)
   isFeatured: Boolean,     // Öne çıkarılma durumu (varsayılan: false)

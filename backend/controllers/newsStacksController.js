@@ -1,41 +1,43 @@
 const NewsStacks = require('../models/NewsStacks');
 const RssNews = require('../models/RssNews');
 
-// Tüm haber yığınlarını getir (filtreleme ve limitlemeli)
+// Tüm haber yığınlarını getir
 exports.getAllNewsStacks = async (req, res) => {
   try {
-    const { isApproved, isFeatured, tags, limit = -1, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+    const {
+      status,
+      isFeatured,
+      tags,
+      limit = -1,
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = req.query;
 
-    // Filtreleme koşullarını oluştur
-    const filter = {};
+    // Filter objesi oluştur
+    let filter = {};
 
-    // isApproved filtresi
-    if (isApproved !== undefined) {
-      filter.isApproved = isApproved === 'true';
+    if (status !== undefined) {
+      filter.status = status;
     }
 
-    // isFeatured filtresi
     if (isFeatured !== undefined) {
       filter.isFeatured = isFeatured === 'true';
     }
 
-    // tags filtresi
     if (tags) {
-      const tagArray = Array.isArray(tags) ? tags : [tags];
+      const tagArray = tags.split(',').map(tag => tag.trim());
       filter.tags = { $in: tagArray };
     }
 
-    // Sıralama ayarları
-    const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    // Sort objesi oluştur
+    const sort = {};
+    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    // Sorguyu oluştur ve sırala
     let query = NewsStacks.find(filter)
-      .populate('news', 'title link pubDate image category guid')
-      .sort(sortOptions);
+      .populate('news', 'title link pubDate image category')
+      .sort(sort);
 
-    // Limit uygula
-    if (limit && parseInt(limit) > 0) {
+    if (limit > 0) {
       query = query.limit(parseInt(limit));
     }
 
@@ -49,7 +51,6 @@ exports.getAllNewsStacks = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Haber yığınları getirilemedi',
       error: error.message
     });
   }
@@ -59,17 +60,18 @@ exports.getAllNewsStacks = async (req, res) => {
 exports.getNewsStackById = async (req, res) => {
   try {
     const newsStack = await NewsStacks.findById(req.params.id)
-      .populate('news', 'title link description pubDate image category guid');
+      .populate('news', 'title link pubDate image category description guid');
 
     if (!newsStack) {
       return res.status(404).json({
         success: false,
-        message: 'Haber yığını bulunamadı'
+        error: 'Haber yığını bulunamadı'
       });
     }
 
-    // Görüntülenme sayısını artır
-    await NewsStacks.findByIdAndUpdate(req.params.id, { $inc: { viewCount: 1 } });
+    // View count'u artır
+    newsStack.viewCount += 1;
+    await newsStack.save();
 
     res.status(200).json({
       success: true,
@@ -78,7 +80,6 @@ exports.getNewsStackById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Haber yığını getirilemedi',
       error: error.message
     });
   }
@@ -87,41 +88,36 @@ exports.getNewsStackById = async (req, res) => {
 // Yeni haber yığını oluştur
 exports.createNewsStack = async (req, res) => {
   try {
-    const { title, description, news, isApproved, tags, isFeatured } = req.body;
+    const { title, description, news, status, tags, isFeatured } = req.body;
 
-    // Haberlerin geçerli olduğunu kontrol et
+    // Haber ID'lerinin geçerli olup olmadığını kontrol et
     if (news && news.length > 0) {
-      for (const newsId of news) {
-        const existingNews = await RssNews.findById(newsId);
-        if (!existingNews) {
-          return res.status(400).json({
-            success: false,
-            message: `ID'si ${newsId} olan haber bulunamadı`
-          });
-        }
+      const newsExists = await RssNews.find({ _id: { $in: news } });
+      if (newsExists.length !== news.length) {
+        return res.status(400).json({
+          success: false,
+          error: 'Bir veya daha fazla geçersiz haber ID\'si'
+        });
       }
+
+      // Haberlerin isInAnyStack durumunu güncelle
+      await RssNews.updateMany(
+        { _id: { $in: news } },
+        { isInAnyStack: true }
+      );
     }
 
     const newsStack = await NewsStacks.create({
       title,
       description,
       news: news || [],
-      isApproved: isApproved || false,
+      status: status || 'pending',
       tags: tags || [],
       isFeatured: isFeatured || false
     });
 
-    // Eklenen haberlerin isInAnyStack değerini true yap
-    if (news && news.length > 0) {
-      await RssNews.updateMany(
-        { _id: { $in: news } },
-        { $set: { isInAnyStack: true } }
-      );
-    }
-
-    // Populate ile detayları getir
     const populatedNewsStack = await NewsStacks.findById(newsStack._id)
-      .populate('news', 'title link pubDate image category guid');
+      .populate('news', 'title link pubDate image category');
 
     res.status(201).json({
       success: true,
@@ -130,7 +126,6 @@ exports.createNewsStack = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Haber yığını oluşturulamadı',
       error: error.message
     });
   }
@@ -139,82 +134,59 @@ exports.createNewsStack = async (req, res) => {
 // Haber yığını güncelle
 exports.updateNewsStack = async (req, res) => {
   try {
-    const { title, description, news, isApproved, tags, isFeatured } = req.body;
+    const newsStack = await NewsStacks.findById(req.params.id);
 
-    // Mevcut stack'i al
-    const currentStack = await NewsStacks.findById(req.params.id);
-    if (!currentStack) {
+    if (!newsStack) {
       return res.status(404).json({
         success: false,
-        message: 'Haber yığını bulunamadı'
+        error: 'Haber yığını bulunamadı'
       });
     }
 
-    // Eğer news güncelleniyorsa
-    if (news && news.length > 0) {
-      // Yeni haberlerin geçerli olduğunu kontrol et
-      for (const newsId of news) {
-        const existingNews = await RssNews.findById(newsId);
-        if (!existingNews) {
-          return res.status(400).json({
-            success: false,
-            message: `ID'si ${newsId} olan haber bulunamadı`
-          });
-        }
-      }
+    // Eğer news array'i güncelleniyor ise
+    if (req.body.news) {
+      // Eski haberlerin isInAnyStack durumunu kontrol et
+      const oldNewsIds = newsStack.news;
+      const newNewsIds = req.body.news;
 
-      // Eski haberlerin isInAnyStack durumunu kontrol et ve güncelle
-      const oldNewsIds = currentStack.news;
-      const newNewsIds = news;
-
-      // Çıkarılan haberler
+      // Eski haberlerden çıkarılan haberleri bul
       const removedNewsIds = oldNewsIds.filter(id => !newNewsIds.includes(id.toString()));
 
-      // Eklenen haberler
-      const addedNewsIds = newNewsIds.filter(id => !oldNewsIds.map(n => n.toString()).includes(id));
-
-      // Çıkarılan haberlerin başka stack'te olup olmadığını kontrol et
-      for (const removedId of removedNewsIds) {
-        const otherStacksCount = await NewsStacks.countDocuments({
+      // Çıkarılan haberlerin başka stacklerde olup olmadığını kontrol et
+      for (let newsId of removedNewsIds) {
+        const otherStacks = await NewsStacks.find({
           _id: { $ne: req.params.id },
-          news: removedId
+          news: newsId
         });
 
-        if (otherStacksCount === 0) {
-          await RssNews.findByIdAndUpdate(removedId, { isInAnyStack: false });
+        if (otherStacks.length === 0) {
+          await RssNews.findByIdAndUpdate(newsId, { isInAnyStack: false });
         }
       }
 
-      // Eklenen haberlerin isInAnyStack değerini true yap
+      // Yeni eklenen haberlerin isInAnyStack durumunu güncelle
+      const addedNewsIds = newNewsIds.filter(id => !oldNewsIds.some(oldId => oldId.toString() === id));
       if (addedNewsIds.length > 0) {
         await RssNews.updateMany(
           { _id: { $in: addedNewsIds } },
-          { $set: { isInAnyStack: true } }
+          { isInAnyStack: true }
         );
       }
     }
 
-    const newsStack = await NewsStacks.findByIdAndUpdate(
+    const updatedNewsStack = await NewsStacks.findByIdAndUpdate(
       req.params.id,
-      {
-        ...(title && { title }),
-        ...(description && { description }),
-        ...(news && { news }),
-        ...(isApproved !== undefined && { isApproved }),
-        ...(tags && { tags }),
-        ...(isFeatured !== undefined && { isFeatured })
-      },
+      req.body,
       { new: true, runValidators: true }
-    ).populate('news', 'title link pubDate image category guid');
+    ).populate('news', 'title link pubDate image category');
 
     res.status(200).json({
       success: true,
-      data: newsStack
+      data: updatedNewsStack
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Haber yığını güncellenemedi',
       error: error.message
     });
   }
@@ -228,35 +200,32 @@ exports.deleteNewsStack = async (req, res) => {
     if (!newsStack) {
       return res.status(404).json({
         success: false,
-        message: 'Haber yığını bulunamadı'
+        error: 'Haber yığını bulunamadı'
       });
     }
 
-    // Stack'te olan haberlerin başka stack'lerde olup olmadığını kontrol et
-    for (const newsId of newsStack.news) {
-      const otherStacksCount = await NewsStacks.countDocuments({
+    // Bu stackteki haberlerin başka stacklerde olup olmadığını kontrol et
+    for (let newsId of newsStack.news) {
+      const otherStacks = await NewsStacks.find({
         _id: { $ne: req.params.id },
         news: newsId
       });
 
-      // Eğer başka stack'te yoksa isInAnyStack'i false yap
-      if (otherStacksCount === 0) {
+      if (otherStacks.length === 0) {
         await RssNews.findByIdAndUpdate(newsId, { isInAnyStack: false });
       }
     }
 
-    // Stack'i sil
     await NewsStacks.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,
-      message: 'Haber yığını silindi ve haberlerin durumu güncellendi',
+      message: 'Haber yığını başarıyla silindi',
       data: {}
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Haber yığını silinemedi',
       error: error.message
     });
   }
@@ -267,41 +236,46 @@ exports.addNewsToStack = async (req, res) => {
   try {
     const { newsId } = req.body;
 
-    // Haberin var olduğunu kontrol et
-    const existingNews = await RssNews.findById(newsId);
-    if (!existingNews) {
-      return res.status(400).json({
-        success: false,
-        message: 'Haber bulunamadı'
-      });
-    }
-
-    // Stack'e haberi ekle
-    const newsStack = await NewsStacks.findByIdAndUpdate(
-      req.params.id,
-      { $push: { news: newsId } },
-      { new: true, runValidators: true }
-    ).populate('news', 'title link pubDate image category guid');
-
+    const newsStack = await NewsStacks.findById(req.params.id);
     if (!newsStack) {
       return res.status(404).json({
         success: false,
-        message: 'Haber yığını bulunamadı'
+        error: 'Haber yığını bulunamadı'
       });
     }
 
-    // Haberin isInAnyStack değerini true yap
+    const news = await RssNews.findById(newsId);
+    if (!news) {
+      return res.status(404).json({
+        success: false,
+        error: 'Haber bulunamadı'
+      });
+    }
+
+    // Haber zaten bu stackte var mı kontrol et
+    if (newsStack.news.includes(newsId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Bu haber zaten yığında mevcut'
+      });
+    }
+
+    newsStack.news.push(newsId);
+    await newsStack.save();
+
+    // Haberin isInAnyStack durumunu güncelle
     await RssNews.findByIdAndUpdate(newsId, { isInAnyStack: true });
+
+    const updatedNewsStack = await NewsStacks.findById(req.params.id)
+      .populate('news', 'title link pubDate image category');
 
     res.status(200).json({
       success: true,
-      message: 'Haber başarıyla eklendi ve durumu güncellendi',
-      data: newsStack
+      data: updatedNewsStack
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Haber yığınına haber eklenemedi',
       error: error.message
     });
   }
@@ -312,40 +286,45 @@ exports.removeNewsFromStack = async (req, res) => {
   try {
     const { newsId } = req.body;
 
-    // Stack'ten haberi çıkar
-    const newsStack = await NewsStacks.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { news: newsId } },
-      { new: true, runValidators: true }
-    ).populate('news', 'title link pubDate image category guid');
-
+    const newsStack = await NewsStacks.findById(req.params.id);
     if (!newsStack) {
       return res.status(404).json({
         success: false,
-        message: 'Haber yığını bulunamadı'
+        error: 'Haber yığını bulunamadı'
       });
     }
 
-    // Haberin başka stack'lerde olup olmadığını kontrol et
-    const otherStacksCount = await NewsStacks.countDocuments({
+    // Haber bu stackte var mı kontrol et
+    if (!newsStack.news.includes(newsId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Bu haber zaten yığında mevcut değil'
+      });
+    }
+
+    newsStack.news.pull(newsId);
+    await newsStack.save();
+
+    // Bu haberin başka stacklerde olup olmadığını kontrol et
+    const otherStacks = await NewsStacks.find({
       _id: { $ne: req.params.id },
       news: newsId
     });
 
-    // Eğer başka stack'te yoksa isInAnyStack'i false yap
-    if (otherStacksCount === 0) {
+    if (otherStacks.length === 0) {
       await RssNews.findByIdAndUpdate(newsId, { isInAnyStack: false });
     }
 
+    const updatedNewsStack = await NewsStacks.findById(req.params.id)
+      .populate('news', 'title link pubDate image category');
+
     res.status(200).json({
       success: true,
-      message: 'Haber başarıyla çıkarıldı ve durumu güncellendi',
-      data: newsStack
+      data: updatedNewsStack
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Haber yığınından haber çıkarılamadı',
       error: error.message
     });
   }

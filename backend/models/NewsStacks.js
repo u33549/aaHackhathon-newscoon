@@ -15,9 +15,10 @@ const newsStacksSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'RssNews'
   }],
-  isApproved: {
-    type: Boolean,
-    default: false
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
   },
   viewCount: {
     type: Number,
@@ -37,7 +38,7 @@ const newsStacksSchema = new mongoose.Schema({
 });
 
 // İndeksler
-newsStacksSchema.index({ isApproved: 1 });
+newsStacksSchema.index({ status: 1 });
 newsStacksSchema.index({ isFeatured: 1 });
 newsStacksSchema.index({ viewCount: -1 });
 newsStacksSchema.index({ tags: 1 });
