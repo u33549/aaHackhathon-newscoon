@@ -17,6 +17,7 @@ const apiKeyAuth = require('./middleware/apiKeyAuth');
 
 var indexRouter = require('./routes/index');
 var rssNewsRouter = require('./routes/rssNews');
+var newsStacksRouter = require('./routes/newsStacks');
 
 var app = express();
 
@@ -35,6 +36,9 @@ app.use('/api', indexRouter);
 
 // Haber API'leri için API anahtarı doğrulama middleware'ini ekle
 app.use('/api/news', apiKeyAuth, rssNewsRouter);
+
+// Haber yığınları API'leri için API anahtarı doğrulama middleware'ini ekle
+app.use('/api/stacks', apiKeyAuth, newsStacksRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

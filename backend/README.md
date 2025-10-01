@@ -10,7 +10,7 @@ Bu proje, MongoDB ve Express.js kullanılarak geliştirilen bir RSS haber API'si
 - [Kullanım](#kullanım)
 - [API Endpoint'leri](#api-endpointleri)
   - [Haber API'leri](#haber-apileri)
-  - [Kullanıcı API'leri](#kullanıcı-apileri)
+  - [Haber Yığınları API'leri](#haber-yığınları-apileri)
 - [API Fonksiyonları ve Kullanımları](#api-fonksiyonları-ve-kullanımları)
 - [Veri Modeli](#veri-modeli)
 - [Filtreleme ve Sınırlama](#filtreleme-ve-sınırlama)
@@ -106,15 +106,17 @@ API'yi kullanmak için aşağıdaki endpoint'lere HTTP istekleri gönderebilirsi
 | `/api/news/guid/:guid` | PUT | GUID'ye göre haber güncelle | - |
 | `/api/news/guid/:guid` | DELETE | GUID'ye göre haber sil | - |
 
-#### Kullanıcı API'leri
+#### Haber Yığınları API'leri
 
-| Endpoint | Metod | Açıklama |
-|----------|-------|----------|
-| `/api/users` | GET | Tüm kullanıcıları listele |
-| `/api/users` | POST | Yeni kullanıcı ekle |
-| `/api/users/:id` | GET | ID'ye göre kullanıcı getir |
-| `/api/users/:id` | PUT | Kullanıcı güncelle |
-| `/api/users/:id` | DELETE | Kullanıcı sil |
+| Endpoint | Metod | Açıklama | Parametreler |
+|----------|-------|----------|-------------|
+| `/api/stacks` | GET | Tüm haber yığınlarını listele | `isApproved`, `isFeatured`, `tags`, `limit`, `sortBy`, `sortOrder` |
+| `/api/stacks` | POST | Yeni haber yığını ekle | - |
+| `/api/stacks/:id` | GET | ID'ye göre haber yığını getir | - |
+| `/api/stacks/:id` | PUT | ID'ye göre haber yığını güncelle | - |
+| `/api/stacks/:id` | DELETE | ID'ye göre haber yığını sil | - |
+| `/api/stacks/:id/addNews` | POST | Haber yığınına haber ekle | - |
+| `/api/stacks/:id/removeNews` | POST | Haber yığınından haber çıkar | - |
 
 ## API Fonksiyonları ve Kullanımları
 
@@ -378,6 +380,203 @@ DELETE /api/news/guid/:guid
 }
 ```
 
+### Haber Yığınları API Fonksiyonları
+
+#### 1. Tüm haber yığınlarını getir (`getAllNewsStacks`)
+
+```
+GET /api/stacks
+```
+
+**Açıklama:** Veritabanındaki haber yığınlarını filtreli şekilde getirir. Farklı parametrelerle filtrelenebilir ve sınırlandırılabilir.
+
+**Query Parametreleri:**
+- `isApproved`: "true" veya "false" değeri alır. Onaylı haber yığınlarını filtrelemek için kullanılır.
+- `isFeatured`: "true" veya "false" değeri alır. Öne çıkarılan haber yığınlarını filtrelemek için kullanılır.
+- `tags`: Etiketlere göre filtreleme yapar. Birden fazla etiket için virgülle ayırabilirsiniz.
+- `limit`: Dönecek maksimum haber yığını sayısı. Varsayılan olarak limit yok (-1).
+- `sortBy`: Sıralama alanı (createdAt, viewCount, title vb.). Varsayılan: "createdAt"
+- `sortOrder`: Sıralama düzeni ("asc" veya "desc"). Varsayılan: "desc"
+
+**Dönen Değer:**
+```json
+{
+  "success": true,
+  "count": 10,
+  "data": [
+    {
+      "_id": "609e1e24a12a452a3c4c5e20",
+      "title": "Haber Yığını Başlığı",
+      "description": "Haber yığınının açıklaması",
+      "news": [
+        {
+          "id": "609e1e24a12a452a3c4c5e21",
+          "guid": "news-guid-1"
+        }
+      ],
+      "isApproved": true,
+      "viewCount": 150,
+      "tags": ["politika", "gündem"],
+      "isFeatured": false,
+      "createdAt": "2023-05-21T14:30:00.000Z",
+      "updatedAt": "2023-05-21T14:30:00.000Z"
+    }
+  ]
+}
+```
+
+#### 2. ID'ye göre haber yığını getir (`getNewsStackById`)
+
+```
+GET /api/stacks/:id
+```
+
+**Açıklama:** MongoDB tarafından atanan ID'ye göre tek bir haber yığını getirir ve görüntülenme sayısını otomatik olarak artırır.
+
+**URL Parametreleri:**
+- `id`: Haber yığınının MongoDB ID'si
+
+**Dönen Değer:**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "609e1e24a12a452a3c4c5e20",
+    "title": "Haber Yığını Başlığı",
+    "description": "Haber yığınının açıklaması",
+    "news": [
+      {
+        "id": {
+          "_id": "609e1e24a12a452a3c4c5e21",
+          "title": "Haber Başlığı",
+          "link": "https://example.com/news/1",
+          "pubDate": "Fri, 21 May 2023 14:30:00 GMT",
+          "image": "https://example.com/images/news1.jpg",
+          "category": "gundem"
+        },
+        "guid": "news-guid-1"
+      }
+    ],
+    "isApproved": true,
+    "viewCount": 151,
+    "tags": ["politika", "gündem"],
+    "isFeatured": false
+  }
+}
+```
+
+#### 3. Yeni haber yığını oluştur (`createNewsStack`)
+
+```
+POST /api/stacks
+```
+
+**Açıklama:** Veritabanına yeni bir haber yığını ekler. Haber ID'lerinin geçerli olduğunu kontrol eder.
+
+**Gönderilecek Veri (JSON):**
+```json
+{
+  "title": "Haber Yığını Başlığı",
+  "description": "Haber yığınının açıklaması",
+  "news": [
+    {
+      "id": "609e1e24a12a452a3c4c5e21"
+    },
+    {
+      "id": "609e1e24a12a452a3c4c5e22"
+    }
+  ],
+  "isApproved": false,
+  "tags": ["politika", "gündem"],
+  "isFeatured": false
+}
+```
+
+**Dönen Değer:**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "609e1e24a12a452a3c4c5e20",
+    "title": "Haber Yığını Başlığı",
+    "description": "Haber yığınının açıklaması",
+    "news": [
+      {
+        "id": {
+          "title": "Haber Başlığı",
+          "link": "https://example.com/news/1"
+        },
+        "guid": "auto-filled-guid"
+      }
+    ],
+    "isApproved": false,
+    "viewCount": 0,
+    "tags": ["politika", "gündem"],
+    "isFeatured": false
+  }
+}
+```
+
+#### 4. Haber yığını güncelle (`updateNewsStack`)
+
+```
+PUT /api/stacks/:id
+```
+
+**Açıklama:** ID'ye göre haber yığını günceller.
+
+**URL Parametreleri:**
+- `id`: Haber yığınının MongoDB ID'si
+
+**Gönderilecek Veri (JSON):**
+```json
+{
+  "title": "Güncellenmiş Başlık",
+  "description": "Güncellenmiş açıklama",
+  "isApproved": true,
+  "isFeatured": true,
+  "tags": ["gündem", "ekonomi"]
+}
+```
+
+#### 5. Haber yığını sil (`deleteNewsStack`)
+
+```
+DELETE /api/stacks/:id
+```
+
+**Açıklama:** ID'ye göre haber yığını siler.
+
+#### 6. Haber yığınına haber ekle (`addNewsToStack`)
+
+```
+POST /api/stacks/:id/addNews
+```
+
+**Açıklama:** Mevcut bir haber yığınına yeni haber ekler.
+
+**Gönderilecek Veri (JSON):**
+```json
+{
+  "newsId": "609e1e24a12a452a3c4c5e23"
+}
+```
+
+#### 7. Haber yığınından haber çıkar (`removeNewsFromStack`)
+
+```
+POST /api/stacks/:id/removeNews
+```
+
+**Açıklama:** Haber yığınından belirli bir haberi çıkarır.
+
+**Gönderilecek Veri (JSON):**
+```json
+{
+  "newsId": "609e1e24a12a452a3c4c5e23"
+}
+```
+
 ## Veri Modeli
 
 ### RSS Haber Modeli
@@ -394,6 +593,27 @@ DELETE /api/news/guid/:guid
   category: String,        // Haber kategorisi (zorunlu) - Değerler: ["gundem","dunya","ekonomi","spor","analiz","kultur"]
   isInAnyStack: Boolean,   // Yığında olup olmadığı (varsayılan: false)
   isUsable: Boolean,       // Kullanılabilir olup olmadığı (varsayılan: true)
+  createdAt: Date,         // Oluşturulma zamanı (otomatik oluşturulur)
+  updatedAt: Date          // Güncellenme zamanı (otomatik güncellenir)
+}
+```
+
+### Haber Yığını Modeli (NewsStacks)
+
+```javascript
+{
+  title: String,           // Yığın başlığı (zorunlu)
+  description: String,     // Yığın açıklaması
+  news: [                  // Haber referansları
+    {
+      id: ObjectId,        // RssNews tablosuna referans (zorunlu)
+      guid: String         // Haberin GUID'si (zorunlu)
+    }
+  ],
+  isApproved: Boolean,     // Onay durumu (varsayılan: false)
+  viewCount: Number,       // Görüntülenme sayısı (varsayılan: 0)
+  tags: [String],          // Etiketler (opsiyonel)
+  isFeatured: Boolean,     // Öne çıkarılma durumu (varsayılan: false)
   createdAt: Date,         // Oluşturulma zamanı (otomatik oluşturulur)
   updatedAt: Date          // Güncellenme zamanı (otomatik güncellenir)
 }
