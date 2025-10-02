@@ -1,5 +1,6 @@
 const NewsStacks = require('../models/NewsStacks');
 const RssNews = require('../models/RssNews');
+const NewsStackImages = require('../models/NewsStackImages');
 
 // Tüm haber yığınlarını getir
 exports.getAllNewsStacks = async (req, res) => {
@@ -43,10 +44,20 @@ exports.getAllNewsStacks = async (req, res) => {
 
     const newsStacks = await query;
 
+    // Her stack için resim bilgisini ekle
+    const newsStacksWithImages = await Promise.all(
+      newsStacks.map(async (stack) => {
+        const stackObj = stack.toObject();
+        const image = await NewsStackImages.findOne({ newsStackId: stack._id });
+        stackObj.photoUrl = image ? image.photoUrl : null;
+        return stackObj;
+      })
+    );
+
     res.status(200).json({
       success: true,
-      count: newsStacks.length,
-      data: newsStacks
+      count: newsStacksWithImages.length,
+      data: newsStacksWithImages
     });
   } catch (error) {
     res.status(500).json({
@@ -73,9 +84,14 @@ exports.getNewsStackById = async (req, res) => {
     newsStack.viewCount += 1;
     await newsStack.save();
 
+    // Resim bilgisini ekle
+    const stackObj = newsStack.toObject();
+    const image = await NewsStackImages.findOne({ newsStackId: newsStack._id });
+    stackObj.photoUrl = image ? image.photoUrl : null;
+
     res.status(200).json({
       success: true,
-      data: newsStack
+      data: stackObj
     });
   } catch (error) {
     res.status(500).json({

@@ -4,58 +4,35 @@ Bu proje, MongoDB ve Express.js kullanılarak geliştirilen bir RSS haber API'si
 
 ## İçerik
 
-- [Kurulum](#kurulum)
 - [Yapılandırma](#yapılandırma)
 - [API Güvenliği](#api-güvenliği)
 - [Kullanım](#kullanım)
 - [API Endpoint'leri](#api-endpointleri)
   - [Haber API'leri](#haber-apileri)
   - [Haber Yığınları API'leri](#haber-yığınları-apileri)
+  - [Haber Yığını Resimleri API'leri](#haber-yığını-resimleri-apileri)
 - [API Fonksiyonları ve Kullanımları](#api-fonksiyonları-ve-kullanımları)
 - [Veri Modeli](#veri-modeli)
 - [Filtreleme ve Sınırlama](#filtreleme-ve-sınırlama)
 - [Lisans](#lisans)
 
-## Kurulum
-
-Projeyi çalıştırmak için aşağıdaki adımları izleyin:
-
-1. Projeyi bilgisayarınıza klonlayın:
-
-```
-git clone <repo_url>
-cd aaHackhathon/backend
-```
-
-2. Gerekli paketleri yükleyin:
-
-```
-npm install
-```
-
-3. `.env` dosyasını oluşturun veya düzenleyin:
-
-```
-NODE_ENV=development
-PORT=3000
-MONGO_URI=mongodb://localhost:27017/aahackathon
-API_KEY=your-secret-api-key
-```
-
-4. MongoDB'nin çalıştığından emin olun.
-
-5. Uygulamayı başlatın:
-
-```
-npm start
-```
 
 ## Yapılandırma
 
 Uygulama aşağıdaki yapılandırma dosyalarını kullanır:
 
-- `.env`: Ortam değişkenleri (MongoDB URI, port, ortam, API anahtarı)
+- `.env`: Ortam değişkenleri (MongoDB URI, port, ortam, API anahtarı, Cloudinary bilgileri)
 - `config/db.js`: MongoDB bağlantı ayarları
+- `config/cloudinary.js`: Cloudinary ayarları (görsel yükleme)
+
+Görsel yükleme için gerekli ortam değişkenleri:
+
+```
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+API_KEY=your-secret-api-key
+```
 
 ## API Güvenliği
 
@@ -118,6 +95,21 @@ API'yi kullanmak için aşağıdaki endpoint'lere HTTP istekleri gönderebilirsi
 | `/api/stacks/:id/addNews` | POST | Haber yığınına haber ekle | - |
 | `/api/stacks/:id/removeNews` | POST | Haber yığınından haber çıkar | - |
 
+Not: Haber yığınları GET yanıtlarında, varsa kapak görselinin URL’si `photoUrl` alanı olarak döner; görsel yoksa `null` olur.
+
+#### Haber Yığını Resimleri API'leri
+
+| Endpoint | Metod | Açıklama | Parametreler |
+|----------|-------|----------|-------------|
+| `/api/news-stack-images` | GET | Tüm resimleri listele | `newsStackId`, `limit` |
+| `/api/news-stack-images` | POST | Base64 resim yükle veya varsa güncelle | - |
+| `/api/news-stack-images/:id` | GET | ID'ye göre resim getir | - |
+| `/api/news-stack-images/:id` | PUT | ID'ye göre resim güncelle | - |
+| `/api/news-stack-images/:id` | DELETE | ID'ye göre resim sil | - |
+| `/api/news-stack-images/news/:newsStackId` | GET | NewsStack ID'ye göre resim getir | - |
+| `/api/news-stack-images/news/:newsStackId` | PUT | NewsStack ID'ye göre resim güncelle | - |
+| `/api/news-stack-images/news/:newsStackId` | DELETE | NewsStack ID'ye göre resim sil | - |
+
 ## API Fonksiyonları ve Kullanımları
 
 ### Haber API Fonksiyonları
@@ -138,17 +130,17 @@ GET /api/news
 - `limit`: Dönecek maksimum haber sayısı. Varsayılan olarak limit yok (-1).
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "count": 25,
   "data": [
     {
       "guid": "unique-id-1",
-      "title": "Haber Başlığı",
-      ...diğer alanlar...
-    },
-    ...diğer haberler...
+      "title": "Haber Başlığı"
+      // ...diğer alanlar...
+    }
+    // ...diğer haberler...
   ]
 }
 ```
@@ -165,13 +157,13 @@ GET /api/news/:id
 - `id`: Haberin MongoDB ID'si
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
     "guid": "unique-id-1",
-    "title": "Haber Başlığı",
-    ...diğer alanlar...
+    "title": "Haber Başlığı"
+    // ...diğer alanlar...
   }
 }
 ```
@@ -188,13 +180,13 @@ GET /api/news/guid/:guid
 - `guid`: Haberin benzersiz GUID değeri
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
     "guid": "unique-id-1",
-    "title": "Haber Başlığı",
-    ...diğer alanlar...
+    "title": "Haber Başlığı"
+    // ...diğer alanlar...
   }
 }
 ```
@@ -208,7 +200,7 @@ POST /api/news
 **Açıklama:** Veritabanına yeni bir haber ekler. Aynı GUID ile başka bir haber varsa ekleme yapılmaz.
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "guid": "unique-id-1",
   "link": "https://example.com/news/1",
@@ -220,13 +212,13 @@ POST /api/news
 ```
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
     "guid": "unique-id-1",
-    "title": "Haber Başlığı",
-    ...diğer alanlar...
+    "title": "Haber Başlığı"
+    // ...diğer alanlar...
   }
 }
 ```
@@ -240,7 +232,7 @@ POST /api/news/bulk
 **Açıklama:** Birden fazla haberi tek seferde ekler. Var olan GUID'ler atlanır, sadece yeni GUID'ler eklenir.
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 [
   {
     "guid": "unique-id-1",
@@ -260,7 +252,7 @@ POST /api/news/bulk
 ```
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "results": [
@@ -290,7 +282,7 @@ PUT /api/news/:id
 - `id`: Haberin MongoDB ID'si
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "title": "Güncellenmiş Başlık",
   "description": "Güncellenmiş açıklama",
@@ -299,13 +291,13 @@ PUT /api/news/:id
 ```
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
     "guid": "unique-id-1",
-    "title": "Güncellenmiş Başlık",
-    ...diğer alanlar...
+    "title": "Güncellenmiş Başlık"
+    // ...diğer alanlar...
   }
 }
 ```
@@ -322,7 +314,7 @@ PUT /api/news/guid/:guid
 - `guid`: Haberin benzersiz GUID değeri
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "title": "Güncellenmiş Başlık",
   "description": "Güncellenmiş açıklama",
@@ -331,13 +323,13 @@ PUT /api/news/guid/:guid
 ```
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
     "guid": "unique-id-1",
-    "title": "Güncellenmiş Başlık",
-    ...diğer alanlar...
+    "title": "Güncellenmiş Başlık"
+    // ...diğer alanlar...
   }
 }
 ```
@@ -354,7 +346,7 @@ DELETE /api/news/:id
 - `id`: Haberin MongoDB ID'si
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
@@ -374,7 +366,7 @@ DELETE /api/news/guid/:guid
 - `guid`: Haberin benzersiz GUID değeri
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
@@ -401,7 +393,7 @@ GET /api/stacks
 - `sortOrder`: Sıralama düzeni ("asc" veya "desc"). Varsayılan: "desc"
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "count": 10,
@@ -421,7 +413,8 @@ GET /api/stacks
       "tags": ["politika", "gündem"],
       "isFeatured": false,
       "createdAt": "2023-05-21T14:30:00.000Z",
-      "updatedAt": "2023-05-21T14:30:00.000Z"
+      "updatedAt": "2023-05-21T14:30:00.000Z",
+      "photoUrl": "https://res.cloudinary.com/.../image.jpg"
     }
   ]
 }
@@ -439,7 +432,7 @@ GET /api/stacks/:id
 - `id`: Haber yığınının MongoDB ID'si
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
@@ -462,7 +455,8 @@ GET /api/stacks/:id
     "status": "approved",
     "viewCount": 151,
     "tags": ["politika", "gündem"],
-    "isFeatured": false
+    "isFeatured": false,
+    "photoUrl": "https://res.cloudinary.com/.../image.jpg"
   }
 }
 ```
@@ -476,7 +470,7 @@ POST /api/stacks
 **Açıklama:** Veritabanına yeni bir haber yığını ekler. Haber ID'lerinin geçerli olduğunu kontrol eder.
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "title": "Haber Yığını Başlığı",
   "description": "Haber yığınının açıklaması",
@@ -491,7 +485,7 @@ POST /api/stacks
 ```
 
 **Dönen Değer:**
-```json
+```javascript
 {
   "success": true,
   "data": {
@@ -527,7 +521,7 @@ PUT /api/stacks/:id
 - `id`: Haber yığınının MongoDB ID'si
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "title": "Güncellenmiş Başlık",
   "description": "Güncellenmiş açıklama",
@@ -554,7 +548,7 @@ POST /api/stacks/:id/addNews
 **Açıklama:** Mevcut bir haber yığınına yeni haber ekler.
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "newsId": "609e1e24a12a452a3c4c5e23"
 }
@@ -569,11 +563,172 @@ POST /api/stacks/:id/removeNews
 **Açıklama:** Haber yığınından belirli bir haberi çıkarır.
 
 **Gönderilecek Veri (JSON):**
-```json
+```javascript
 {
   "newsId": "609e1e24a12a452a3c4c5e23"
 }
 ```
+
+### Haber Yığını Resimleri API Fonksiyonları
+
+#### 1. Tüm resimleri getir (`getAllImages`)
+
+```
+GET /api/news-stack-images
+```
+
+**Açıklama:** Haber yığını resimlerini listeleyip, isteğe bağlı filtre ve limit uygular.
+
+**Query Parametreleri:**
+- `newsStackId`: Belirli bir haber yığınının resmini(lerini) filtrelemek için.
+- `limit`: Dönecek maksimum kayıt sayısı. Varsayılan: sınırsız (-1).
+
+**Dönen Değer:**
+```javascript
+{
+  "success": true,
+  "count": 1,
+  "data": [
+    {
+      "_id": "66f0a...",
+      "newsStackId": {
+        "_id": "66f09...",
+        "title": "Stack Başlığı",
+        "description": "Stack açıklaması"
+      },
+      "photoUrl": "https://res.cloudinary.com/.../image.jpg",
+      "cloudinaryPublicId": "newsstacks/newsstack_...",
+      "originalName": "kapak.jpg",
+      "format": "jpg",
+      "width": 1200,
+      "height": 630,
+      "bytes": 120345,
+      "createdAt": "2025-10-02T12:00:00.000Z",
+      "updatedAt": "2025-10-02T12:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### 2. ID'ye göre resim getir (`getImageById`)
+
+```
+GET /api/news-stack-images/:id
+```
+
+**Açıklama:** ID'ye göre tek bir resmi getirir.
+
+**Dönen Değer:**
+```javascript
+{
+  "success": true,
+  "data": {
+    "_id": "66f0a...",
+    "newsStackId": {
+      "_id": "66f09...",
+      "title": "Stack Başlığı",
+      "description": "Stack açıklaması"
+    },
+    "photoUrl": "https://res.cloudinary.com/.../image.jpg",
+    "cloudinaryPublicId": "newsstacks/newsstack_...",
+    "originalName": "kapak.jpg",
+    "format": "jpg",
+    "width": 1200,
+    "height": 630,
+    "bytes": 120345
+  }
+}
+```
+
+#### 3. NewsStack ID'ye göre resim getir (`getImageByNewsStackId`)
+
+```
+GET /api/news-stack-images/news/:newsStackId
+```
+
+**Açıklama:** Belirli bir haber yığınına ait resmi getirir.
+
+#### 4. Base64 resim yükle veya güncelle (`createOrUpdateImage`)
+
+```
+POST /api/news-stack-images
+```
+
+**Açıklama:** Gönderilen Base64 resmi Cloudinary'ye yükler ve ilgili haber yığını ile ilişkilendirir. Aynı `newsStackId` için kayıt varsa günceller. Başarı durumunda yeni kayıt için 201, güncelleme için 200 döner.
+
+**Gönderilecek Veri (JSON):**
+```javascript
+{
+  "newsStackId": "66f09...", 
+  "photo": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABA...",
+  "originalName": "kapak.jpg"
+}
+```
+
+**Dönen Değer:**
+```javascript
+{
+  "success": true,
+  "message": "Resim başarıyla yüklendi",
+  "data": {
+    "_id": "66f0a...",
+    "newsStackId": {
+      "_id": "66f09...",
+      "title": "Stack Başlığı",
+      "description": "Stack açıklaması"
+    },
+    "photoUrl": "https://res.cloudinary.com/.../image.jpg",
+    "cloudinaryPublicId": "newsstacks/newsstack_...",
+    "originalName": "kapak.jpg",
+    "format": "jpg",
+    "width": 1200,
+    "height": 630,
+    "bytes": 120345
+  }
+}
+```
+
+> Not: Bu endpoint yazma işlemidir; `x-api-key` header'ı gerektirir.
+
+#### 5. ID'ye göre resim güncelle (`updateImageById`)
+
+```
+PUT /api/news-stack-images/:id
+```
+
+**Açıklama:** Mevcut kaydı yeni Base64 görselle günceller veya sadece `originalName` alanını değiştirebilir.
+
+**Gönderilecek Veri (JSON) (örnek):**
+```javascript
+{
+  "photo": "data:image/png;base64,iVBORw0KGgo...",
+  "originalName": "guncel.png"
+}
+```
+
+#### 6. NewsStack ID'ye göre resim güncelle (`updateImageByNewsStackId`)
+
+```
+PUT /api/news-stack-images/news/:newsStackId
+```
+
+**Açıklama:** Belirtilen `newsStackId` kaydını günceller.
+
+#### 7. ID'ye göre resim sil (`deleteImageById`)
+
+```
+DELETE /api/news-stack-images/:id
+```
+
+**Açıklama:** Kaydı veritabanından ve görseli Cloudinary'den siler.
+
+#### 8. NewsStack ID'ye göre resim sil (`deleteImageByNewsStackId`)
+
+```
+DELETE /api/news-stack-images/news/:newsStackId
+```
+
+**Açıklama:** Belirtilen haber yığınına ait görseli ve kaydı siler.
 
 ## Veri Modeli
 
@@ -614,6 +769,23 @@ POST /api/stacks/:id/removeNews
   isFeatured: Boolean,     // Öne çıkarılma durumu (varsayılan: false)
   createdAt: Date,         // Oluşturulma zamanı (otomatik oluşturulur)
   updatedAt: Date          // Güncellenme zamanı (otomatik güncellenir)
+}
+```
+
+### Haber Yığını Resim Modeli (NewsStackImages)
+
+```javascript
+{
+  newsStackId: ObjectId,      // NewsStacks tablosuna referans (benzersiz & zorunlu)
+  cloudinaryPublicId: String, // Cloudinary'de dosyanın public_id değeri (zorunlu)
+  photoUrl: String,           // Yüklenen görselin erişim URL'si (zorunlu)
+  originalName: String,       // İsteğe bağlı orijinal dosya adı
+  format: String,             // Görsel formatı (jpg, png, webp ...)
+  width: Number,              // Genişlik (px)
+  height: Number,             // Yükseklik (px)
+  bytes: Number,              // Dosya boyutu (byte)
+  createdAt: Date,            // Otomatik
+  updatedAt: Date             // Otomatik
 }
 ```
 

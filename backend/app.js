@@ -18,6 +18,7 @@ const apiKeyAuth = require('./middleware/apiKeyAuth');
 var indexRouter = require('./routes/index');
 var rssNewsRouter = require('./routes/rssNews');
 var newsStacksRouter = require('./routes/newsStacks');
+var newsStackImagesRouter = require('./routes/newsStackImages');
 
 var app = express();
 
@@ -26,8 +27,8 @@ var app = express();
 // app.set('view engine', 'pug');
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' })); // Base64 resimler için limiti artırdık
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 
@@ -39,6 +40,16 @@ app.use('/api/news', apiKeyAuth, rssNewsRouter);
 
 // Haber yığınları API'leri için API anahtarı doğrulama middleware'ini ekle
 app.use('/api/stacks', apiKeyAuth, newsStacksRouter);
+
+// Haber yığını resimleri API'leri - okuma işlemleri serbest, yazma işlemleri API key gerektirir
+app.use('/api/news-stack-images', (req, res, next) => {
+  // GET istekleri için API key kontrolü yapma
+  if (req.method === 'GET') {
+    return next();
+  }
+  // POST, PUT, DELETE için API key kontrolü yap
+  return apiKeyAuth(req, res, next);
+}, newsStackImagesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
