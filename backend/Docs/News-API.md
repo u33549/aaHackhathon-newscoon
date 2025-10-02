@@ -4,6 +4,7 @@ Bu doküman Haber API'sinin tüm fonksiyonlarını detaylı olarak açıklar.
 
 ## İçindekiler
 
+- [Parametre İsimlendirme Sözleşmesi](#parametre-isimlendirme-sözleşmesi)
 - [1. Tüm Haberleri Getir](#1-tüm-haberleri-getir)
 - [2. ID'ye Göre Haber Getir](#2-idye-göre-haber-getir)
 - [3. GUID'ye Göre Haber Getir](#3-guidye-göre-haber-getir)
@@ -13,6 +14,13 @@ Bu doküman Haber API'sinin tüm fonksiyonlarını detaylı olarak açıklar.
 - [7. Haber Güncelle (GUID ile)](#7-haber-güncelle-guid-ile)
 - [8. Haber Sil (ID ile)](#8-haber-sil-id-ile)
 - [9. Haber Sil (GUID ile)](#9-haber-sil-guid-ile)
+
+---
+
+## Parametre İsimlendirme Sözleşmesi
+
+- id (newsId): RssNews belgesinin MongoDB ObjectId değeri
+- guid (newsGuid): RssNews benzersiz GUID değeri
 
 ---
 
@@ -39,6 +47,22 @@ GET /api/news?isInAnyStack=false
 GET /api/news?category=gundem&limit=5&isUsable=true
 ```
 
+Örnek Yanıt (kısaltılmış):
+```json
+{
+  "success": true,
+  "count": 10,
+  "data": [
+    {
+      "_id": "<newsId>",
+      "guid": "<newsGuid>",
+      "title": "HABER_BASLIGI",
+      "category": "gundem"
+    }
+  ]
+}
+```
+
 ---
 
 ## 2. ID'ye Göre Haber Getir
@@ -48,11 +72,23 @@ GET /api/news/:id
 ```
 
 URL Parametreleri:
-- id: MongoDB ObjectId
+- id (newsId): Haberin MongoDB ObjectId değeri
 
 Örnek:
 ```bash
 GET /api/news/609e1e24a12a452a3c4c5e20
+```
+
+Örnek Yanıt (kısaltılmış):
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "609e1e24a12a452a3c4c5e20",
+    "guid": "breaking-news-2023-001",
+    "title": "HABER_BASLIGI"
+  }
+}
 ```
 
 ---
@@ -64,11 +100,23 @@ GET /api/news/guid/:guid
 ```
 
 URL Parametreleri:
-- guid: String GUID
+- guid (newsGuid): Haberin benzersiz GUID değeri
 
 Örnek:
 ```bash
 GET /api/news/guid/unique-news-identifier-12345
+```
+
+Örnek Yanıt (kısaltılmış):
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "609e1e24a12a452a3c4c5e20",
+    "guid": "unique-news-identifier-12345",
+    "title": "HABER_BASLIGI"
+  }
+}
 ```
 
 ---
@@ -85,7 +133,7 @@ Header:
 Gövde:
 ```json
 {
-  "guid": "BENZERSIZ_HABER_ID",
+  "guid": "BENZERSIZ_HABER_GUID",
   "link": "HABER_URL",
   "title": "HABER_BASLIGI",
   "description": "HABER_ACIKLAMASI",
@@ -94,7 +142,7 @@ Gövde:
   "category": "HABER_KATEGORISI"
 }
 ```
-Örnek:
+Örnek İstek (curl):
 ```bash
 curl -X POST "http://localhost:3000/api/news" \
   -H "Content-Type: application/json" \
@@ -108,6 +156,18 @@ curl -X POST "http://localhost:3000/api/news" \
     "image": "https://example.com/images/economic-package.jpg",
     "category": "ekonomi"
   }'
+```
+
+Örnek Yanıt (kısaltılmış):
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "<newsId>",
+    "guid": "breaking-news-2023-001",
+    "title": "Önemli Gelişme: Yeni Ekonomik Paket Açıklandı"
+  }
+}
 ```
 
 ---
@@ -129,6 +189,17 @@ Gövde (dizi):
 ]
 ```
 
+Örnek Yanıt:
+```json
+{
+  "success": true,
+  "results": [
+    { "guid": "HABER_1_GUID", "status": "created", "id": "<newsId>" },
+    { "guid": "HABER_2_GUID", "status": "skipped", "message": "Bu GUID ile daha önce bir haber kaydedilmiş" }
+  ]
+}
+```
+
 ---
 
 ## 6. Haber Güncelle (ID ile)
@@ -141,11 +212,11 @@ Header:
 - x-api-key: YOUR_API_KEY
 
 URL Parametreleri:
-- id: MongoDB ObjectId
+- id (newsId): Haberin MongoDB ObjectId değeri
 
 Gövde (opsiyonel alanlar): title, description, link, image, category, isInAnyStack, isUsable
 
-Örnek:
+Örnek İstek (curl):
 ```bash
 curl -X PUT "http://localhost:3000/api/news/609e1e24a12a452a3c4c5e20" \
   -H "Content-Type: application/json" \
@@ -155,6 +226,17 @@ curl -X PUT "http://localhost:3000/api/news/609e1e24a12a452a3c4c5e20" \
     "description": "Tüm detaylar açıklandı.",
     "isInAnyStack": true
   }'
+```
+
+Örnek Yanıt (kısaltılmış):
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "609e1e24a12a452a3c4c5e20",
+    "title": "Güncellendi: Ekonomik Paket Detayları Netleşti"
+  }
+}
 ```
 
 ---
@@ -169,9 +251,20 @@ Header:
 - x-api-key: YOUR_API_KEY
 
 URL Parametreleri:
-- guid: String GUID
+- guid (newsGuid): Haberin benzersiz GUID değeri
 
 Gövde: 6. madde ile aynı
+
+Örnek Yanıt (kısaltılmış):
+```json
+{
+  "success": true,
+  "data": {
+    "guid": "breaking-news-2023-001",
+    "title": "Son Durum: Ekonomik Paket Onaylandı"
+  }
+}
+```
 
 ---
 
@@ -185,7 +278,16 @@ Header:
 - x-api-key: YOUR_API_KEY
 
 URL Parametreleri:
-- id: MongoDB ObjectId
+- id (newsId): Haberin MongoDB ObjectId değeri
+
+Örnek Yanıt:
+```json
+{
+  "success": true,
+  "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
+  "data": {}
+}
+```
 
 ---
 
@@ -199,5 +301,6 @@ Header:
 - x-api-key: YOUR_API_KEY
 
 URL Parametreleri:
-- guid: String GUID
+- guid (newsGuid): Haberin benzersiz GUID değeri
 
+Örnek Yanıt: 8. madde ile aynı

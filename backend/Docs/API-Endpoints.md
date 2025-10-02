@@ -4,12 +4,23 @@ Tüm endpoint'lerin hızlı referansı ve örnek filtreler.
 
 ## İçindekiler
 
+- [Parametre İsimlendirme Sözleşmesi](#parametre-isimlendirme-sözleşmesi)
 - [Haber API'leri](#haber-apileri)
 - [Haber Yığınları API'leri](#haber-yığınları-apileri)
 - [Haber Yığını Resimleri API'leri](#haber-yığını-resimleri-apileri)
 - [Filtreleme ve Query Parametreleri](#filtreleme-ve-query-parametreleri)
   - [Haber Filtreleme](#haber-filtreleme)
   - [Haber Yığınları Filtreleme](#haber-yığınları-filtreleme)
+
+## Parametre İsimlendirme Sözleşmesi
+
+- id (newsId): RssNews belgesinin MongoDB ObjectId değeri
+- id (stackId): NewsStacks belgesinin MongoDB ObjectId değeri
+- id (imageId): NewsStackImages belgesinin MongoDB ObjectId değeri
+- guid (newsGuid): RssNews benzersiz GUID değeri
+- newsStackId (stackId): NewsStacks MongoDB ObjectId değeri
+
+Not: Hızlı referans tablosu sadece endpoint kapsamını gösterir; parametrelerin ayrıntılı açıklaması ve örnekler için ilgili detay dokümanlarına bakın (Docs klasörü).
 
 ## Haber API'leri
 
@@ -18,12 +29,12 @@ Tüm endpoint'lerin hızlı referansı ve örnek filtreler.
 | `/api/news` | GET | Tüm haberleri listele | `pubDate`, `isInAnyStack`, `isUsable`, `category`, `limit` |
 | `/api/news` | POST | Yeni haber ekle | - |
 | `/api/news/bulk` | POST | Toplu haber ekle | - |
-| `/api/news/:id` | GET | ID'ye göre haber getir | - |
-| `/api/news/:id` | PUT | ID'ye göre haber güncelle | - |
-| `/api/news/:id` | DELETE | ID'ye göre haber sil | - |
-| `/api/news/guid/:guid` | GET | GUID'ye göre haber getir | - |
-| `/api/news/guid/:guid` | PUT | GUID'ye göre haber güncelle | - |
-| `/api/news/guid/:guid` | DELETE | GUID'ye göre haber sil | - |
+| `/api/news/:id` | GET | ID'ye (newsId) göre haber getir | - |
+| `/api/news/:id` | PUT | ID'ye (newsId) göre haber güncelle | - |
+| `/api/news/:id` | DELETE | ID'ye (newsId) göre haber sil | - |
+| `/api/news/guid/:guid` | GET | GUID'ye (newsGuid) göre haber getir | - |
+| `/api/news/guid/:guid` | PUT | GUID'ye (newsGuid) göre haber güncelle | - |
+| `/api/news/guid/:guid` | DELETE | GUID'ye (newsGuid) göre haber sil | - |
 
 ## Haber Yığınları API'leri
 
@@ -31,26 +42,26 @@ Tüm endpoint'lerin hızlı referansı ve örnek filtreler.
 |----------|-------|----------|-------------|
 | `/api/stacks` | GET | Tüm haber yığınlarını listele | `status`, `isFeatured`, `tags`, `limit`, `sortBy`, `sortOrder` |
 | `/api/stacks` | POST | Yeni haber yığını ekle | - |
-| `/api/stacks/:id` | GET | ID'ye göre haber yığını getir | - |
-| `/api/stacks/:id` | PUT | ID'ye göre haber yığını güncelle | - |
-| `/api/stacks/:id` | DELETE | ID'ye göre haber yığını sil | - |
-| `/api/stacks/:id/addNews` | POST | Haber yığınına haber ekle | - |
-| `/api/stacks/:id/removeNews` | POST | Haber yığınından haber çıkar | - |
+| `/api/stacks/:id` | GET | ID'ye (stackId) göre haber yığını getir | - |
+| `/api/stacks/:id` | PUT | ID'ye (stackId) göre haber yığını güncelle | - |
+| `/api/stacks/:id` | DELETE | ID'ye (stackId) göre haber yığını sil | - |
+| `/api/stacks/:id/addNews` | POST | Haber yığınına haber ekle (stackId + newsId) | - |
+| `/api/stacks/:id/removeNews` | POST | Haber yığınından haber çıkar (stackId + newsId) | - |
 
-> Not: Haber yığınları GET yanıtlarında, varsa kapak görselinin URL’si `photoUrl` alanı olarak döner; görsel yoksa `null` olur.
+> Not: Haber yığınları GET yanıtlarında, varsa kapak görselinin URL'si `photoUrl` alanı olarak döner; görsel yoksa `null` olur.
 
 ## Haber Yığını Resimleri API'leri
 
 | Endpoint | Metod | Açıklama | Parametreler |
 |----------|-------|----------|-------------|
 | `/api/news-stack-images` | GET | Tüm resimleri listele | `newsStackId`, `limit` |
-| `/api/news-stack-images` | POST | Base64 resim yükle veya varsa güncelle | - |
-| `/api/news-stack-images/:id` | GET | ID'ye göre resim getir | - |
-| `/api/news-stack-images/:id` | PUT | ID'ye göre resim güncelle | - |
-| `/api/news-stack-images/:id` | DELETE | ID'ye göre resim sil | - |
-| `/api/news-stack-images/news/:newsStackId` | GET | NewsStack ID'ye göre resim getir | - |
-| `/api/news-stack-images/news/:newsStackId` | PUT | NewsStack ID'ye göre resim güncelle | - |
-| `/api/news-stack-images/news/:newsStackId` | DELETE | NewsStack ID'ye göre resim sil | - |
+| `/api/news-stack-images` | POST | Base64 resim yükle veya varsa güncelle (newsStackId) | - |
+| `/api/news-stack-images/:id` | GET | ID'ye (imageId) göre resim getir | - |
+| `/api/news-stack-images/:id` | PUT | ID'ye (imageId) göre resim güncelle | - |
+| `/api/news-stack-images/:id` | DELETE | ID'ye (imageId) göre resim sil | - |
+| `/api/news-stack-images/news/:newsStackId` | GET | NewsStack ID'ye (stackId) göre resim getir | - |
+| `/api/news-stack-images/news/:newsStackId` | PUT | NewsStack ID'ye (stackId) göre resim güncelle | - |
+| `/api/news-stack-images/news/:newsStackId` | DELETE | NewsStack ID'ye (stackId) göre resim sil | - |
 
 ## Filtreleme ve Query Parametreleri
 
