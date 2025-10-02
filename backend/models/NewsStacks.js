@@ -32,6 +32,10 @@ const newsStacksSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
+  },
+  isPhotoUpToDate: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

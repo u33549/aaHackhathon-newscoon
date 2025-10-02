@@ -12,7 +12,13 @@ Bu proje, MongoDB ve Express.js kullanılarak geliştirilen bir RSS haber API'si
   - [Haber Yığınları API'leri](#haber-yığınları-apileri)
   - [Haber Yığını Resimleri API'leri](#haber-yığını-resimleri-apileri)
 - [API Fonksiyonları ve Kullanımları](#api-fonksiyonları-ve-kullanımları)
+  - [Haber API Fonksiyonları](#haber-api-fonksiyonları)
+  - [Haber Yığınları API Fonksiyonları](#haber-yığınları-api-fonksiyonları)
+  - [Haber Yığını Resimleri API Fonksiyonları](#haber-yığını-resimleri-api-fonksiyonları)
 - [Veri Modeli](#veri-modeli)
+  - [RSS Haber Modeli](#rss-haber-modeli)
+  - [Haber Yığını Modeli (NewsStacks)](#haber-yığını-modeli-newsstacks)
+  - [Haber Yığını Resim Modeli (NewsStackImages)](#haber-yığını-resim-modeli-newsstackimages)
 - [Filtreleme ve Sınırlama](#filtreleme-ve-sınırlama)
 - [Lisans](#lisans)
 
@@ -41,27 +47,6 @@ Bu API, okuma ve yazma işlemleri için farklı yetkilendirme düzeyleri uygular
 - **Okuma İşlemleri (GET)**: Herkes tarafından erişilebilir. Kimlik doğrulama gerekmez.
 - **Yazma İşlemleri (POST, PUT, DELETE)**: Sadece geçerli API anahtarına sahip kullanıcılar tarafından erişilebilir.
 
-### API Anahtarı Kullanımı
-
-Yazma işlemleri için isteklerinize `x-api-key` header'ı eklemeniz gerekmektedir:
-
-```
-x-api-key: your-secret-api-key
-```
-
-Örnek (cURL ile):
-
-```bash
-# GET isteği - API anahtarı gerekmez
-curl http://localhost:3000/api/news
-
-# POST isteği - API anahtarı gerekir
-curl -X POST \
-  http://localhost:3000/api/news \
-  -H 'Content-Type: application/json' \
-  -H 'x-api-key: your-secret-api-key' \
-  -d '{"guid": "unique-id", "title": "Haber Başlığı", ...}'
-```
 
 ## Kullanım
 
@@ -767,10 +752,37 @@ DELETE /api/news-stack-images/news/:newsStackId
   viewCount: Number,       // Görüntülenme sayısı (varsayılan: 0)
   tags: [String],          // Etiketler (opsiyonel)
   isFeatured: Boolean,     // Öne çıkarılma durumu (varsayılan: false)
+  isPhotoUpToDate: Boolean, // Fotoğrafın güncel olup olmadığı (varsayılan: false)
   createdAt: Date,         // Oluşturulma zamanı (otomatik oluşturulur)
   updatedAt: Date          // Güncellenme zamanı (otomatik güncellenir)
 }
 ```
+
+#### Fotoğraf Güncelleme Sistemi
+
+API, haber yığınları için fotoğraf güncelleme durumunu takip eden bir sistem kullanır:
+
+##### `isPhotoUpToDate` Alanı
+
+Her haber yığında (`NewsStacks`) `isPhotoUpToDate` adında bir Boolean alan bulunur. Bu alan fotoğrafın haber içeriğine göre güncel olup olmadığını takip eder:
+
+- **Varsayılan Değer**: `false` (yeni oluşturulan haber yığınları için)
+- **`true` Olma Durumları**:
+    - Haber yığını için yeni fotoğraf yüklendiğinde
+    - Mevcut fotoğraf güncellendiğinde
+- **`false` Olma Durumları**:
+    - Haber yığınına yeni haber eklendiğinde
+    - Haber yığınından haber çıkarıldığında
+    - Haber yığınının haber listesi güncellendiğinde
+
+##### İş Akışı
+
+1. **Yeni Haber Yığını Oluşturma**: `isPhotoUpToDate = false`
+2. **Fotoğraf Yükleme/Güncelleme**: `isPhotoUpToDate = true`
+3. **Haber Ekleme/Çıkarma**: `isPhotoUpToDate = false`
+
+Bu sistem sayesinde hangi haber yığınlarının fotoğraflarının güncellenmesi gerektiğini kolayca takip edebilirsiniz.
+
 
 ### Haber Yığını Resim Modeli (NewsStackImages)
 

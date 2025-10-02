@@ -188,6 +188,9 @@ exports.updateNewsStack = async (req, res) => {
           { isInAnyStack: true }
         );
       }
+
+      // Haber listesi değiştiği için fotoğraf güncelliği durumunu false yap
+      req.body.isPhotoUpToDate = false;
     }
 
     const updatedNewsStack = await NewsStacks.findByIdAndUpdate(
@@ -277,6 +280,8 @@ exports.addNewsToStack = async (req, res) => {
     }
 
     newsStack.news.push(newsId);
+    // Yeni haber eklendiği için fotoğraf güncelliği durumunu false yap
+    newsStack.isPhotoUpToDate = false;
     await newsStack.save();
 
     // Haberin isInAnyStack durumunu güncelle
@@ -319,6 +324,8 @@ exports.removeNewsFromStack = async (req, res) => {
     }
 
     newsStack.news.pull(newsId);
+    // Haber çıkarıldığı için fotoğraf güncelliği durumunu false yap
+    newsStack.isPhotoUpToDate = false;
     await newsStack.save();
 
     // Bu haberin başka stacklerde olup olmadığını kontrol et

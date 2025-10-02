@@ -156,6 +156,9 @@ const createOrUpdateImage = async (req, res) => {
         .populate('newsStackId', 'title description');
     }
 
+    // Fotoğraf yüklendiği/güncellendiği için NewsStack'teki isPhotoUpToDate'i true yap
+    await NewsStacks.findByIdAndUpdate(newsStackId, { isPhotoUpToDate: true });
+
     res.status(existingImage ? 200 : 201).json({
       success: true,
       message: existingImage ? 'Resim başarıyla güncellendi' : 'Resim başarıyla yüklendi',
@@ -212,6 +215,9 @@ const updateImageById = async (req, res) => {
         height: uploadResult.height,
         bytes: uploadResult.bytes
       };
+
+      // Fotoğraf güncellendiği için NewsStack'teki isPhotoUpToDate'i true yap
+      await NewsStacks.findByIdAndUpdate(existingImage.newsStackId, { isPhotoUpToDate: true });
     }
 
     if (originalName) {
@@ -280,6 +286,9 @@ const updateImageByNewsStackId = async (req, res) => {
         height: uploadResult.height,
         bytes: uploadResult.bytes
       };
+
+      // Fotoğraf güncellendiği için NewsStack'teki isPhotoUpToDate'i true yap
+      await NewsStacks.findByIdAndUpdate(req.params.newsStackId, { isPhotoUpToDate: true });
     }
 
     if (originalName) {
