@@ -16,12 +16,9 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:latest
+    image: mongo:6.0
     ports:
       - "27017:27017"
     volumes:
-      - mongodb_data:/data/db
+      - ./mongo_data:/data/db
     restart: unless-stopped
-
-volumes:
-  mongodb_data:
