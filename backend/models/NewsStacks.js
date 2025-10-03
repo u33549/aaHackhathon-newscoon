@@ -12,7 +12,7 @@ const newsStacksSchema = new mongoose.Schema({
     trim: true
   },
   news: [{
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'RssNews'
   }],
   status: {

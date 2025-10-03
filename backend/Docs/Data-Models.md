@@ -17,7 +17,8 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 
 ```javascript
 {
-  guid: String,            // Benzersiz tanımlayıcı (zorunlu)
+  _id: String,             // guid değeriyle otomatik doldurulur (primary key)
+  guid: String,            // Benzersiz tanımlayıcı (zorunlu, unique, index)
   isPermaLink: String,     // "true" | "false" (varsayılan: "false")
   link: String,            // Haberin URL'i (zorunlu)
   title: String,           // Başlık (zorunlu)
@@ -32,6 +33,8 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 }
 ```
 
+**Not:** RssNews artık `guid` alanını primary key olarak kullanır. Tüm CRUD işlemleri GUID üzerinden yapılır.
+
 ---
 
 ## Haber Yığını Modeli (NewsStacks)
@@ -40,9 +43,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 {
   title: String,           // Yığın başlığı (zorunlu)
   description: String,     // Açıklama (opsiyonel)
-  news: [                  // Haber referansları
-    { id: ObjectId, guid: String }
-  ],
+  news: [String],          // Haber GUID referansları
   status: String,          // "pending" | "approved" | "rejected" (varsayılan: "pending")
   viewCount: Number,       // Varsayılan: 0
   tags: [String],          // Opsiyonel
@@ -83,7 +84,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 
 ## İlişkiler
 
-- RssNews ↔ NewsStacks: Çoktan çoğa (NewsStacks.news dizisi üzerinden)
+- RssNews ↔ NewsStacks: Çoktan çoğa (NewsStacks.news dizisi GUID referansları üzerinden)
 - NewsStacks ↔ NewsStackImages: Bire bir (her yığının tek kapağı olur)
 
 ---
@@ -93,7 +94,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 ### Haber (RssNews)
 ```json
 {
-  "_id": "609e1e24a12a452a3c4c5e20",
+  "_id": "aa-news-20231002-001",
   "guid": "aa-news-20231002-001",
   "isPermaLink": "false",
   "link": "https://example.com/news/ekonomi-paketi",
@@ -114,8 +115,8 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   "title": "Gündem: Ekonomik Gelişmeler",
   "description": "Bu hafta yaşanan gelişmeler",
   "news": [
-    { "id": "609e1e24a12a452a3c4c5e20", "guid": "aa-news-20231002-001" },
-    { "id": "609e1e24a12a452a3c4c5e21", "guid": "aa-news-20231002-002" }
+    "aa-news-20231002-001",
+    "aa-news-20231002-002"
   ],
   "status": "approved",
   "viewCount": 142,

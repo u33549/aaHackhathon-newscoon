@@ -14,10 +14,9 @@ Tüm endpoint'lerin hızlı referansı ve örnek filtreler.
 
 ## Parametre İsimlendirme Sözleşmesi
 
-- id (newsId): RssNews belgesinin MongoDB ObjectId değeri
+- guid (newsGuid): RssNews belgesinin benzersiz GUID değeri (primary key)
 - id (stackId): NewsStacks belgesinin MongoDB ObjectId değeri
 - id (imageId): NewsStackImages belgesinin MongoDB ObjectId değeri
-- guid (newsGuid): RssNews benzersiz GUID değeri
 - newsStackId (stackId): NewsStacks MongoDB ObjectId değeri
 
 Not: Hızlı referans tablosu sadece endpoint kapsamını gösterir; parametrelerin ayrıntılı açıklaması ve örnekler için ilgili detay dokümanlarına bakın (Docs klasörü).
@@ -29,9 +28,6 @@ Not: Hızlı referans tablosu sadece endpoint kapsamını gösterir; parametrele
 | `/api/news` | GET | Tüm haberleri listele | `pubDate`, `isInAnyStack`, `isUsable`, `category`, `limit` |
 | `/api/news` | POST | Yeni haber ekle | - |
 | `/api/news/bulk` | POST | Toplu haber ekle | - |
-| `/api/news/:id` | GET | ID'ye (newsId) göre haber getir | - |
-| `/api/news/:id` | PUT | ID'ye (newsId) göre haber güncelle | - |
-| `/api/news/:id` | DELETE | ID'ye (newsId) göre haber sil | - |
 | `/api/news/guid/:guid` | GET | GUID'ye (newsGuid) göre haber getir | - |
 | `/api/news/guid/:guid` | PUT | GUID'ye (newsGuid) göre haber güncelle | - |
 | `/api/news/guid/:guid` | DELETE | GUID'ye (newsGuid) göre haber sil | - |
@@ -45,8 +41,8 @@ Not: Hızlı referans tablosu sadece endpoint kapsamını gösterir; parametrele
 | `/api/stacks/:id` | GET | ID'ye (stackId) göre haber yığını getir | - |
 | `/api/stacks/:id` | PUT | ID'ye (stackId) göre haber yığını güncelle | - |
 | `/api/stacks/:id` | DELETE | ID'ye (stackId) göre haber yığını sil | - |
-| `/api/stacks/:id/addNews` | POST | Haber yığınına haber ekle (stackId + newsId) | - |
-| `/api/stacks/:id/removeNews` | POST | Haber yığınından haber çıkar (stackId + newsId) | - |
+| `/api/stacks/:id/addNews` | POST | Haber yığınına haber ekle (stackId + newsGuid) | - |
+| `/api/stacks/:id/removeNews` | POST | Haber yığınından haber çıkar (stackId + newsGuid) | - |
 
 > Not: Haber yığınları GET yanıtlarında, varsa kapak görselinin URL'si `photoUrl` alanı olarak döner; görsel yoksa `null` olur.
 

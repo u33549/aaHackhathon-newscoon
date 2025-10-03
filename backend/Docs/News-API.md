@@ -6,21 +6,17 @@ Bu doküman Haber API'sinin tüm fonksiyonlarını detaylı olarak açıklar.
 
 - [Parametre İsimlendirme Sözleşmesi](#parametre-isimlendirme-sözleşmesi)
 - [1. Tüm Haberleri Getir](#1-tüm-haberleri-getir)
-- [2. ID'ye Göre Haber Getir](#2-idye-göre-haber-getir)
-- [3. GUID'ye Göre Haber Getir](#3-guidye-göre-haber-getir)
-- [4. Yeni Haber Oluştur](#4-yeni-haber-oluştur)
-- [5. Toplu Haber Oluştur](#5-toplu-haber-oluştur)
-- [6. Haber Güncelle (ID ile)](#6-haber-güncelle-id-ile)
-- [7. Haber Güncelle (GUID ile)](#7-haber-güncelle-guid-ile)
-- [8. Haber Sil (ID ile)](#8-haber-sil-id-ile)
-- [9. Haber Sil (GUID ile)](#9-haber-sil-guid-ile)
+- [2. GUID'ye Göre Haber Getir](#2-guidye-göre-haber-getir)
+- [3. Yeni Haber Oluştur](#3-yeni-haber-oluştur)
+- [4. Toplu Haber Oluştur](#4-toplu-haber-oluştur)
+- [5. Haber Güncelle (GUID ile)](#5-haber-güncelle-guid-ile)
+- [6. Haber Sil (GUID ile)](#6-haber-sil-guid-ile)
 
 ---
 
 ## Parametre İsimlendirme Sözleşmesi
 
-- id (newsId): RssNews belgesinin MongoDB ObjectId değeri
-- guid (newsGuid): RssNews benzersiz GUID değeri
+- guid (newsGuid): RssNews belgesinin benzersiz GUID değeri (primary key)
 
 ---
 
@@ -54,8 +50,8 @@ GET /api/news?category=gundem&limit=5&isUsable=true
   "count": 10,
   "data": [
     {
-      "_id": "<newsId>",
-      "guid": "<newsGuid>",
+      "_id": "aa-news-20231002-001",
+      "guid": "aa-news-20231002-001",
       "title": "HABER_BASLIGI",
       "category": "gundem"
     }
@@ -65,35 +61,7 @@ GET /api/news?category=gundem&limit=5&isUsable=true
 
 ---
 
-## 2. ID'ye Göre Haber Getir
-
-```http
-GET /api/news/:id
-```
-
-URL Parametreleri:
-- id (newsId): Haberin MongoDB ObjectId değeri
-
-Örnek:
-```bash
-GET /api/news/609e1e24a12a452a3c4c5e20
-```
-
-Örnek Yanıt (kısaltılmış):
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "609e1e24a12a452a3c4c5e20",
-    "guid": "breaking-news-2023-001",
-    "title": "HABER_BASLIGI"
-  }
-}
-```
-
----
-
-## 3. GUID'ye Göre Haber Getir
+## 2. GUID'ye Göre Haber Getir
 
 ```http
 GET /api/news/guid/:guid
@@ -112,7 +80,7 @@ GET /api/news/guid/unique-news-identifier-12345
 {
   "success": true,
   "data": {
-    "_id": "609e1e24a12a452a3c4c5e20",
+    "_id": "unique-news-identifier-12345",
     "guid": "unique-news-identifier-12345",
     "title": "HABER_BASLIGI"
   }
@@ -121,7 +89,7 @@ GET /api/news/guid/unique-news-identifier-12345
 
 ---
 
-## 4. Yeni Haber Oluştur
+## 3. Yeni Haber Oluştur
 
 ```http
 POST /api/news
@@ -142,6 +110,9 @@ Gövde:
   "category": "HABER_KATEGORISI"
 }
 ```
+
+**Not:** `guid` alanı zorunludur ve benzersiz olmalıdır.
+
 Örnek İstek (curl):
 ```bash
 curl -X POST "http://localhost:3000/api/news" \
@@ -163,7 +134,7 @@ curl -X POST "http://localhost:3000/api/news" \
 {
   "success": true,
   "data": {
-    "_id": "<newsId>",
+    "_id": "breaking-news-2023-001",
     "guid": "breaking-news-2023-001",
     "title": "Önemli Gelişme: Yeni Ekonomik Paket Açıklandı"
   }
@@ -172,7 +143,7 @@ curl -X POST "http://localhost:3000/api/news" \
 
 ---
 
-## 5. Toplu Haber Oluştur
+## 4. Toplu Haber Oluştur
 
 ```http
 POST /api/news/bulk
@@ -194,7 +165,7 @@ Gövde (dizi):
 {
   "success": true,
   "results": [
-    { "guid": "HABER_1_GUID", "status": "created", "id": "<newsId>" },
+    { "guid": "HABER_1_GUID", "status": "created", "id": "HABER_1_GUID" },
     { "guid": "HABER_2_GUID", "status": "skipped", "message": "Bu GUID ile daha önce bir haber kaydedilmiş" }
   ]
 }
@@ -202,23 +173,23 @@ Gövde (dizi):
 
 ---
 
-## 6. Haber Güncelle (ID ile)
+## 5. Haber Güncelle (GUID ile)
 
 ```http
-PUT /api/news/:id
+PUT /api/news/guid/:guid
 ```
 
 Header:
 - x-api-key: YOUR_API_KEY
 
 URL Parametreleri:
-- id (newsId): Haberin MongoDB ObjectId değeri
+- guid (newsGuid): Haberin benzersiz GUID değeri
 
 Gövde (opsiyonel alanlar): title, description, link, image, category, isInAnyStack, isUsable
 
 Örnek İstek (curl):
 ```bash
-curl -X PUT "http://localhost:3000/api/news/609e1e24a12a452a3c4c5e20" \
+curl -X PUT "http://localhost:3000/api/news/guid/breaking-news-2023-001" \
   -H "Content-Type: application/json" \
   -H "x-api-key: YOUR_API_KEY" \
   -d '{
@@ -233,7 +204,8 @@ curl -X PUT "http://localhost:3000/api/news/609e1e24a12a452a3c4c5e20" \
 {
   "success": true,
   "data": {
-    "_id": "609e1e24a12a452a3c4c5e20",
+    "_id": "breaking-news-2023-001",
+    "guid": "breaking-news-2023-001",
     "title": "Güncellendi: Ekonomik Paket Detayları Netleşti"
   }
 }
@@ -241,57 +213,7 @@ curl -X PUT "http://localhost:3000/api/news/609e1e24a12a452a3c4c5e20" \
 
 ---
 
-## 7. Haber Güncelle (GUID ile)
-
-```http
-PUT /api/news/guid/:guid
-```
-
-Header:
-- x-api-key: YOUR_API_KEY
-
-URL Parametreleri:
-- guid (newsGuid): Haberin benzersiz GUID değeri
-
-Gövde: 6. madde ile aynı
-
-Örnek Yanıt (kısaltılmış):
-```json
-{
-  "success": true,
-  "data": {
-    "guid": "breaking-news-2023-001",
-    "title": "Son Durum: Ekonomik Paket Onaylandı"
-  }
-}
-```
-
----
-
-## 8. Haber Sil (ID ile)
-
-```http
-DELETE /api/news/:id
-```
-
-Header:
-- x-api-key: YOUR_API_KEY
-
-URL Parametreleri:
-- id (newsId): Haberin MongoDB ObjectId değeri
-
-Örnek Yanıt:
-```json
-{
-  "success": true,
-  "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
-  "data": {}
-}
-```
-
----
-
-## 9. Haber Sil (GUID ile)
+## 6. Haber Sil (GUID ile)
 
 ```http
 DELETE /api/news/guid/:guid
@@ -303,4 +225,17 @@ Header:
 URL Parametreleri:
 - guid (newsGuid): Haberin benzersiz GUID değeri
 
-Örnek Yanıt: 8. madde ile aynı
+Örnek İstek:
+```bash
+curl -X DELETE "http://localhost:3000/api/news/guid/breaking-news-2023-001" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Örnek Yanıt:
+```json
+{
+  "success": true,
+  "message": "Haber başarıyla silindi ve tüm stacklerden kaldırıldı",
+  "data": {}
+}
+```

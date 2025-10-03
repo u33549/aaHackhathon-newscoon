@@ -62,31 +62,7 @@ exports.getAllNews = async (req, res) => {
   }
 };
 
-// ID'ye göre tek bir haber getir
-exports.getNewsById = async (req, res) => {
-  try {
-    const news = await RssNews.findById(req.params.id);
-
-    if (!news) {
-      return res.status(404).json({
-        success: false,
-        error: 'Haber bulunamadı'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: news
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Sunucu hatası'
-    });
-  }
-};
-
-// GUID'ye göre haber getir
+// GUID'ye göre tek bir haber getir (eski ID endpoint'i kaldırıldı)
 exports.getNewsByGuid = async (req, res) => {
   try {
     const news = await RssNews.findOne({ guid: req.params.guid });
@@ -194,35 +170,6 @@ exports.createBulkNews = async (req, res) => {
   }
 };
 
-// Haberi güncelle
-exports.updateNews = async (req, res) => {
-  try {
-    let news = await RssNews.findById(req.params.id);
-
-    if (!news) {
-      return res.status(404).json({
-        success: false,
-        error: 'Haber bulunamadı'
-      });
-    }
-
-    news = await RssNews.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true
-    });
-
-    res.status(200).json({
-      success: true,
-      data: news
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Sunucu hatası'
-    });
-  }
-};
-
 // GUID ile haber güncelle
 exports.updateNewsByGuid = async (req, res) => {
   try {
@@ -252,41 +199,6 @@ exports.updateNewsByGuid = async (req, res) => {
   }
 };
 
-// Haberi sil
-exports.deleteNews = async (req, res) => {
-  try {
-    const news = await RssNews.findById(req.params.id);
-
-    if (!news) {
-      return res.status(404).json({
-        success: false,
-        message: 'Haber bulunamadı'
-      });
-    }
-
-    // Önce bu haberi içeren tüm stacklerden kaldır
-    await NewsStacks.updateMany(
-      { news: req.params.id },
-      { $pull: { news: req.params.id } }
-    );
-
-    // Sonra haberi sil
-    await RssNews.findByIdAndDelete(req.params.id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Haber başarıyla silindi ve tüm stacklerden kaldırıldı',
-      data: {}
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Haber silinemedi',
-      error: error.message
-    });
-  }
-};
-
 // GUID'ye göre haberi sil
 exports.deleteNewsByGuid = async (req, res) => {
   try {
@@ -301,8 +213,8 @@ exports.deleteNewsByGuid = async (req, res) => {
 
     // Önce bu haberi içeren tüm stacklerden kaldır
     await NewsStacks.updateMany(
-      { news: news._id },
-      { $pull: { news: news._id } }
+      { news: req.params.guid },
+      { $pull: { news: req.params.guid } }
     );
 
     // Sonra haberi sil

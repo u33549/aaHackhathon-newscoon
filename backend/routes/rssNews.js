@@ -1,13 +1,10 @@
 const express = require('express');
 const {
   getAllNews,
-  getNewsById,
   getNewsByGuid,
   createNews,
   createBulkNews,
-  updateNews,
   updateNewsByGuid,
-  deleteNews,
   deleteNewsByGuid
 } = require('../controllers/rssNewsController');
 
@@ -21,12 +18,6 @@ router.route('/')
 // Toplu haber ekleme
 router.route('/bulk')
   .post(createBulkNews);
-
-// ID'ye göre işlemler
-router.route('/:id')
-  .get(getNewsById)
-  .put(updateNews)
-  .delete(deleteNews);
 
 // GUID'ye göre işlemler
 router.route('/guid/:guid')

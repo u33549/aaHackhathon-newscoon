@@ -18,11 +18,10 @@ Bu doküman Haber Yığınları (NewsStacks) API'sinin tüm fonksiyonlarını a�
 
 ## Parametre İsimlendirme Sözleşmesi
 
-- id (stackId): Haber Yığınının MongoDB ObjectId değeri
-- newsId: RssNews (haber) belgesinin MongoDB ObjectId değeri
+- newsGuid: RssNews (haber) belgesinin GUID değeri
 - Yazma işlemleri için x-api-key header'ı zorunludur
 
----
+**Not:** Haber referansları artık GUID üzerinden yapılır. NewsStacks modeli `news` dizisinde haber GUID'lerini tutar.
 
 ## 1. Tüm Haber Yığınlarını Getir
 
@@ -64,7 +63,8 @@ GET /api/stacks?limit=2&sortBy=viewCount&sortOrder=desc
       "description": "Bu hafta yaşanan gelişmeler",
       "news": [
         {
-          "_id": "609e1e24a12a452a3c4c5e20",
+          "_id": "aa-news-20231002-001",
+          "guid": "aa-news-20231002-001",
           "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
           "link": "https://example.com/news/ekonomi-paketi",
           "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
@@ -130,14 +130,14 @@ GET /api/stacks/609e1e24a12a452a3c4c5e25
     "description": "Bu hafta yaşanan gelişmeler",
     "news": [
       {
-        "_id": "609e1e24a12a452a3c4c5e20",
+        "_id": "aa-news-20231002-001",
+        "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
         "image": "https://example.com/images/ekonomi-paketi.jpg",
         "category": "ekonomi",
-        "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi...",
-        "guid": "aa-news-20231002-001"
+        "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi..."
       }
     ],
     "status": "approved",
@@ -170,12 +170,14 @@ POST /api/stacks
 {
   "title": "HABER_YIGINI_BASLIGI",
   "description": "HABER_YIGINI_ACIKLAMASI",
-  "news": ["<newsId>", "<newsId>"],
+  "news": ["<newsGuid>", "<newsGuid>"],
   "status": "pending",
   "tags": ["ETIKET_1", "ETIKET_2"],
   "isFeatured": false
 }
 ```
+
+**Not:** `news` dizisinde haber GUID'leri kullanılır.
 
 Örnek İstek (curl):
 ```bash
@@ -185,7 +187,7 @@ curl -X POST "http://localhost:3000/api/stacks" \
   -d '{
     "title": "Gündem: Ekonomik Gelişmeler",
     "description": "Bu hafta yaşanan gelişmeler",
-    "news": ["609e1e24a12a452a3c4c5e20"],
+    "news": ["aa-news-20231002-001"],
     "status": "pending",
     "tags": ["ekonomi", "gündem"],
     "isFeatured": true
@@ -202,7 +204,8 @@ curl -X POST "http://localhost:3000/api/stacks" \
     "description": "Bu hafta yaşanan gelişmeler",
     "news": [
       {
-        "_id": "609e1e24a12a452a3c4c5e20",
+        "_id": "aa-news-20231002-001",
+        "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
@@ -238,6 +241,8 @@ PUT /api/stacks/:id
   - id (stackId): Haber yığınının MongoDB ObjectId değeri
 - Gövde (opsiyonel): title, description, status, isFeatured, tags, news[]
 
+**Not:** `news` dizisi güncellenirken haber GUID'leri kullanılır.
+
 Örnek İstek (curl):
 ```bash
 curl -X PUT "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25" \
@@ -260,7 +265,8 @@ curl -X PUT "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25" \
     "description": "Bu hafta yaşanan gelişmeler",
     "news": [
       {
-        "_id": "609e1e24a12a452a3c4c5e20",
+        "_id": "aa-news-20231002-001",
+        "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
@@ -281,7 +287,7 @@ curl -X PUT "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25" \
 
 Olası Hatalar:
 - 404 Haber yığını bulunamadı
-- 400 Geçersiz haber ID'leri (news[] güncellenirken)
+- 400 Geçersiz haber GUID'leri (news[] güncellenirken)
 
 ---
 
@@ -316,7 +322,7 @@ DELETE /api/stacks/:id
 POST /api/stacks/:id/addNews
 ```
 
-Açıklama: Mevcut bir haber yığınına yeni bir haber (RssNews kaydı) ekler. `id (stackId)` ve `newsId` farklı kaynakları temsil eder; biri NewsStacks, diğeri RssNews belgesidir.
+Açıklama: Mevcut bir haber yığınına yeni bir haber (RssNews kaydı) ekler. `id (stackId)` ve `newsGuid` farklı kaynakları temsil eder; biri NewsStacks, diğeri RssNews belgesidir.
 
 İstek Şablonu:
 - Yöntem: POST
@@ -327,8 +333,10 @@ Açıklama: Mevcut bir haber yığınına yeni bir haber (RssNews kaydı) ekler.
   - id (stackId): Haber Yığınının MongoDB ObjectId değeri
 - Gövde (şema):
 ```json
-{ "newsId": "EKLENECEK_HABERIN_RSSNEWS_ID" }
+{ "newsGuid": "EKLENECEK_HABERIN_GUID" }
 ```
+
+**Not:** `newsGuid` parametresi RssNews belgesinin GUID değeridir.
 
 Örnek İstek (curl):
 ```bash
@@ -336,7 +344,7 @@ curl -X POST "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25/addNews"
   -H "Content-Type: application/json" \
   -H "x-api-key: YOUR_API_KEY" \
   -d '{
-    "newsId": "609e1e24a12a452a3c4c5e20"
+    "newsGuid": "aa-news-20231002-001"
   }'
 ```
 
@@ -350,7 +358,8 @@ curl -X POST "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25/addNews"
     "description": "Bu hafta yaşanan gelişmeler",
     "news": [
       {
-        "_id": "609e1e24a12a452a3c4c5e20",
+        "_id": "aa-news-20231002-001",
+        "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
@@ -391,8 +400,10 @@ POST /api/stacks/:id/removeNews
   - id (stackId): Haber yığınının MongoDB ObjectId değeri
 - Gövde (şema):
 ```json
-{ "newsId": "CIKARILACAK_HABERIN_RSSNEWS_ID" }
+{ "newsGuid": "CIKARILACAK_HABERIN_GUID" }
 ```
+
+**Not:** `newsGuid` parametresi RssNews belgesinin GUID değeridir.
 
 Örnek Başarılı Yanıt (tam, 200):
 ```json
@@ -425,3 +436,4 @@ Olası Hatalar:
 - GET /api/stacks yanıtlarında varsa kapağın URL'si `photoUrl` alanında döner.
 - Haber eklendiğinde/çıkarıldığında ilgili yığının `isPhotoUpToDate` alanı `false` yapılır (iş mantığı).
 - GET /api/stacks/:id çağrısı görüntülenme sayısını artırır.
+- Haber referansları artık GUID üzerinden yapılır, `newsId` yerine `newsGuid` kullanılır.

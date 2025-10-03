@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const rssNewsSchema = new mongoose.Schema({
+  _id: {
+    type: String
+  },
   guid: {
     type: String,
     required: [true, 'GUID alanı zorunludur'],
@@ -52,7 +55,28 @@ const rssNewsSchema = new mongoose.Schema({
     default: Date.now
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  _id: false
 });
+
+// guid'i _id olarak kullanmak için pre-save hook
+rssNewsSchema.pre('save', function(next) {
+  if (this.isNew && this.guid) {
+    this._id = this.guid;
+  }
+  next();
+});
+
+// guid alanını virtual olarak _id'ye bağla
+rssNewsSchema.virtual('id').get(function() {
+  return this._id;
+});
+
+// JSON çıktısında virtuals'ı dahil et
+rssNewsSchema.set('toJSON', { virtuals: true });
+rssNewsSchema.set('toObject', { virtuals: true });
+
+// İndeksler
+rssNewsSchema.index({ guid: 1 }, { unique: true });
 
 module.exports = mongoose.model('RssNews', rssNewsSchema);
