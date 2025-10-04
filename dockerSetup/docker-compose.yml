@@ -7,10 +7,12 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "3545:3000"
+    env_file:
+      - .env
     environment:
-      - NODE_ENV=development
-      - MONGO_URI=mongodb://mongodb:27017/newscoon
-      - API_KEY=hackhathon-newscoon-2025
+      - NODE_ENV=${NODE_ENV}
+      - MONGO_URI=${MONGO_URI}
+      - API_KEY=${API_KEY}
     depends_on:
       - mongodb
     restart: unless-stopped
@@ -19,6 +21,12 @@ services:
     image: mongo:6.0
     ports:
       - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ADMIN_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ADMIN_PASSWORD}
+    command: mongod --auth
     volumes:
       - ./mongo_data:/data/db
     restart: unless-stopped
