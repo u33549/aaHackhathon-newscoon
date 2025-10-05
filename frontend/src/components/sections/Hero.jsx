@@ -13,7 +13,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos, PlayArrow } from '@mui/icons-material';
-import { categoryColors } from '../../constants';
+import { categoryColors } from '../../constants/index.jsx';
 
 const Hero = ({ slides, onArticleSelect }) => {
   const theme = useTheme();

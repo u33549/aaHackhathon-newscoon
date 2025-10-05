@@ -14,6 +14,7 @@ import {
   Stack
 } from '@mui/material';
 import { EmojiEvents, Star } from '@mui/icons-material';
+import { LogoIcon } from '../../constants/index.jsx';
 
 const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
   const theme = useTheme();
@@ -30,14 +31,14 @@ const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
       sx={{
         bgcolor: isMobile ? 'rgba(18, 18, 18, 0.6)' : 'background.default',
         backdropFilter: isMobile ? 'blur(10px)' : 'none',
-        minHeight: { xs: 72, md: 80 } // Header'ı daha yüksek yaptım
+        minHeight: { xs: 72, md: 80 }
       }}
     >
       <Container maxWidth="lg">
         <Toolbar sx={{
           justifyContent: 'space-between',
-          py: { xs: 1, md: 2 }, // Padding'i artırdım
-          minHeight: { xs: 72, md: 80 } // Toolbar'ı da daha yüksek yaptım
+          py: { xs: 1, md: 2 },
+          minHeight: { xs: 72, md: 80 }
         }}>
           {/* Logo - Hem mobil hem desktop'ta göster */}
           <Box sx={{
@@ -45,10 +46,10 @@ const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
             alignItems: 'center',
             gap: { xs: 1.5, md: 2 }
           }}>
-            {/* Logo hem mobilde hem desktop'ta göster */}
-            <Star sx={{
-              fontSize: { xs: 28, md: 32 },
-              color: 'primary.main'
+            {/* Newscoon logo'su hem mobilde hem desktop'ta */}
+            <LogoIcon sx={{
+              width: { xs: 20, md: 24 },
+              height: { xs: 20, md: 24 }
             }} />
             <Typography
               variant="h5"
@@ -128,7 +129,7 @@ const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
             </Box>
           )}
 
-          {/* Mobile Layout - Logo, Level, XP ve Rozetler */}
+          {/* Mobile Layout - Level, XP ve Rozetler */}
           {isMobile && (
             <Stack direction="row" alignItems="center" spacing={1.5}>
               {/* Level Display */}

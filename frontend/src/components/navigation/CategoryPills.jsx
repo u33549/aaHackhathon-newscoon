@@ -6,7 +6,7 @@ import {
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { categoryColors } from '../../constants';
+import { categoryColors } from '../../constants/index.jsx';
 
 const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
   const theme = useTheme();

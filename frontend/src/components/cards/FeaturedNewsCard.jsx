@@ -7,7 +7,7 @@ import {
   Chip,
   useTheme
 } from '@mui/material';
-import { categoryColors } from '../../constants';
+import { categoryColors } from '../../constants/index.jsx';
 
 const FeaturedNewsCard = ({ news }) => {
   const theme = useTheme();

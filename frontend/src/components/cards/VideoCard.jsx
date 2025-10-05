@@ -10,7 +10,7 @@ import {
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { categoryColors } from '../../constants';
+import { categoryColors } from '../../constants/index.jsx';
 
 const VideoCard = ({ video, variant = 'default', onClick }) => {
   const theme = useTheme();

@@ -6,13 +6,24 @@ import {
   LocalHospital,
   Whatshot,
   EmojiEvents,
-  Share,
-  Star
+  Share
 } from '@mui/icons-material';
+import LogoImage from '../assets/Logo_Newscoon.png';
 
 // --- ICONS ---
 export const LogoIcon = ({ sx, ...props }) => (
-  React.createElement(Star, { sx: { color: '#FDE047', ...sx }, ...props })
+  <img
+    src={LogoImage}
+    alt="Newscoon Logo"
+    style={{
+      width: '32px',
+      height: '32px',
+      objectFit: 'contain',
+      objectPosition: 'center',
+      ...sx
+    }}
+    {...props}
+  />
 );
 
 export const TeknolojiBadgeIcon = () => React.createElement(Computer);

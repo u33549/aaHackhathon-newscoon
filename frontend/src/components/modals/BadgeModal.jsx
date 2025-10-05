@@ -20,7 +20,7 @@ import {
   Stack
 } from '@mui/material';
 import { Close, EmojiEvents, Star } from '@mui/icons-material';
-import { allAchievements, levelThresholds } from '../../constants';
+import { allAchievements, levelThresholds } from '../../constants/index.jsx';
 
 const BadgeModal = ({ isOpen, onClose, badges, totalXp, earnedAchievements, level }) => {
   const theme = useTheme();

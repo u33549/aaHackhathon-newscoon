@@ -21,7 +21,7 @@ import {
   Stack
 } from '@mui/material';
 import { ArrowBack, Share, EmojiEvents } from '@mui/icons-material';
-import { categoryColors } from '../constants';
+import { categoryColors } from '../constants/index.jsx';
 
 const ArticlePage = ({
   article,

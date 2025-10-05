@@ -23,7 +23,7 @@ import {
   allBadges,
   levelThresholds,
   allAchievements
-} from './constants';
+} from './constants/index.jsx';
 
 function App() {
   // State management

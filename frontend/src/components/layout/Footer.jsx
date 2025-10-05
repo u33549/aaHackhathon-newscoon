@@ -10,7 +10,7 @@ import {
   useMediaQuery,
   Stack
 } from '@mui/material';
-import { LogoIcon } from '../../constants';
+import { LogoIcon } from '../../constants/index.jsx';
 
 const Footer = () => {
   const theme = useTheme();
@@ -39,7 +39,10 @@ const Footer = () => {
               mb: { xs: 1.5, md: 2 },
               justifyContent: { xs: 'center', md: 'flex-start' }
             }}>
-              <LogoIcon sx={{ fontSize: { xs: 24, md: 28 } }} />
+              <LogoIcon sx={{
+                width: { xs: 24, md: 28 },
+                height: { xs: 24, md: 28 }
+              }} />
               <Typography
                 variant={isSmall ? "h6" : "h6"}
                 fontWeight={700}
