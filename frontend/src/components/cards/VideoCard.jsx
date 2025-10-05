@@ -2,10 +2,8 @@ import React from 'react';
 import {
   Card,
   CardMedia,
-  CardContent,
   Typography,
   Box,
-  Avatar,
   Chip,
   useTheme,
   useMediaQuery
@@ -90,35 +88,11 @@ const VideoCard = ({ video, variant = 'default', onClick }) => {
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            mb: 0.5
+            overflow: 'hidden'
           }}
         >
           {video.title}
         </Typography>
-
-        {/* Channel Info */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Avatar
-            src={video.channelIconUrl}
-            alt="Channel"
-            sx={{
-              width: 20,
-              height: 20,
-              border: '1px solid rgba(255, 255, 255, 0.3)'
-            }}
-          />
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '0.7rem',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
-            }}
-          >
-            {video.age || 'Yeni'}
-          </Typography>
-        </Box>
       </Box>
 
       {/* XP Badge (if exists) */}
