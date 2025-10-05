@@ -1,49 +1,122 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Box,
   Container,
   Typography,
   Grid,
+  IconButton,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 const NewsSection = ({ title, children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+  const scrollContainerRef = useRef(null);
+
+  const scroll = (direction) => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = container.clientWidth;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
-    <Box sx={{ py: 0}}>
-      <Container maxWidth="lg">
+    <Box sx={{ mb: 4 }}>
+      {/* Section Title */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        mb: 2,
+        px: isMobile ? 2 : 0
+      }}>
         <Typography
-          variant={isSmall ? "h5" : isMobile ? "h4" : "h4"}
-          component="h2"
+          variant={isMobile ? 'h6' : 'h5'}
           sx={{
-            fontWeight: 600,
-            mb: { xs: 2, md: 3 },
-            color: 'text.primary',
-            px: { xs: 1, md: 0 }
+            fontWeight: 'bold',
+            color: 'text.primary'
           }}
         >
           {title}
         </Typography>
 
-        <Grid container spacing={{ xs: 2, sm: 2, md: 3 }}>
-          {React.Children.map(children, (child, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              key={index}
+        {/* Navigation Arrows - Desktop only */}
+        {!isMobile && (
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <IconButton
+              onClick={() => scroll('left')}
+              sx={{
+                backgroundColor: 'grey.100',
+                '&:hover': {
+                  backgroundColor: 'grey.200'
+                }
+              }}
             >
-              {child}
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              onClick={() => scroll('right')}
+              sx={{
+                backgroundColor: 'grey.100',
+                '&:hover': {
+                  backgroundColor: 'grey.200'
+                }
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          </Box>
+        )}
+      </Box>
+
+      {/* Slider Container */}
+      <Box
+        ref={scrollContainerRef}
+        sx={{
+          display: 'flex',
+          overflowX: 'auto',
+          gap: 2,
+          px: isMobile ? 2 : 0,
+          pb: 1,
+          // Scrollbar styling
+          '&::-webkit-scrollbar': {
+            height: 6,
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'grey.100',
+            borderRadius: 3,
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'grey.400',
+            borderRadius: 3,
+            '&:hover': {
+              backgroundColor: 'grey.500',
+            },
+          },
+          // Firefox scrollbar
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${theme.palette.grey[400]} ${theme.palette.grey[100]}`,
+        }}
+      >
+        {React.Children.map(children, (child, index) => (
+          <Box
+            key={index}
+            sx={{
+              flex: '0 0 auto',
+              width: isMobile ? '85vw' : '320px', // Tam genişlik mobilde, sabit genişlik desktop'ta
+              maxWidth: isMobile ? '85vw' : '320px',
+            }}
+          >
+            {child}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };
