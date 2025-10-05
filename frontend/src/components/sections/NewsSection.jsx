@@ -80,28 +80,19 @@ const NewsSection = ({ title, children }) => {
         ref={scrollContainerRef}
         sx={{
           display: 'flex',
-          overflowX: 'auto',
+          overflowX: 'scroll',
+          overflowY: 'hidden',
           gap: 2,
           px: isMobile ? 2 : 0,
           pb: 1,
-          // Scrollbar styling
+          // Scrollbar'ları tamamen gizle
           '&::-webkit-scrollbar': {
-            height: 6,
+            display: 'none'
           },
-          '&::-webkit-scrollbar-track': {
-            backgroundColor: 'grey.100',
-            borderRadius: 3,
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'grey.400',
-            borderRadius: 3,
-            '&:hover': {
-              backgroundColor: 'grey.500',
-            },
-          },
-          // Firefox scrollbar
-          scrollbarWidth: 'thin',
-          scrollbarColor: `${theme.palette.grey[400]} ${theme.palette.grey[100]}`,
+          // Firefox için scrollbar gizle
+          scrollbarWidth: 'none',
+          // IE ve Edge için
+          msOverflowStyle: 'none',
         }}
       >
         {React.Children.map(children, (child, index) => (
