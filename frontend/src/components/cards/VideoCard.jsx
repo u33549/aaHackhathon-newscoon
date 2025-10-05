@@ -58,40 +58,46 @@ const VideoCard = ({ video, variant = 'default', onClick }) => {
           right: 0,
           background: 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.0) 70%)',
           padding: { xs: 1.5, md: 2 },
+          paddingBottom: { xs: 2, md: 2.5 },
           zIndex: 2
         }}
       >
-        {/* Category Chip */}
-        {video.duration && (
-          <Chip
-            label={video.duration}
-            size="small"
+        {/* Title and Category in horizontal layout */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+          {/* Title with Hero-like styling */}
+          <Typography
+            variant={isSmall ? 'body1' : 'h6'}
             sx={{
-              backgroundColor: categoryColor,
               color: 'white',
-              fontWeight: 600,
-              mb: 1,
-              fontSize: '0.7rem'
+              fontWeight: 'bold',
+              lineHeight: 1.2,
+              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              flex: 1,
+              minWidth: 0
             }}
-          />
-        )}
+          >
+            {video.title}
+          </Typography>
 
-        {/* Title with Hero-like styling */}
-        <Typography
-          variant={isSmall ? 'body1' : 'h6'}
-          sx={{
-            color: 'white',
-            fontWeight: 'bold',
-            lineHeight: 1.2,
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}
-        >
-          {video.title}
-        </Typography>
+          {/* Category Chip */}
+          {video.duration && (
+            <Chip
+              label={video.duration}
+              size="small"
+              sx={{
+                backgroundColor: categoryColor,
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '0.7rem',
+                flexShrink: 0
+              }}
+            />
+          )}
+        </Box>
       </Box>
 
       {/* XP Badge (if exists) */}
