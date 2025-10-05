@@ -12,7 +12,6 @@ import { categoryColors } from '../../constants/index.jsx';
 
 const VideoCard = ({ video, variant = 'default', onClick }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const categoryColor = categoryColors[video.duration?.toLowerCase()] || 'primary.main';
