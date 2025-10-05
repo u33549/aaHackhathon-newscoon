@@ -9,13 +9,16 @@ import {
   CardContent,
   Chip,
   IconButton,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { ArrowBackIos, ArrowForwardIos, PlayArrow } from '@mui/icons-material';
 import { categoryColors } from '../../constants';
 
 const Hero = ({ slides, onArticleSelect }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
@@ -33,22 +36,22 @@ const Hero = ({ slides, onArticleSelect }) => {
   return (
     <Box sx={{
       bgcolor: 'background.default',
-      py: 4
+      py: { xs: 2, md: 4 }
     }}>
       <Container maxWidth="lg">
         <Card
           sx={{
             position: 'relative',
-            borderRadius: 3,
+            borderRadius: { xs: 2, md: 3 },
             overflow: 'hidden',
             bgcolor: 'background.paper',
-            minHeight: 500
+            minHeight: { xs: 300, sm: 400, md: 500 }
           }}
         >
           {/* Hero Image */}
           <CardMedia
             component="img"
-            height="300"
+            height={isMobile ? (isSmall ? "250" : "300") : "300"}
             image={currentArticle.imageUrl}
             alt={currentArticle.title}
             sx={{
@@ -57,41 +60,45 @@ const Hero = ({ slides, onArticleSelect }) => {
             }}
           />
 
-          {/* Navigation Arrows */}
-          {slides.length > 1 && (
+          {/* Navigation Arrows - Only on larger screens */}
+          {slides.length > 1 && !isSmall && (
             <>
               <IconButton
                 onClick={prevSlide}
                 sx={{
                   position: 'absolute',
-                  left: 16,
+                  left: { xs: 8, md: 16 },
                   top: '50%',
                   transform: 'translateY(-50%)',
                   bgcolor: 'rgba(0, 0, 0, 0.5)',
                   color: 'white',
                   '&:hover': {
                     bgcolor: 'rgba(0, 0, 0, 0.7)'
-                  }
+                  },
+                  width: { xs: 36, md: 48 },
+                  height: { xs: 36, md: 48 }
                 }}
               >
-                <ArrowBackIos />
+                <ArrowBackIos fontSize={isMobile ? "small" : "medium"} />
               </IconButton>
 
               <IconButton
                 onClick={nextSlide}
                 sx={{
                   position: 'absolute',
-                  right: 16,
+                  right: { xs: 8, md: 16 },
                   top: '50%',
                   transform: 'translateY(-50%)',
                   bgcolor: 'rgba(0, 0, 0, 0.5)',
                   color: 'white',
                   '&:hover': {
                     bgcolor: 'rgba(0, 0, 0, 0.7)'
-                  }
+                  },
+                  width: { xs: 36, md: 48 },
+                  height: { xs: 36, md: 48 }
                 }}
               >
-                <ArrowForwardIos />
+                <ArrowForwardIos fontSize={isMobile ? "small" : "medium"} />
               </IconButton>
             </>
           )}
@@ -104,30 +111,32 @@ const Hero = ({ slides, onArticleSelect }) => {
               left: 0,
               right: 0,
               background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.8))',
-              p: 4
+              p: { xs: 2, sm: 3, md: 4 }
             }}
           >
             {/* Category Chip */}
             <Chip
               label={currentArticle.superTitle}
-              size="small"
+              size={isSmall ? "small" : "medium"}
               sx={{
                 bgcolor: categoryColors[currentArticle.category] || 'primary.main',
                 color: 'white',
                 fontWeight: 600,
-                mb: 2
+                mb: { xs: 1, md: 2 },
+                fontSize: { xs: '0.7rem', md: '0.8rem' }
               }}
             />
 
             {/* Title */}
             <Typography
-              variant="h3"
+              variant={isSmall ? "h5" : isMobile ? "h4" : "h3"}
               component="h1"
               sx={{
                 color: 'white',
                 fontWeight: 700,
-                mb: 1,
-                textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                mb: { xs: 0.5, md: 1 },
+                textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                lineHeight: { xs: 1.2, md: 1.3 }
               }}
             >
               {currentArticle.title}
@@ -135,24 +144,27 @@ const Hero = ({ slides, onArticleSelect }) => {
 
             {/* Subtitle */}
             <Typography
-              variant="h6"
+              variant={isSmall ? "body1" : "h6"}
               sx={{
                 color: 'rgba(255, 255, 255, 0.9)',
-                mb: 3,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+                mb: { xs: 2, md: 3 },
+                textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+                display: { xs: 'none', sm: 'block' }
               }}
             >
               {currentArticle.subtitle}
             </Typography>
 
-            {/* Summary */}
+            {/* Summary - Hidden on mobile */}
             <Typography
               variant="body1"
               sx={{
                 color: 'rgba(255, 255, 255, 0.8)',
-                mb: 3,
-                maxWidth: '70%',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+                mb: { xs: 2, md: 3 },
+                maxWidth: { sm: '80%', md: '70%' },
+                textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+                display: { xs: 'none', md: 'block' },
+                fontSize: { md: '1rem', lg: '1.1rem' }
               }}
             >
               {currentArticle.summary}
@@ -166,9 +178,9 @@ const Hero = ({ slides, onArticleSelect }) => {
               sx={{
                 bgcolor: 'primary.main',
                 color: 'primary.contrastText',
-                px: 4,
-                py: 1.5,
-                fontSize: '1.1rem',
+                px: { xs: 3, md: 4 },
+                py: { xs: 1, md: 1.5 },
+                fontSize: { xs: '0.9rem', md: '1.1rem' },
                 fontWeight: 600,
                 '&:hover': {
                   bgcolor: 'primary.dark'
@@ -184,10 +196,11 @@ const Hero = ({ slides, onArticleSelect }) => {
             <Box
               sx={{
                 position: 'absolute',
-                bottom: 16,
-                right: 16,
+                bottom: { xs: 8, md: 16 },
+                right: { xs: 8, md: 16 },
                 display: 'flex',
-                gap: 1
+                gap: { xs: 0.5, md: 1 },
+                flexDirection: { xs: 'row', sm: 'row' }
               }}
             >
               {slides.map((_, index) => (
@@ -195,16 +208,39 @@ const Hero = ({ slides, onArticleSelect }) => {
                   key={index}
                   onClick={() => setCurrentSlide(index)}
                   sx={{
-                    width: 8,
-                    height: 8,
+                    width: { xs: 6, md: 8 },
+                    height: { xs: 6, md: 8 },
                     borderRadius: '50%',
                     bgcolor: index === currentSlide ? 'primary.main' : 'rgba(255, 255, 255, 0.5)',
                     cursor: 'pointer',
-                    transition: 'background-color 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'scale(1.2)'
+                    }
                   }}
                 />
               ))}
             </Box>
+          )}
+
+          {/* Mobile swipe hint */}
+          {isSmall && slides.length > 1 && (
+            <Typography
+              variant="caption"
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                color: 'rgba(255, 255, 255, 0.7)',
+                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                px: 1,
+                py: 0.5,
+                borderRadius: 1,
+                fontSize: '0.65rem'
+              }}
+            >
+              {currentSlide + 1}/{slides.length}
+            </Typography>
           )}
         </Card>
       </Container>

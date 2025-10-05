@@ -4,12 +4,14 @@ import {
   Container,
   TextField,
   InputAdornment,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
 
 const SearchBar = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearchChange = (event) => {
@@ -19,7 +21,7 @@ const SearchBar = () => {
   return (
     <Box sx={{
       bgcolor: 'background.default',
-      py: 3
+      py: { xs: 2, md: 3 }
     }}>
       <Container maxWidth="lg">
         <TextField
@@ -27,17 +29,22 @@ const SearchBar = () => {
           placeholder="Haberlerde ara..."
           value={searchTerm}
           onChange={handleSearchChange}
+          size={isMobile ? "medium" : "medium"}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search color="action" />
+                <Search color="action" fontSize={isMobile ? "medium" : "medium"} />
               </InputAdornment>
             ),
           }}
           sx={{
-            maxWidth: 600,
+            maxWidth: { xs: '100%', md: 600 },
             mx: 'auto',
-            display: 'block'
+            display: 'block',
+            '& .MuiOutlinedInput-root': {
+              fontSize: { xs: '0.9rem', md: '1rem' },
+              height: { xs: 48, md: 56 }
+            }
           }}
         />
       </Container>

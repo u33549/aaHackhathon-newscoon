@@ -3,12 +3,14 @@ import {
   Box,
   Container,
   Chip,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { categoryColors } from '../../constants';
 
 const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const categories = [
     { id: 'all', name: 'Tümü', color: 'primary.main' },
@@ -21,18 +23,20 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
   return (
     <Box sx={{
       bgcolor: 'background.default',
-      py: 2,
+      py: { xs: 1.5, md: 2 },
       borderBottom: '1px solid',
       borderColor: 'divider'
     }}>
       <Container maxWidth="lg">
         <Box sx={{
           display: 'flex',
-          gap: 1,
+          gap: { xs: 0.8, md: 1 },
           overflowX: 'auto',
-          pb: 1,
+          pb: { xs: 1, md: 1 },
+          px: { xs: 0, md: 0 },
+          // Mobilde scroll bar gizle
           '&::-webkit-scrollbar': {
-            height: 6
+            height: { xs: 3, md: 6 }
           },
           '&::-webkit-scrollbar-track': {
             bgcolor: 'rgba(255, 255, 255, 0.1)',
@@ -41,7 +45,10 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
           '&::-webkit-scrollbar-thumb': {
             bgcolor: 'rgba(255, 255, 255, 0.3)',
             borderRadius: 3
-          }
+          },
+          // Mobilde snap scroll
+          scrollSnapType: 'x mandatory',
+          scrollBehavior: 'smooth'
         }}>
           {categories.map((category) => (
             <Chip
@@ -49,9 +56,15 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
               label={category.name}
               onClick={() => onSelectCategory(category.id)}
               variant={selectedCategory === category.id ? 'filled' : 'outlined'}
+              size={isMobile ? 'medium' : 'medium'}
               sx={{
                 minWidth: 'fit-content',
                 fontWeight: 600,
+                fontSize: { xs: '0.8rem', md: '0.875rem' },
+                height: { xs: 32, md: 36 },
+                px: { xs: 1.5, md: 2 },
+                flexShrink: 0, // Mobilde küçülmesin
+                scrollSnapAlign: 'start',
                 ...(selectedCategory === category.id ? {
                   bgcolor: category.color,
                   color: 'white',
