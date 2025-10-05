@@ -14,46 +14,55 @@ import {
   Stack
 } from '@mui/material';
 import { EmojiEvents, Star } from '@mui/icons-material';
-import { LogoIcon } from '../../constants';
 
 const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   const progressPercentage = xpForNextLevel.max > 0
     ? (xpForNextLevel.current / xpForNextLevel.max) * 100
     : 0;
 
   return (
-    <AppBar position="sticky" elevation={0}>
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        bgcolor: isMobile ? 'rgba(18, 18, 18, 0.6)' : 'background.default',
+        backdropFilter: isMobile ? 'blur(10px)' : 'none',
+        minHeight: { xs: 72, md: 80 } // Header'ı daha yüksek yaptım
+      }}
+    >
       <Container maxWidth="lg">
         <Toolbar sx={{
           justifyContent: 'space-between',
-          py: { xs: 0.5, md: 1 },
-          minHeight: { xs: 56, md: 64 }
+          py: { xs: 1, md: 2 }, // Padding'i artırdım
+          minHeight: { xs: 72, md: 80 } // Toolbar'ı da daha yüksek yaptım
         }}>
-          {/* Logo */}
+          {/* Logo - Hem mobil hem desktop'ta göster */}
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: { xs: 1, md: 2 }
+            gap: { xs: 1.5, md: 2 }
           }}>
-            <LogoIcon sx={{ fontSize: { xs: 24, md: 32 } }} />
+            {/* Logo hem mobilde hem desktop'ta göster */}
+            <Star sx={{
+              fontSize: { xs: 28, md: 32 },
+              color: 'primary.main'
+            }} />
             <Typography
-              variant={isSmall ? "h6" : "h5"}
+              variant="h5"
               component="div"
               sx={{
                 fontWeight: 700,
-                color: 'primary.main',
-                display: { xs: 'block', sm: 'block' }
+                color: 'primary.main'
               }}
             >
-              {isSmall ? "NC" : "Newscoon"}
+              Newscoon
             </Typography>
           </Box>
 
-          {/* XP and Level Display - Desktop */}
+          {/* XP and Level Display - Sadece Desktop */}
           {!isMobile && (
             <Box sx={{
               display: 'flex',
@@ -119,25 +128,31 @@ const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
             </Box>
           )}
 
-          {/* Mobile Layout */}
+          {/* Mobile Layout - Logo, Level, XP ve Rozetler */}
           {isMobile && (
-            <Stack direction="row" alignItems="center" spacing={1}>
-              {/* Compact Level Display */}
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              {/* Level Display */}
               <Chip
                 icon={<Star />}
-                label={level}
+                label={`L${level}`}
                 color="primary"
                 size="small"
-                sx={{ fontWeight: 600 }}
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.75rem'
+                }}
               />
 
-              {/* Compact XP */}
+              {/* XP Display */}
               <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ fontSize: '0.7rem' }}
+                variant="body2"
+                color="primary.main"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.8rem'
+                }}
               >
-                {totalXp}XP
+                {totalXp} XP
               </Typography>
 
               {/* Badges Icon Button */}
@@ -148,42 +163,11 @@ const Header = ({ totalXp, level, xpForNextLevel, onOpenBadges }) => {
                   p: 1
                 }}
               >
-                <EmojiEvents fontSize="small" />
+                <EmojiEvents fontSize="medium" />
               </IconButton>
             </Stack>
           )}
         </Toolbar>
-
-        {/* Mobile XP Progress Bar */}
-        {isMobile && (
-          <Box sx={{ px: 2, pb: 1 }}>
-            <LinearProgress
-              variant="determinate"
-              value={progressPercentage}
-              sx={{
-                height: 4,
-                borderRadius: 2,
-                bgcolor: 'rgba(255, 255, 255, 0.1)',
-                '& .MuiLinearProgress-bar': {
-                  bgcolor: 'primary.main',
-                  borderRadius: 2
-                }
-              }}
-            />
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              mt: 0.5
-            }}>
-              <Typography variant="caption" color="text.secondary" fontSize="0.65rem">
-                {xpForNextLevel.current}/{xpForNextLevel.max}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" fontSize="0.65rem">
-                Seviye {level + 1}'e {xpForNextLevel.max - xpForNextLevel.current} XP
-              </Typography>
-            </Box>
-          </Box>
-        )}
       </Container>
     </AppBar>
   );
