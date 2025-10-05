@@ -14,7 +14,7 @@ const NewsSection = ({ title, children }) => {
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box sx={{ py: { xs: 3, md: 4 } }}>
+    <Box sx={{ py: 0}}>
       <Container maxWidth="lg">
         <Typography
           variant={isSmall ? "h5" : isMobile ? "h4" : "h4"}

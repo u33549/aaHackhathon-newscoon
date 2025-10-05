@@ -49,7 +49,7 @@ const MainPage = () => {
       </Box>
 
       {/* News Section */}
-      <Container maxWidth="lg" sx={{ mt: 2 }}>
+      <Container maxWidth="lg" sx={{ mt: 0 }}>
         <NewsSection
           searchQuery={searchQuery}
           selectedCategory={selectedCategory}

@@ -21,7 +21,7 @@ const SearchBar = () => {
   return (
     <Box sx={{
       bgcolor: 'background.default',
-      py: { xs: 2, md: 3 }
+      py: { xs: 1, md: 3 }
     }}>
       <Container maxWidth="lg">
         <TextField

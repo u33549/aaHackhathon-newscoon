@@ -301,7 +301,7 @@ function App() {
 
               <SearchBar />
 
-              <Box sx={{ py: 4 }}>
+              <Box sx={{ py: 2 }}>
                 <NewsSection title="Sana Özel Haberler">
                   {recommendedNews.map(video => (
                     <VideoCard
