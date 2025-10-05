@@ -37,7 +37,7 @@ const VideoCard = ({ video, variant = 'default', onClick }) => {
       {/* Background Image */}
       <CardMedia
         component="img"
-        height={variant === 'portrait' ? '200' : '160'}
+        height={variant === 'portrait' ? '300' : '220'}
         image={video.thumbnailUrl || 'https://via.placeholder.com/320x180'}
         alt={video.title}
         sx={{
