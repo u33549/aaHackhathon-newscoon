@@ -161,13 +161,14 @@ const Hero = () => {
 
         {/* Title */}
         <Typography
-          variant={isMobile ? 'h6' : 'h4'}
+          variant={isMobile ? 'h3' : 'h1'}
           sx={{
             color: 'white',
             fontWeight: 'bold',
             marginBottom: 1,
-            lineHeight: 1.2,
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+            lineHeight: 1.1,
+            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.9)',
+            fontSize: isMobile ? '1.75rem' : '3rem'
           }}
         >
           {currentNews.title}

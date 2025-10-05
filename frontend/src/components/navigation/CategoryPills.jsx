@@ -72,10 +72,11 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
               transition: 'all 0.3s ease',
               ...(selectedCategory === category.id
                 ? {
-                    backgroundColor: category.id === 'all' ? 'grey.200' : 'primary.main',
-                    color: category.id === 'all' ? 'black' : 'white', // "Tümü" seçiliyken siyah yazı
+                    backgroundColor: 'primary.main',
+                    color: '#1a1a1a', // Koyu yazı rengi (aktif pill için)
                     '&:hover': {
-                      backgroundColor: category.id === 'all' ? 'grey.300' : 'primary.dark',
+                      backgroundColor: 'primary.dark',
+                      color: '#1a1a1a', // Hover durumunda da koyu yazı
                     },
                   }
                 : {
