@@ -12,19 +12,24 @@ import LogoImage from '../assets/Logo_Newscoon.png';
 
 // --- ICONS ---
 export const LogoIcon = ({ sx, ...props }) => (
-  <img
-    src={LogoImage}
-    alt="Newscoon Logo"
-    style={{
-      width: '32px',
-      height: '32px',
-      objectFit: 'contain',
-      objectPosition: 'center',
-      ...sx
-    }}
-    {...props}
-  />
+    <img
+        src={LogoImage}
+        alt="Newscoon Logo"
+        style={{
+            width: '100%',
+            height: '100%',
+            maxWidth: '48px',
+            maxHeight: '48px',
+            objectFit: 'contain',
+            objectPosition: 'center',
+            borderRadius: '4px',
+            display: 'block',
+            ...sx
+        }}
+        {...props}
+    />
 );
+
 
 export const TeknolojiBadgeIcon = () => React.createElement(Computer);
 export const EkonomiBadgeIcon = () => React.createElement(TrendingUp);
