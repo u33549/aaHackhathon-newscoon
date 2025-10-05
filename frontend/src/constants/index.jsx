@@ -216,3 +216,33 @@ export const categoryColors = {
   bilim: '#8B5CF6',
   saglik: '#EF4444'
 };
+
+export const mockNews = [
+  {
+    id: 1,
+    title: 'Yapay Zeka Teknolojisi Geleceği Şekillendiriyor',
+    description: 'Yapay zeka teknolojilerindeki son gelişmeler, insan yaşamını köklü bir şekilde değiştirmeye devam ediyor. Uzmanlar, önümüzdeki 10 yıl içinde büyük dönüşümler bekleniyor.',
+    category: 'teknoloji',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=600&fit=crop',
+    publishedAt: '2024-01-15T10:30:00Z',
+    source: 'TechNews'
+  },
+  {
+    id: 2,
+    title: 'Sporda Tarihi Başarı: Milli Takım Şampiyon',
+    description: 'Milli takımımız uzun yıllar sonra uluslararası arenada büyük bir başarıya imza attı. Bu zafer, spor tarihimizde önemli bir dönüm noktası olarak kayıtlara geçti.',
+    category: 'spor',
+    image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&h=600&fit=crop',
+    publishedAt: '2024-01-15T14:20:00Z',
+    source: 'SportHaber'
+  },
+  {
+    id: 3,
+    title: 'Ekonomide Yeni Dönem: Büyük Yatırımlar Geliyor',
+    description: 'Ülke ekonomisinde yeni bir dönem başlıyor. Büyük ölçekli yatırım projeleri ile birlikte istihdam oranlarında da önemli artışlar bekleniyor.',
+    category: 'ekonomi',
+    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&h=600&fit=crop',
+    publishedAt: '2024-01-15T16:45:00Z',
+    source: 'EkonoHaber'
+  }
+];
