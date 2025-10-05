@@ -1,90 +1,96 @@
 import React from 'react';
 import {
   Box,
-  Container,
   Chip,
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { categoryColors } from '../../constants/index.jsx';
 
 const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const categories = [
-    { id: 'all', name: 'Tümü', color: 'primary.main' },
-    { id: 'teknoloji', name: 'Teknoloji', color: categoryColors.teknoloji },
-    { id: 'ekonomi', name: 'Ekonomi', color: categoryColors.ekonomi },
-    { id: 'bilim', name: 'Bilim', color: categoryColors.bilim },
-    { id: 'saglik', name: 'Sağlık', color: categoryColors.saglik }
+    { id: 'all', label: 'Tümü' },
+    { id: 'teknoloji', label: 'Teknoloji' },
+    { id: 'ekonomi', label: 'Ekonomi' },
+    { id: 'spor', label: 'Spor' },
+    { id: 'saglik', label: 'Sağlık' },
+    { id: 'politika', label: 'Politika' },
+    { id: 'egitim', label: 'Eğitim' },
+    { id: 'dünya', label: 'Dünya' },
+    { id: 'gündem', label: 'Gündem' },
+    { id: 'bilim', label: 'Bilim' },
+    { id: 'sanat', label: 'Sanat' },
+    { id: 'kültür', label: 'Kültür' }
   ];
 
   return (
-    <Box sx={{
-      bgcolor: 'background.default',
-      py: { xs: 1.5, md: 2 },
-      borderBottom: '1px solid',
-      borderColor: 'divider'
-    }}>
-      <Container maxWidth="lg">
-        <Box sx={{
+    <Box
+      sx={{
+        width: '100%',
+        overflowX: 'auto',
+        py: 2,
+        '&::-webkit-scrollbar': {
+          height: 6,
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'grey.300',
+          borderRadius: 3,
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+          backgroundColor: 'grey.400',
+        },
+      }}
+    >
+      <Box
+        sx={{
           display: 'flex',
-          gap: { xs: 0.8, md: 1 },
-          overflowX: 'auto',
-          pb: { xs: 1, md: 1 },
-          px: { xs: 0, md: 0 },
-          // Mobilde scroll bar gizle
-          '&::-webkit-scrollbar': {
-            height: { xs: 3, md: 6 }
-          },
-          '&::-webkit-scrollbar-track': {
-            bgcolor: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: 3
-          },
-          '&::-webkit-scrollbar-thumb': {
-            bgcolor: 'rgba(255, 255, 255, 0.3)',
-            borderRadius: 3
-          },
-          // Mobilde snap scroll
-          scrollSnapType: 'x mandatory',
-          scrollBehavior: 'smooth'
-        }}>
-          {categories.map((category) => (
-            <Chip
-              key={category.id}
-              label={category.name}
-              onClick={() => onSelectCategory(category.id)}
-              variant={selectedCategory === category.id ? 'filled' : 'outlined'}
-              size={isMobile ? 'medium' : 'medium'}
-              sx={{
-                minWidth: 'fit-content',
-                fontWeight: 600,
-                fontSize: { xs: '0.8rem', md: '0.875rem' },
-                height: { xs: 32, md: 36 },
-                px: { xs: 1.5, md: 2 },
-                flexShrink: 0, // Mobilde küçülmesin
-                scrollSnapAlign: 'start',
-                ...(selectedCategory === category.id ? {
-                  bgcolor: category.color,
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: category.color,
-                    filter: 'brightness(0.9)'
+          gap: 1,
+          minWidth: 'fit-content',
+          px: isMobile ? 2 : 0,
+        }}
+      >
+        {categories.map((category) => (
+          <Chip
+            key={category.id}
+            label={category.label}
+            onClick={() => onSelectCategory(category.id)}
+            variant={selectedCategory === category.id ? 'filled' : 'outlined'}
+            sx={{
+              borderRadius: 25, // Daha oval şekil
+              px: 2,
+              py: 0.5,
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              minWidth: 'fit-content',
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              ...(selectedCategory === category.id
+                ? {
+                    backgroundColor: category.id === 'all' ? 'grey.200' : 'primary.main',
+                    color: category.id === 'all' ? 'black' : 'white', // "Tümü" seçiliyken siyah yazı
+                    '&:hover': {
+                      backgroundColor: category.id === 'all' ? 'grey.300' : 'primary.dark',
+                    },
                   }
-                } : {
-                  borderColor: category.color,
-                  color: category.color,
-                  '&:hover': {
-                    bgcolor: `${category.color}20`,
-                    borderColor: category.color
-                  }
-                })
-              }}
-            />
-          ))}
-        </Box>
-      </Container>
+                : {
+                    backgroundColor: 'transparent',
+                    color: 'text.primary',
+                    borderColor: 'grey.300',
+                    '&:hover': {
+                      backgroundColor: 'grey.100',
+                      borderColor: 'grey.400',
+                    },
+                  }),
+            }}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };
