@@ -31,19 +31,12 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
         width: '100%',
         overflowX: 'auto',
         py: 2,
+        // Scrollbar'ı tamamen gizle
+        scrollbarWidth: 'none', // Firefox
+        msOverflowStyle: 'none', // IE ve Edge
         '&::-webkit-scrollbar': {
-          height: 6,
-        },
-        '&::-webkit-scrollbar-track': {
-          backgroundColor: 'transparent',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: 'grey.300',
-          borderRadius: 3,
-        },
-        '&::-webkit-scrollbar-thumb:hover': {
-          backgroundColor: 'grey.400',
-        },
+          display: 'none' // Chrome, Safari, Opera
+        }
       }}
     >
       <Box
