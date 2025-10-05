@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -13,6 +13,11 @@ const Hero = () => {
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentNews, setCurrentNews] = useState(mockNews[0]);
 
+  // Touch/Swipe için state'ler
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const heroRef = useRef(null);
+
   // Auto-rotate news every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,10 +31,64 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Swipe için minimum mesafe
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null); // Önceki touch'ı temizle
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      // Sol kaydırma - sonraki haber
+      nextNews();
+    }
+    if (isRightSwipe) {
+      // Sağ kaydırma - önceki haber
+      prevNews();
+    }
+  };
+
+  const nextNews = () => {
+    setCurrentNewsIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % mockNews.length;
+      setCurrentNews(mockNews[nextIndex]);
+      return nextIndex;
+    });
+  };
+
+  const prevNews = () => {
+    setCurrentNewsIndex((prevIndex) => {
+      const nextIndex = (prevIndex - 1 + mockNews.length) % mockNews.length;
+      setCurrentNews(mockNews[nextIndex]);
+      return nextIndex;
+    });
+  };
+
+  const goToNews = (index) => {
+    setCurrentNewsIndex(index);
+    setCurrentNews(mockNews[index]);
+  };
+
   const categoryColor = categoryColors[currentNews.category?.toLowerCase()] || '#FFD700';
 
   return (
     <Box
+      ref={heroRef}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
       sx={{
         position: 'relative',
         width: '100%',
@@ -37,6 +96,7 @@ const Hero = () => {
         overflow: 'hidden',
         backgroundColor: '#000',
         cursor: 'pointer',
+        touchAction: 'pan-y', // Sadece dikey kaydırmaya izin ver
         '&:hover .hero-image': {
           transform: 'scale(1.03)',
         }
@@ -72,6 +132,37 @@ const Hero = () => {
           zIndex: 2
         }}
       />
+
+      {/* Swipe Indicator - Sadece mobilde göster */}
+      {isMobile && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 16,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: 2,
+            padding: '4px 12px',
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '0.65rem',
+              textAlign: 'center'
+            }}
+          >
+            ← Kaydırın →
+          </Typography>
+        </Box>
+      )}
 
       {/* Content */}
       <Box
@@ -142,10 +233,7 @@ const Hero = () => {
         {mockNews.map((_, index) => (
           <Box
             key={index}
-            onClick={() => {
-              setCurrentNewsIndex(index);
-              setCurrentNews(mockNews[index]);
-            }}
+            onClick={() => goToNews(index)}
             sx={{
               width: 8,
               height: 8,
@@ -161,6 +249,33 @@ const Hero = () => {
           />
         ))}
       </Box>
+
+      {/* Mobil için haber sayısı göstergesi */}
+      {isMobile && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            zIndex: 3,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: 2,
+            padding: '4px 8px',
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '0.65rem',
+              fontWeight: 'bold'
+            }}
+          >
+            {currentNewsIndex + 1}/{mockNews.length}
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 };
