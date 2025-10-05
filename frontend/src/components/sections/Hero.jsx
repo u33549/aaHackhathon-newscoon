@@ -133,37 +133,6 @@ const Hero = () => {
         }}
       />
 
-      {/* Swipe Indicator - Sadece mobilde göster */}
-      {isMobile && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 3,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            borderRadius: 2,
-            padding: '4px 12px',
-            backdropFilter: 'blur(10px)'
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '0.65rem',
-              textAlign: 'center'
-            }}
-          >
-            ← Kaydırın →
-          </Typography>
-        </Box>
-      )}
-
       {/* Content */}
       <Box
         sx={{
@@ -249,33 +218,6 @@ const Hero = () => {
           />
         ))}
       </Box>
-
-      {/* Mobil için haber sayısı göstergesi */}
-      {isMobile && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 3,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            borderRadius: 2,
-            padding: '4px 8px',
-            backdropFilter: 'blur(10px)'
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontSize: '0.65rem',
-              fontWeight: 'bold'
-            }}
-          >
-            {currentNewsIndex + 1}/{mockNews.length}
-          </Typography>
-        </Box>
-      )}
     </Box>
   );
 };
