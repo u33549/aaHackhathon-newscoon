@@ -1,18 +1,15 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
-import { theme } from './theme/theme.js'
+import { newscoonTheme } from './theme/theme.js'
 import App from './App.jsx'
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <ThemeProvider theme={theme}>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <ThemeProvider theme={newscoonTheme}>
       <CssBaseline />
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <App />
     </ThemeProvider>
-  </StrictMode>,
+  </React.StrictMode>,
 )
