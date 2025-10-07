@@ -14,7 +14,7 @@ import {
   Stack
 } from '@mui/material';
 import { EmojiEvents, Star } from '@mui/icons-material';
-import { LogoIcon } from '../../constants/index.jsx';
+import LogoNewscoon from '../../assets/Logo_Newscoon.png';
 
 const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
   const theme = useTheme();
@@ -31,14 +31,14 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
       sx={{
         bgcolor: isMobile ? 'rgba(18, 18, 18, 0.6)' : 'background.default',
         backdropFilter: isMobile ? 'blur(10px)' : 'none',
-        minHeight: { xs: 72, md: 80 }
+        minHeight: { xs: 72, md: 80 } // Header'ı daha yüksek yaptım
       }}
     >
       <Container maxWidth="lg">
         <Toolbar sx={{
           justifyContent: 'space-between',
-          py: { xs: 1, md: 2 },
-          minHeight: { xs: 72, md: 80 }
+          py: { xs: 1, md: 2 }, // Padding'i artırdım
+          minHeight: { xs: 72, md: 80 } // Toolbar'ı da daha yüksek yaptım
         }}>
           {/* Logo - Hem mobil hem desktop'ta göster */}
           <Box sx={{
@@ -46,123 +46,126 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
             alignItems: 'center',
             gap: { xs: 1.5, md: 2 }
           }}>
-            {/* Newscoon logo'su hem mobilde hem desktop'ta */}
-            <LogoIcon sx={{
-              width: { xs: 20, md: 24 },
-              height: { xs: 20, md: 24 }
-            }} />
-            {!isMobile && (
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{
-                  fontWeight: 'bold',
-                  color: 'text.primary'
-                }}
-              >
-                Newscoon
-              </Typography>
-            )}
+            {/* Gerçek Newscoon logosu */}
+            <img
+              src={LogoNewscoon}
+              alt="Newscoon Logo"
+              style={{
+                height: '40px',
+                width: 'auto',
+                objectFit: 'contain'
+              }}
+            />
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                fontWeight: 700,
+                color: 'primary.main'
+              }}
+            >
+              Newscoon
+            </Typography>
           </Box>
 
-          {/* XP ve Level Bilgisi */}
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: { xs: 1, md: 2 },
-            flex: 1,
-            justifyContent: 'flex-end'
-          }}>
-            {/* Level ve XP Desktop */}
-            {!isMobile && (
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Level
-                  </Typography>
-                  <Chip
-                    label={level}
-                    color="primary"
-                    size="small"
-                    sx={{
-                      minWidth: 45,
-                      fontWeight: 'bold'
-                    }}
-                  />
-                </Box>
-
-                <Box sx={{ minWidth: 120 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    XP: {xpForNextLevel.current}/{xpForNextLevel.max}
-                  </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={progressPercentage}
-                    sx={{
-                      mt: 0.5,
-                      height: 6,
-                      borderRadius: 3,
-                      bgcolor: 'action.hover',
-                      '& .MuiLinearProgress-bar': {
-                        borderRadius: 3
-                      }
-                    }}
-                  />
-                </Box>
-
-                <Button
-                  startIcon={<EmojiEvents />}
-                  onClick={onOpenBadges}
-                  variant="outlined"
-                  size="small"
-                  sx={{
-                    borderRadius: 2,
-                    textTransform: 'none'
-                  }}
-                >
-                  Rozetler
-                </Button>
-              </Stack>
-            )}
-
-            {/* Mobil XP ve Level */}
-            {isMobile && (
-              <Stack direction="row" spacing={1} alignItems="center">
+          {/* XP and Level Display - Sadece Desktop */}
+          {!isMobile && (
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3
+            }}>
+              {/* Level */}
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="caption" color="text.secondary">
+                  Level
+                </Typography>
                 <Chip
-                  label={`Lv.${level}`}
+                  label={level}
                   color="primary"
                   size="small"
-                  sx={{ fontWeight: 'bold' }}
-                />
-
-                <Box sx={{ minWidth: 60 }}>
-                  <LinearProgress
-                    variant="determinate"
-                    value={progressPercentage}
-                    sx={{
-                      height: 4,
-                      borderRadius: 2,
-                      bgcolor: 'action.hover',
-                      '& .MuiLinearProgress-bar': {
-                        borderRadius: 2
-                      }
-                    }}
-                  />
-                </Box>
-
-                <IconButton
-                  onClick={onOpenBadges}
-                  size="small"
                   sx={{
-                    color: 'primary.main',
-                    bgcolor: 'action.hover'
+                    minWidth: 45,
+                    fontWeight: 'bold'
                   }}
-                >
-                  <EmojiEvents />
-                </IconButton>
-              </Stack>
-            )}
-          </Box>
+                />
+              </Box>
+
+              {/* XP Progress */}
+              <Box sx={{ minWidth: 150 }}>
+                <Typography variant="caption" color="text.secondary">
+                  XP: {xpForNextLevel.current}/{xpForNextLevel.max}
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={progressPercentage}
+                  sx={{
+                    mt: 0.5,
+                    height: 6,
+                    borderRadius: 3,
+                    bgcolor: 'action.hover',
+                    '& .MuiLinearProgress-bar': {
+                      borderRadius: 3
+                    }
+                  }}
+                />
+              </Box>
+
+              {/* Badges Button */}
+              <Button
+                startIcon={<EmojiEvents />}
+                onClick={onOpenBadges}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none'
+                }}
+              >
+                Rozetler
+              </Button>
+            </Box>
+          )}
+
+          {/* Mobile Layout - Logo, Level, XP ve Rozetler */}
+          {isMobile && (
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+              {/* Level Display */}
+              <Chip
+                icon={<Star />}
+                label={`L${level}`}
+                color="primary"
+                size="small"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.75rem'
+                }}
+              />
+
+              {/* XP Display */}
+              <Typography
+                variant="body2"
+                color="primary.main"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: '0.8rem'
+                }}
+              >
+                {totalXp} XP
+              </Typography>
+
+              {/* Badges Icon Button */}
+              <IconButton
+                onClick={onOpenBadges}
+                size="small"
+                sx={{
+                  p: 1
+                }}
+              >
+                <EmojiEvents fontSize="medium" />
+              </IconButton>
+            </Stack>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
