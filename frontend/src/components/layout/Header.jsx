@@ -31,14 +31,14 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
       sx={{
         bgcolor: isMobile ? 'rgba(18, 18, 18, 0.6)' : 'background.default',
         backdropFilter: isMobile ? 'blur(10px)' : 'none',
-        minHeight: { xs: 72, md: 80 } // Header'ı daha yüksek yaptım
+        minHeight: { xs: 72, md: 80 }
       }}
     >
       <Container maxWidth="lg">
         <Toolbar sx={{
           justifyContent: 'space-between',
-          py: { xs: 1, md: 2 }, // Padding'i artırdım
-          minHeight: { xs: 72, md: 80 } // Toolbar'ı da daha yüksek yaptım
+          py: { xs: 1, md: 2 },
+          minHeight: { xs: 72, md: 80 }
         }}>
           {/* Logo - Hem mobil hem desktop'ta göster */}
           <Box sx={{
@@ -111,9 +111,9 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
                 />
               </Box>
 
-              {/* Badges Button */}
+              {/* Badges Button - Kupa ikonu sarı */}
               <Button
-                startIcon={<EmojiEvents />}
+                startIcon={<EmojiEvents sx={{ color: '#FFD700' }} />}
                 onClick={onOpenBadges}
                 variant="outlined"
                 size="small"
@@ -154,7 +154,7 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
                 {totalXp} XP
               </Typography>
 
-              {/* Badges Icon Button */}
+              {/* Badges Icon Button - Kupa ikonu sarı */}
               <IconButton
                 onClick={onOpenBadges}
                 size="small"
@@ -162,7 +162,10 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
                   p: 1
                 }}
               >
-                <EmojiEvents fontSize="medium" />
+                <EmojiEvents
+                  fontSize="medium"
+                  sx={{ color: '#FFD700' }}
+                />
               </IconButton>
             </Stack>
           )}
