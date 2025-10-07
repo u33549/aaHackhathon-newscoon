@@ -32,9 +32,41 @@ api.interceptors.response.use(
     return response.data; // Backend'den gelen data kısmını doğrudan döndür
   },
   (error) => {
-    // Hata durumlarını yönet
-    const errorMessage = error.response?.data?.message || error.message || 'Bilinmeyen hata';
-    console.error('API Error:', errorMessage);
+    // Hata durumlarını detaylı yönet
+    let errorMessage = 'Bilinmeyen hata';
+    let errorDetails = {};
+
+    if (error.response) {
+      // Backend'den hata yanıtı geldi
+      const { status, data } = error.response;
+      errorMessage = data?.message || data?.error || `HTTP ${status} Error`;
+      errorDetails = {
+        status,
+        statusText: error.response.statusText,
+        data: data,
+        url: error.config?.url,
+        method: error.config?.method?.toUpperCase(),
+      };
+
+      console.error('Backend API Error:', {
+        message: errorMessage,
+        ...errorDetails,
+      });
+    } else if (error.request) {
+      // İstek gönderildi ama yanıt alınamadı (network hatası)
+      errorMessage = 'Sunucuya ulaşılamıyor (Network Error)';
+      errorDetails = {
+        code: error.code,
+        url: error.config?.url,
+      };
+
+      console.error('Network Error:', errorDetails);
+    } else {
+      // İstek hazırlanırken hata oluştu
+      errorMessage = error.message;
+      console.error('Request Setup Error:', error.message);
+    }
+
     return Promise.reject(new Error(errorMessage));
   }
 );
