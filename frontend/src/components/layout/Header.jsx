@@ -1,95 +1,166 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
   Box,
   Typography,
   Button,
+  LinearProgress,
+  Chip,
   Container,
   useTheme,
   useMediaQuery,
-  IconButton
+  IconButton,
+  Stack
 } from '@mui/material';
-import { Dashboard, Home, Article } from '@mui/icons-material';
+import { EmojiEvents, Star } from '@mui/icons-material';
 import { LogoIcon } from '../../constants/index.jsx';
 
-const Header = () => {
+const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const location = useLocation();
+
+  const progressPercentage = xpForNextLevel.max > 0
+    ? (xpForNextLevel.current / xpForNextLevel.max) * 100
+    : 0;
 
   return (
     <AppBar
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: 'background.default',
-        borderBottom: '1px solid',
-        borderBottomColor: 'divider'
+        bgcolor: isMobile ? 'rgba(18, 18, 18, 0.6)' : 'background.default',
+        backdropFilter: isMobile ? 'blur(10px)' : 'none',
+        minHeight: { xs: 72, md: 80 }
       }}
     >
       <Container maxWidth="lg">
         <Toolbar sx={{
           justifyContent: 'space-between',
-          py: 1
+          py: { xs: 1, md: 2 },
+          minHeight: { xs: 72, md: 80 }
         }}>
-          {/* Logo */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <LogoIcon sx={{ width: 32, height: 32 }} />
-            <Typography
-              variant="h6"
-              component={Link}
-              to="/"
-              sx={{
-                textDecoration: 'none',
-                color: 'text.primary',
-                fontWeight: 'bold'
-              }}
-            >
-              Newscoon
-            </Typography>
+          {/* Logo - Hem mobil hem desktop'ta göster */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: 1.5, md: 2 }
+          }}>
+            {/* Newscoon logo'su hem mobilde hem desktop'ta */}
+            <LogoIcon sx={{
+              width: { xs: 20, md: 24 },
+              height: { xs: 20, md: 24 }
+            }} />
+            {!isMobile && (
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                  fontWeight: 'bold',
+                  color: 'text.primary'
+                }}
+              >
+                Newscoon
+              </Typography>
+            )}
           </Box>
 
-          {/* Navigation */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {isMobile ? (
-              <>
-                <IconButton
-                  component={Link}
-                  to="/"
-                  color={location.pathname === '/' ? 'primary' : 'default'}
-                >
-                  <Home />
-                </IconButton>
-                <IconButton
-                  component={Link}
-                  to="/admin"
-                  color={location.pathname === '/admin' ? 'primary' : 'default'}
-                >
-                  <Dashboard />
-                </IconButton>
-              </>
-            ) : (
-              <>
+          {/* XP ve Level Bilgisi */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: 1, md: 2 },
+            flex: 1,
+            justifyContent: 'flex-end'
+          }}>
+            {/* Level ve XP Desktop */}
+            {!isMobile && (
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Level
+                  </Typography>
+                  <Chip
+                    label={level}
+                    color="primary"
+                    size="small"
+                    sx={{
+                      minWidth: 45,
+                      fontWeight: 'bold'
+                    }}
+                  />
+                </Box>
+
+                <Box sx={{ minWidth: 120 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    XP: {xpForNextLevel.current}/{xpForNextLevel.max}
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={progressPercentage}
+                    sx={{
+                      mt: 0.5,
+                      height: 6,
+                      borderRadius: 3,
+                      bgcolor: 'action.hover',
+                      '& .MuiLinearProgress-bar': {
+                        borderRadius: 3
+                      }
+                    }}
+                  />
+                </Box>
+
                 <Button
-                  component={Link}
-                  to="/"
-                  variant={location.pathname === '/' ? 'contained' : 'text'}
-                  startIcon={<Home />}
+                  startIcon={<EmojiEvents />}
+                  onClick={onOpenBadges}
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none'
+                  }}
                 >
-                  Ana Sayfa
+                  Rozetler
                 </Button>
-                <Button
-                  component={Link}
-                  to="/admin"
-                  variant={location.pathname === '/admin' ? 'contained' : 'text'}
-                  startIcon={<Dashboard />}
-                  color="secondary"
+              </Stack>
+            )}
+
+            {/* Mobil XP ve Level */}
+            {isMobile && (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Chip
+                  label={`Lv.${level}`}
+                  color="primary"
+                  size="small"
+                  sx={{ fontWeight: 'bold' }}
+                />
+
+                <Box sx={{ minWidth: 60 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={progressPercentage}
+                    sx={{
+                      height: 4,
+                      borderRadius: 2,
+                      bgcolor: 'action.hover',
+                      '& .MuiLinearProgress-bar': {
+                        borderRadius: 2
+                      }
+                    }}
+                  />
+                </Box>
+
+                <IconButton
+                  onClick={onOpenBadges}
+                  size="small"
+                  sx={{
+                    color: 'primary.main',
+                    bgcolor: 'action.hover'
+                  }}
                 >
-                  Admin Panel
-                </Button>
-              </>
+                  <EmojiEvents />
+                </IconButton>
+              </Stack>
             )}
           </Box>
         </Toolbar>
