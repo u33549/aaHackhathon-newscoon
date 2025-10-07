@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var dotenv = require('dotenv');
+var cors = require('cors');
 
 // .env dosyasından ortam değişkenlerini yükle
 dotenv.config();
@@ -21,6 +22,24 @@ var newsStacksRouter = require('./routes/newsStacks');
 var newsStackImagesRouter = require('./routes/newsStackImages');
 
 var app = express();
+
+// CORS ayarları - Development modunda her yerden erişime izin ver
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+    credentials: false
+  }));
+} else {
+  // Production modunda daha kısıtlı CORS
+  app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:5173'], // Frontend URL'leri ekleyebilirsiniz
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
+    credentials: true
+  }));
+}
 
 // view engine setup - frontend olmayacak, API odaklı
 // app.set('views', path.join(__dirname, 'views'));
