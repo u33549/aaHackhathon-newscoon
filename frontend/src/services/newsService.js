@@ -91,3 +91,17 @@ export const getLatestNews = async (limit = 20) => {
 export const getUsableNews = async (limit = 50) => {
   return await getAllNews({ isUsable: true, limit });
 };
+
+export const newsService = {
+  getAllNews,
+  getNewsByGuid,
+  createNews,
+  createBulkNews,
+  updateNewsByGuid,
+  deleteNewsByGuid,
+  getNewsByCategory,
+  getLatestNews,
+  getUsableNews
+};
+
+export default newsService;

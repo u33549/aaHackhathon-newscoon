@@ -116,3 +116,23 @@ export const getStacksByTags = async (tags, limit = 10) => {
     limit
   });
 };
+
+
+
+// stackService.js dosyasının en sonuna ekleyin:
+
+export const stackService = {
+  getAllStacks,
+  getStackById,
+  createStack,
+  updateStackById,
+  deleteStackById,
+  addNewsToStack,
+  removeNewsFromStack,
+  getApprovedStacks,
+  getFeaturedStacks,
+  getPopularStacks,
+  getStacksByTags
+};
+
+export default stackService;

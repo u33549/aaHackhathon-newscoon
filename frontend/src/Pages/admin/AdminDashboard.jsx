@@ -1,204 +1,219 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  IconButton
-} from '@mui/material';
-import {
-  Dashboard,
-  Article,
-  People,
-  Settings,
-  Add,
-  Edit,
-  Delete,
-  Visibility
-} from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { newsService } from '../../services/newsService';
+import { stackService } from '../../services/stackService';
+import { getAllStackImages } from '../../services/imageService';
 
 const AdminDashboard = () => {
-  const [stats] = useState({
-    totalArticles: 142,
-    totalUsers: 1250,
-    todayViews: 8430,
-    pendingArticles: 7
+  const [stats, setStats] = useState({
+    newsCount: 0,
+    stackCount: 0,
+    photoCount: 0,
+    loading: true,
   });
 
-  const [recentArticles] = useState([
-    { id: 1, title: 'Teknoloji Dünyasında Son Gelişmeler', status: 'published', author: 'Admin', date: '2025-01-07' },
-    { id: 2, title: 'Spor Haberleri Özeti', status: 'draft', author: 'Editor', date: '2025-01-07' },
-    { id: 3, title: 'Ekonomik Göstergeler', status: 'pending', author: 'Writer', date: '2025-01-06' },
-    { id: 4, title: 'Sağlık Sektörü Analizi', status: 'published', author: 'Admin', date: '2025-01-06' }
-  ]);
+  const [recentNews, setRecentNews] = useState([]);
+  const [recentStacks, setRecentStacks] = useState([]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'published': return 'success';
-      case 'draft': return 'warning';
-      case 'pending': return 'info';
-      default: return 'default';
+  useEffect(() => {
+    fetchStats();
+    fetchRecentData();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const [newsRes, stacksRes, photosRes] = await Promise.all([
+        newsService.getAllNews().catch(() => ({ data: [] })),
+        stackService.getAllStacks().catch(() => ({ data: [] })),
+        getAllStackImages().catch(() => ({ data: [] })),
+      ]);
+
+      setStats({
+        newsCount: newsRes?.data?.length || 0,
+        stackCount: stacksRes?.data?.length || 0,
+        photoCount: photosRes?.data?.length || 0,
+        loading: false,
+      });
+    } catch (error) {
+      console.error('Stats yüklenemedi:', error);
+      setStats(prev => ({ ...prev, loading: false }));
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'published': return 'Yayında';
-      case 'draft': return 'Taslak';
-      case 'pending': return 'Beklemede';
-      default: return status;
+  const fetchRecentData = async () => {
+    try {
+      const [newsRes, stacksRes] = await Promise.all([
+        newsService.getAllNews({ limit: 5 }).catch(() => ({ data: [] })),
+        stackService.getAllStacks({ limit: 5 }).catch(() => ({ data: [] })),
+      ]);
+
+      setRecentNews(newsRes?.data?.slice(0, 5) || []);
+      setRecentStacks(stacksRes?.data?.slice(0, 5) || []);
+    } catch (error) {
+      console.error('Son veriler yüklenemedi:', error);
     }
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
-        Admin Paneli
-      </Typography>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900">🎛️ Admin Paneli</h1>
+          <p className="text-gray-600 mt-2">Hoş geldiniz! Sistemdeki tüm içerikleri buradan yönetebilirsiniz.</p>
+        </div>
 
-      {/* İstatistik Kartları */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <Article color="primary" sx={{ mr: 2, fontSize: 40 }} />
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Toplam Makale
-                  </Typography>
-                  <Typography variant="h5">
-                    {stats.totalArticles}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        {/* İstatistik Kartları */}
+        {stats.loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Link to="/admin/news" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">Toplam Haberler</p>
+                  <p className="text-4xl font-bold text-blue-600 mt-2">{stats.newsCount}</p>
+                </div>
+                <div className="bg-blue-100 p-4 rounded-full">
+                  <span className="text-4xl">📰</span>
+                </div>
+              </div>
+              <div className="mt-4 text-blue-600 font-medium hover:underline">
+                Haberleri Yönet →
+              </div>
+            </Link>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <People color="secondary" sx={{ mr: 2, fontSize: 40 }} />
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Toplam Kullanıcı
-                  </Typography>
-                  <Typography variant="h5">
-                    {stats.totalUsers}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+            <Link to="/admin/stacks" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">Toplam Yığınlar</p>
+                  <p className="text-4xl font-bold text-green-600 mt-2">{stats.stackCount}</p>
+                </div>
+                <div className="bg-green-100 p-4 rounded-full">
+                  <span className="text-4xl">📚</span>
+                </div>
+              </div>
+              <div className="mt-4 text-green-600 font-medium hover:underline">
+                Yığınları Yönet →
+              </div>
+            </Link>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <Visibility color="info" sx={{ mr: 2, fontSize: 40 }} />
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Bugünkü Görüntüleme
-                  </Typography>
-                  <Typography variant="h5">
-                    {stats.todayViews.toLocaleString()}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+            <Link to="/admin/photos" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-medium">Toplam Fotoğraflar</p>
+                  <p className="text-4xl font-bold text-purple-600 mt-2">{stats.photoCount}</p>
+                </div>
+                <div className="bg-purple-100 p-4 rounded-full">
+                  <span className="text-4xl">📸</span>
+                </div>
+              </div>
+              <div className="mt-4 text-purple-600 font-medium hover:underline">
+                Fotoğrafları Yönet →
+              </div>
+            </Link>
+          </div>
+        )}
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center">
-                <Dashboard color="warning" sx={{ mr: 2, fontSize: 40 }} />
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Bekleyen Makale
-                  </Typography>
-                  <Typography variant="h5">
-                    {stats.pendingArticles}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+        {/* Hızlı Erişim */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Son Haberler */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">📰 Son Haberler</h2>
+              <Link to="/admin/news" className="text-blue-600 hover:underline text-sm">
+                Tümünü Gör →
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {recentNews.length > 0 ? (
+                recentNews.map((news) => (
+                  <div key={news.guid} className="border-l-4 border-blue-500 pl-4 py-2">
+                    <div className="font-medium text-gray-900 text-sm">
+                      {news.title?.substring(0, 60)}...
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {news.category} • {new Date(news.pubDate).toLocaleDateString('tr-TR')}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">Henüz haber yok</p>
+              )}
+            </div>
+          </div>
 
-      {/* Son Makaleler Tablosu */}
-      <Paper sx={{ p: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h6">
-            Son Makaleler
-          </Typography>
-          <Button variant="contained" startIcon={<Add />}>
-            Yeni Makale
-          </Button>
-        </Box>
+          {/* Son Yığınlar */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">📚 Son Yığınlar</h2>
+              <Link to="/admin/stacks" className="text-green-600 hover:underline text-sm">
+                Tümünü Gör →
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {recentStacks.length > 0 ? (
+                recentStacks.map((stack) => (
+                  <div key={stack._id} className="border-l-4 border-green-500 pl-4 py-2">
+                    <div className="font-medium text-gray-900 text-sm">
+                      {stack.title}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        stack.status === 'approved' ? 'bg-green-100 text-green-800' :
+                        stack.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {stack.status === 'approved' ? 'Onaylandı' : 
+                         stack.status === 'rejected' ? 'Reddedildi' : 'Beklemede'}
+                      </span>
+                      <span>{stack.news?.length || 0} haber</span>
+                      {stack.isFeatured && <span>⭐</span>}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">Henüz yığın yok</p>
+              )}
+            </div>
+          </div>
+        </div>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Başlık</TableCell>
-                <TableCell>Durum</TableCell>
-                <TableCell>Yazar</TableCell>
-                <TableCell>Tarih</TableCell>
-                <TableCell>İşlemler</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {recentArticles.map((article) => (
-                <TableRow key={article.id}>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {article.title}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={getStatusText(article.status)}
-                      color={getStatusColor(article.status)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>{article.author}</TableCell>
-                  <TableCell>{article.date}</TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="primary">
-                      <Visibility />
-                    </IconButton>
-                    <IconButton size="small" color="info">
-                      <Edit />
-                    </IconButton>
-                    <IconButton size="small" color="error">
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Container>
+        {/* Hızlı İşlemler */}
+        <div className="mt-8 bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">⚡ Hızlı İşlemler</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link to="/admin/news" 
+              className="flex items-center gap-3 p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all">
+              <span className="text-3xl">➕</span>
+              <div>
+                <div className="font-medium text-gray-900">Yeni Haber Ekle</div>
+                <div className="text-sm text-gray-600">Sisteme yeni haber ekleyin</div>
+              </div>
+            </Link>
+
+            <Link to="/admin/stacks"
+              className="flex items-center gap-3 p-4 border-2 border-green-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all">
+              <span className="text-3xl">📚</span>
+              <div>
+                <div className="font-medium text-gray-900">Yeni Yığın Oluştur</div>
+                <div className="text-sm text-gray-600">Haber yığını oluşturun</div>
+              </div>
+            </Link>
+
+            <Link to="/admin/photos"
+              className="flex items-center gap-3 p-4 border-2 border-purple-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all">
+              <span className="text-3xl">📤</span>
+              <div>
+                <div className="font-medium text-gray-900">Fotoğraf Yükle</div>
+                <div className="text-sm text-gray-600">Yığınlara fotoğraf ekleyin</div>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
