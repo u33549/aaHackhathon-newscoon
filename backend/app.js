@@ -63,16 +63,30 @@ app.use(cookieParser());
 // API rotaları
 app.use('/api', indexRouter);
 
-// Haber API'leri için API anahtarı doğrulama middleware'ini ekle
-app.use('/api/news', apiKeyAuth, rssNewsRouter);
+// Haber API'leri için API anahtarı doğrulama middleware'ini ekle (OPTIONS hariç)
+app.use('/api/news', (req, res, next) => {
+  // OPTIONS request'leri için API key kontrolü yapma
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  // Diğer metodlar için API key kontrolü yap
+  return apiKeyAuth(req, res, next);
+}, rssNewsRouter);
 
-// Haber yığınları API'leri için API anahtarı doğrulama middleware'ini ekle
-app.use('/api/stacks', apiKeyAuth, newsStacksRouter);
+// Haber yığınları API'leri için API anahtarı doğrulama middleware'ini ekle (OPTIONS hariç)
+app.use('/api/stacks', (req, res, next) => {
+  // OPTIONS request'leri için API key kontrolü yapma
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  // Diğer metodlar için API key kontrolü yap
+  return apiKeyAuth(req, res, next);
+}, newsStacksRouter);
 
 // Haber yığını resimleri API'leri - okuma işlemleri serbest, yazma işlemleri API key gerektirir
 app.use('/api/news-stack-images', (req, res, next) => {
-  // GET istekleri için API key kontrolü yapma
-  if (req.method === 'GET') {
+  // GET ve OPTIONS istekleri için API key kontrolü yapma
+  if (req.method === 'GET' || req.method === 'OPTIONS') {
     return next();
   }
   // POST, PUT, DELETE için API key kontrolü yap
