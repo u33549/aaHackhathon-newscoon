@@ -42,11 +42,18 @@ export const ShareIcon = () => React.createElement(Share);
 // --- DATA ---
 export const allBadges = [
     {
-      id: 'teknoloji',
-      name: 'Teknoloji Uzmanı',
-      description: 'Teknoloji kategorisindeki ilk haberini okudun.',
+      id: 'gundem',
+      name: 'Gündem Uzmanı',
+      description: 'Gündem kategorisindeki ilk haberini okudun.',
       icon: React.createElement(TeknolojiBadgeIcon),
       color: '#3B82F6'
+    },
+    {
+      id: 'dunya',
+      name: 'Dünya Gözlemcisi',
+      description: 'Dünya kategorisindeki ilk haberini okudun.',
+      icon: React.createElement(EkonomiBadgeIcon),
+      color: '#10B981'
     },
     {
       id: 'ekonomi',
@@ -56,18 +63,25 @@ export const allBadges = [
       color: '#10B981'
     },
     {
-      id: 'bilim',
-      name: 'Bilim Kaşifi',
-      description: 'Bilim kategorisindeki ilk haberini okudun.',
+      id: 'spor',
+      name: 'Spor Tutkunusu',
+      description: 'Spor kategorisindeki ilk haberini okudun.',
       icon: React.createElement(BilimBadgeIcon),
       color: '#8B5CF6'
     },
     {
-      id: 'saglik',
-      name: 'Sağlık Elçisi',
-      description: 'Sağlık kategorisindeki ilk haberini okudun.',
+      id: 'analiz',
+      name: 'Analiz Uzmanı',
+      description: 'Analiz kategorisindeki ilk haberini okudun.',
       icon: React.createElement(SaglikBadgeIcon),
       color: '#EF4444'
+    },
+    {
+      id: 'kultur',
+      name: 'Kültür Elçisi',
+      description: 'Kültür kategorisindeki ilk haberini okudun.',
+      icon: React.createElement(TeknolojiBadgeIcon),
+      color: '#F59E0B'
     },
 ];
 
@@ -78,7 +92,7 @@ export const heroSlides = [
         superTitle: 'SON DAKİKA',
         title: 'YAPAY ZEKA DEVRİMİ',
         subtitle: 'Global Teknoloji Zirvesi, çığır açan yapay zeka gelişmelerini duyurdu',
-        category: 'teknoloji',
+        category: 'gundem',
         summary: "Global Teknoloji Zirvesi, 'Prometheus' adlı yeni bir sinir ağı mimarisiyle yapay zeka alanında devrim yarattı. Bu teknoloji, daha az veri ve enerjiyle öğrenerek otonom araçlardan tıbba kadar birçok alanda çığır açma potansiyeli taşıyor.",
         content: [
             { title: "Zirvenin Gündemi Belirleyen Duyuruları", paragraph: "Silikon Vadisi'nin kalbinde düzenlenen ve teknoloji dünyasının nefesini tutarak takip ettiği Yıllık Global Teknoloji Zirvesi, bu yıl yapay zeka alanında adeta bir paradigma kayması yaratan bir dizi çarpıcı duyuruyla sona erdi. Dünyanın dört bir yanından gelen binlerce mühendis, araştırmacı ve yatırımcı, insanlığın geleceğini şekillendirecek bu yeni teknolojilere ilk elden tanıklık etti. Zirvenin kapanış konuşmasında, yapay zekanın sadece bir otomasyon aracı olmaktan çıkıp yaratıcı bir ortak haline geldiği vurgulandı." },
@@ -119,7 +133,7 @@ export const heroSlides = [
         superTitle: 'BİLİM',
         title: 'YAŞANABİLİR GEZEGEN',
         subtitle: 'Sıvı suya sahip olma potansiyeli olan yeni bir ötegezegen keşfedildi',
-        category: 'bilim',
+        category: 'analiz',
         summary: "James Webb Uzay Teleskobu, Dünya'ya benzer büyüklükte ve yaşanabilir bölgede yer alan Kepler-186f ötegezegeninin atmosferinde su buharı izleri tespit etti. Bu, yaşam potansiyeli için önemli bir adım olarak görülüyor.",
         content: [
             { title: "James Webb Teleskobu'ndan Tarihi Onay", paragraph: "Gökbilimciler, insanlığın evrendeki yerini sorgulatan tarihi bir keşfe imza attı. NASA'nın James Webb Uzay Teleskobu'nu (JWST) kullanan uluslararası bir araştırma ekibi, daha önce aday olarak gösterilen Kepler-186f adlı ötegezegenin varlığını doğruladı ve atmosferik verilerini ilk kez analiz etti." },
@@ -140,7 +154,7 @@ export const heroSlides = [
         superTitle: 'SAĞLIK',
         title: 'EVRENSEL AŞI UMUDU',
         subtitle: 'Bilim insanları yeni evrensel aşı denemeleri konusunda iyimser',
-        category: 'saglik',
+        category: 'analiz',
         summary: "Tüm grip türlerine ve gelecekteki pandemilere karşı koruma sağlaması hedeflenen evrensel bir grip aşısı, insan denemelerinin son aşamasına geçti. Başarılı olursa, yıllık aşı ihtiyacı ortadan kalkabilir.",
         content: [
             { title: "Aşı Teknolojisinde Yeni Bir Çağ", paragraph: "Tıp dünyasında heyecanla beklenen bir gelişme yaşandı. Onlarca yıldır süren araştırmaların doruk noktası olarak kabul edilen evrensel bir grip aşısı adayı, insan denemelerinin son ve en kritik aşaması olan Faz 3'e geçti." },
@@ -158,10 +172,10 @@ export const heroSlides = [
 ];
 
 export const featuredNews = [
-    { id: 1, category: 'Teknoloji', summary: 'Yeni nesil yapay zeka modelleri, insan zekasını aşan yetenekler sergiliyor ve teknoloji dünyasında yeni bir çağ başlatıyor.' },
-    { id: 2, category: 'Finans', summary: 'Beklenmedik faiz artırımı kararı sonrası piyasalarda dalgalanma yaşanırken, uzmanlar ekonominin geleceği hakkında ikiye bölündü.' },
-    { id: 3, category: 'Bilim', summary: 'Gökbilimciler, Dünya\'ya benzerliğiyle heyecan yaratan ve yüzeyinde sıvı su bulundurma potansiyeli olan yeni bir gezegen keşfetti.' },
-    { id: 4, category: 'Sağlık', summary: 'Evrensel grip aşısı denemeleri son aşamaya geçti. Başarılı olursa, yıllık aşı ihtiyacı ortadan kalkabilir ve salgınlara karşı koruma sağlayabilir.' },
+    { id: 1, category: 'Gündem', summary: 'Yeni nesil yapay zeka modelleri, insan zekasını aşan yetenekler sergiliyor ve teknoloji dünyasında yeni bir çağ başlatıyor.' },
+    { id: 2, category: 'Ekonomi', summary: 'Beklenmedik faiz artırımı kararı sonrası piyasalarda dalgalanma yaşanırken, uzmanlar ekonominin geleceği hakkında ikiye bölündü.' },
+    { id: 3, category: 'Analiz', summary: 'Gökbilimciler, Dünya\'ya benzerliğiyle heyecan yaratan ve yüzeyinde sıvı su bulundurma potansiyeli olan yeni bir gezegen keşfetti.' },
+    { id: 4, category: 'Kültür', summary: 'Evrensel grip aşısı denemeleri son aşamaya geçti. Başarılı olursa, yıllık aşı ihtiyacı ortadan kalkabilir ve salgınlara karşı koruma sağlayabilir.' },
 ];
 
 // --- GAMIFICATION CONSTANTS ---
@@ -211,10 +225,12 @@ export const leaderboardData = [
 ];
 
 export const categoryColors = {
-  teknoloji: '#3B82F6',
+  gundem: '#3B82F6',
+  dunya: '#10B981',
   ekonomi: '#10B981',
-  bilim: '#8B5CF6',
-  saglik: '#EF4444'
+  spor: '#8B5CF6',
+  analiz: '#EF4444',
+  kultur: '#F59E0B'
 };
 
 export const mockNews = [
@@ -222,7 +238,7 @@ export const mockNews = [
     id: 1,
     title: 'Yapay Zeka Teknolojisi',
     description: 'Yapay zeka teknolojilerindeki son gelişmeler, insan yaşamını köklü bir şekilde değiştirmeye devam ediyor. Uzmanlar, önümüzdeki 10 yıl içinde büyük dönüşümler bekleniyor.',
-    category: 'teknoloji',
+    category: 'gundem',
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=600&fit=crop',
     publishedAt: '2024-01-15T10:30:00Z',
     source: 'TechNews'

@@ -1,9 +1,7 @@
 import React, { useRef } from 'react';
 import {
   Box,
-  Container,
   Typography,
-  Grid,
   IconButton,
   useMediaQuery,
   useTheme

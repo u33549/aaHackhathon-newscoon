@@ -12,17 +12,12 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
 
   const categories = [
     { id: 'all', label: 'Tümü' },
-    { id: 'teknoloji', label: 'Teknoloji' },
+    { id: 'gundem', label: 'Gündem' },
+    { id: 'dunya', label: 'Dünya' },
     { id: 'ekonomi', label: 'Ekonomi' },
     { id: 'spor', label: 'Spor' },
-    { id: 'saglik', label: 'Sağlık' },
-    { id: 'politika', label: 'Politika' },
-    { id: 'egitim', label: 'Eğitim' },
-    { id: 'dünya', label: 'Dünya' },
-    { id: 'gündem', label: 'Gündem' },
-    { id: 'bilim', label: 'Bilim' },
-    { id: 'sanat', label: 'Sanat' },
-    { id: 'kültür', label: 'Kültür' }
+    { id: 'analiz', label: 'Analiz' },
+    { id: 'kultur', label: 'Kültür' }
   ];
 
   return (
