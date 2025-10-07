@@ -24,31 +24,7 @@ var newsStackImagesRouter = require('./routes/newsStackImages');
 var app = express();
 
 // CORS ayarlarını yapılandırma
-app.use(cors({
-  origin: true, // Tüm origin'lere izin ver
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key', 'Access-Control-Allow-Origin', 'Origin', 'X-Requested-With', 'Accept'],
-  credentials: true,
-  optionsSuccessStatus: 200 // Legacy browser desteği için
-}));
-
-// Preflight request'ler için ek middleware
-app.options('*', cors());
-
-// Manuel CORS header'ları ekleme (ekstra güvence için)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key, Origin, X-Requested-With, Accept');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // OPTIONS request'lerde hemen yanıt ver
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
+app.use(cors());
 
 // view engine setup - frontend olmayacak, API odaklı
 // app.set('views', path.join(__dirname, 'views'));
