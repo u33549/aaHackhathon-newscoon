@@ -10,6 +10,7 @@ import Footer from './components/layout/Footer';
 // Pages
 import MainPage from './pages/MainPage';
 import ArticlePage from './pages/ArticlePage';
+import AllNewsPage from './pages/AllNewsPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TestPage from './pages/TestPage';
 
@@ -22,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/article/:id" element={<ArticlePage />} />
+          <Route path="/all-news" element={<AllNewsPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/test" element={<TestPage />} />
         </Routes>
