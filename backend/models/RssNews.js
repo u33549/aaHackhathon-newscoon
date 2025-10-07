@@ -29,6 +29,7 @@ const rssNewsSchema = new mongoose.Schema({
   },
   newstext: {
     type: String,
+    required: [true, 'haber metni zorunludur'],
     trim: true
   },
   pubDate: {
