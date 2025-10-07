@@ -11,6 +11,7 @@ import Footer from './components/layout/Footer';
 import MainPage from './pages/MainPage';
 import ArticlePage from './pages/ArticlePage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import TestPage from './pages/TestPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/article/:id" element={<ArticlePage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/test" element={<TestPage />} />
         </Routes>
         <Footer />
       </div>

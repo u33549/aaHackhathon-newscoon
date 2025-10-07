@@ -50,41 +50,46 @@ export {
 } from './imageService';
 
 // Hızlı kullanım için gruplandırılmış objeler
+// Re-export edilen fonksiyonları kullanarak objeler oluştur
+import * as newsServices from './newsService';
+import * as stackServices from './stackService';
+import * as imageServices from './imageService';
+
 export const newsAPI = {
-  getAll: getAllNews,
-  getByGuid: getNewsByGuid,
-  create: createNews,
-  createBulk: createBulkNews,
-  update: updateNewsByGuid,
-  delete: deleteNewsByGuid,
-  getByCategory: getNewsByCategory,
-  getLatest: getLatestNews,
-  getUsable: getUsableNews
+  getAll: newsServices.getAllNews,
+  getByGuid: newsServices.getNewsByGuid,
+  create: newsServices.createNews,
+  createBulk: newsServices.createBulkNews,
+  update: newsServices.updateNewsByGuid,
+  delete: newsServices.deleteNewsByGuid,
+  getByCategory: newsServices.getNewsByCategory,
+  getLatest: newsServices.getLatestNews,
+  getUsable: newsServices.getUsableNews
 };
 
 export const stacksAPI = {
-  getAll: getAllStacks,
-  getById: getStackById,
-  create: createStack,
-  update: updateStackById,
-  delete: deleteStackById,
-  addNews: addNewsToStack,
-  removeNews: removeNewsFromStack,
-  getApproved: getApprovedStacks,
-  getFeatured: getFeaturedStacks,
-  getPopular: getPopularStacks,
-  getByTags: getStacksByTags
+  getAll: stackServices.getAllStacks,
+  getById: stackServices.getStackById,
+  create: stackServices.createStack,
+  update: stackServices.updateStackById,
+  delete: stackServices.deleteStackById,
+  addNews: stackServices.addNewsToStack,
+  removeNews: stackServices.removeNewsFromStack,
+  getApproved: stackServices.getApprovedStacks,
+  getFeatured: stackServices.getFeaturedStacks,
+  getPopular: stackServices.getPopularStacks,
+  getByTags: stackServices.getStacksByTags
 };
 
 export const imagesAPI = {
-  getAll: getAllStackImages,
-  getById: getStackImageById,
-  getByStackId: getStackImageByStackId,
-  upload: uploadStackImage,
-  updateById: updateStackImageById,
-  updateByStackId: updateStackImageByStackId,
-  deleteById: deleteStackImageById,
-  deleteByStackId: deleteStackImageByStackId,
-  uploadFile: uploadImageFile,
-  updateCover: updateStackCoverImage
+  getAll: imageServices.getAllStackImages,
+  getById: imageServices.getStackImageById,
+  getByStackId: imageServices.getStackImageByStackId,
+  upload: imageServices.uploadStackImage,
+  updateById: imageServices.updateStackImageById,
+  updateByStackId: imageServices.updateStackImageByStackId,
+  deleteById: imageServices.deleteStackImageById,
+  deleteByStackId: imageServices.deleteStackImageByStackId,
+  uploadFile: imageServices.uploadImageFile,
+  updateCover: imageServices.updateStackCoverImage
 };
