@@ -209,16 +209,18 @@ const MainPage = () => {
               </Button>
             }
           >
-            {allNewsTimeline.map(newsItem => (
-              <FeaturedNewsCard
-                key={newsItem.id}
-                news={{
-                  id: newsItem.id,
-                  category: newsItem.category,
-                  summary: newsItem.summary
-                }}
-              />
-            ))}
+            <NewsCard
+              articles={allNewsTimeline.map(newsItem => ({
+                id: newsItem.id,
+                thumbnailUrl: newsItem.imageUrl,
+                imageUrl: newsItem.imageUrl,
+                category: newsItem.category,
+                title: newsItem.title,
+                age: new Date(newsItem.pubDate || Date.now()).toLocaleDateString('tr-TR')
+              }))}
+              variant="horizontal"
+              onClick={(newsId) => handleNewsCardClick(newsId)}
+            />
           </NewsSection>
 
           <NewsSection title="Son okunan haberler">
