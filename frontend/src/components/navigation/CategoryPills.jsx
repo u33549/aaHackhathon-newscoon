@@ -6,7 +6,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 
-const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
+const CategoryPills = ({ selectedCategory, onCategoryChange }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -46,7 +46,7 @@ const CategoryPills = ({ selectedCategory, onSelectCategory }) => {
           <Chip
             key={category.id}
             label={category.label}
-            onClick={() => onSelectCategory(category.id)}
+            onClick={() => onCategoryChange(category.id)}
             variant={selectedCategory === category.id ? 'filled' : 'outlined'}
             sx={{
               borderRadius: 25, // Daha oval şekil

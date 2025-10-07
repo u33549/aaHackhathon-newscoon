@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Container,
@@ -9,13 +9,12 @@ import {
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
 
-const SearchBar = () => {
+const SearchBar = ({ searchQuery, onSearchChange, placeholder = "Haberlerde ara..." }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
+    onSearchChange(event.target.value);
   };
 
   return (
@@ -26,8 +25,8 @@ const SearchBar = () => {
       <Container maxWidth="lg">
         <TextField
           fullWidth
-          placeholder="Haberlerde ara..."
-          value={searchTerm}
+          placeholder={placeholder}
+          value={searchQuery}
           onChange={handleSearchChange}
           size={isMobile ? "medium" : "medium"}
           InputProps={{

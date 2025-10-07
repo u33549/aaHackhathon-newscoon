@@ -77,15 +77,31 @@ const MainPage = () => {
   let filteredNews = selectedCategory === 'all' ? news : news.filter(article => article.category === selectedCategory);
 
   if (searchQuery) {
-    filteredNews = filteredNews.filter(article =>
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.content?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    filteredNews = filteredNews.filter(article => {
+      const title = article.title?.toLowerCase() || '';
+      const summary = article.summary?.toLowerCase() || '';
+
+      // content array'ini string'e çevir
+      let contentText = '';
+      if (Array.isArray(article.content)) {
+        contentText = article.content
+          .map(item => `${item.title || ''} ${item.paragraph || ''}`)
+          .join(' ')
+          .toLowerCase();
+      } else if (typeof article.content === 'string') {
+        contentText = article.content.toLowerCase();
+      }
+
+      const searchTerm = searchQuery.toLowerCase();
+      return title.includes(searchTerm) ||
+             summary.includes(searchTerm) ||
+             contentText.includes(searchTerm);
+    });
   }
 
   const filteredFeaturedNews = selectedCategory === 'all'
     ? featuredNews
-    : featuredNews.filter(item => item.category.toLowerCase() === selectedCategory);
+    : featuredNews.filter(item => item.category === selectedCategory);
 
   // Generate recommendations
   const readArticleIds = new Set(readArticles.map(a => a.id));
