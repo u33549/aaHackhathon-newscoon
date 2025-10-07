@@ -26,7 +26,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  InputAdornment
 } from '@mui/material';
 import {
   ExpandMore,
@@ -126,7 +127,7 @@ const TestPage = () => {
                 size="small"
                 fullWidth
                 margin="dense"
-                placeholder="gündem, teknoloji, spor..."
+                placeholder="gundem, teknoloji, spor..."
               />
             </CardContent>
             <CardActions>
@@ -158,6 +159,20 @@ const TestPage = () => {
                 size="small"
                 fullWidth
                 margin="dense"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => updateFormData('newsGuid', `news-${Date.now()}`)}
+                        edge="end"
+                        size="small"
+                        title="GUID Yenile"
+                      >
+                        <Refresh />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <TextField
                 label="Başlık"
@@ -187,7 +202,7 @@ const TestPage = () => {
               />
               <TextField
                 label="Kategori"
-                value={formData.newsCreateCategory || 'test'}
+                value={formData.newsCreateCategory || 'gundem'}
                 onChange={(e) => updateFormData('newsCreateCategory', e.target.value)}
                 size="small"
                 fullWidth
@@ -203,7 +218,7 @@ const TestPage = () => {
                   description: formData.newsDescription || 'Test haber açıklaması',
                   link: formData.newsLink || 'https://example.com/news',
                   pubDate: new Date().toUTCString(),
-                  category: formData.newsCreateCategory || 'test'
+                  category: formData.newsCreateCategory || 'gundem'
                 })}
                 disabled={loading}
               >
@@ -237,6 +252,13 @@ const TestPage = () => {
                 disabled={loading || !formData.newsGetGuid}
               >
                 Getir
+              </Button>
+              <Button
+                startIcon={<Refresh />}
+                onClick={() => updateFormData('newsGetGuid', `news-${Date.now()}`)}
+                disabled={loading}
+              >
+                Yenile
               </Button>
             </CardActions>
           </Card>
