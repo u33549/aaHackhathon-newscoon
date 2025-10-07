@@ -1,181 +1,111 @@
 import React from 'react';
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Grid, 
-  Link,
-  Divider,
-  useTheme,
-  useMediaQuery,
-  Stack
+import { Link } from 'react-router-dom';
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  IconButton,
+  Divider
 } from '@mui/material';
+import { Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
 import { LogoIcon } from '../../constants/index.jsx';
 
 const Footer = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
-
   return (
-    <Box 
-      component="footer" 
-      sx={{ 
+    <Box
+      component="footer"
+      sx={{
         bgcolor: 'background.paper',
         borderTop: '1px solid',
-        borderColor: 'divider',
-        py: { xs: 4, md: 6 },
-        mt: { xs: 6, md: 8 }
+        borderTopColor: 'divider',
+        mt: 'auto'
       }}
     >
-      <Container maxWidth="lg">
-        <Grid container spacing={{ xs: 3, md: 4 }}>
-          {/* Logo and Description */}
-          <Grid item xs={12} md={6} lg={4}>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: { xs: 1.5, md: 2 },
-              mb: { xs: 1.5, md: 2 },
-              justifyContent: { xs: 'center', md: 'flex-start' }
-            }}>
-              <LogoIcon sx={{
-                width: { xs: 24, md: 28 },
-                height: { xs: 24, md: 28 }
-              }} />
-              <Typography
-                variant={isSmall ? "h6" : "h6"}
-                fontWeight={700}
-                color="primary.main"
-              >
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Grid container spacing={4}>
+          {/* Logo ve Açıklama */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <LogoIcon sx={{ width: 24, height: 24 }} />
+              <Typography variant="h6" fontWeight="bold">
                 Newscoon
               </Typography>
             </Box>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                mb: 2,
-                textAlign: { xs: 'center', md: 'left' },
-                fontSize: { xs: '0.85rem', md: '0.875rem' }
-              }}
-            >
-              Haber okuma deneyimini oyunlaştıran modern platform.
-              Öğren, kazan ve seviye atla!
+            <Typography variant="body2" color="text.secondary">
+              Güncel haberleri takip edin, okuyarak XP kazanın ve rozetler toplayın.
+              Haber okuma deneyiminizi gamification ile daha eğlenceli hale getirin.
             </Typography>
           </Grid>
 
-          {/* Links - Mobile Stack, Desktop Grid */}
-          <Grid item xs={12} md={6} lg={8}>
-            {isMobile ? (
-              // Mobile: Stack layout
-              <Stack spacing={3}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
-                    Hızlı Erişim
-                  </Typography>
-                  <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap" useFlexGap>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">Ana Sayfa</Link>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">Kategoriler</Link>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">Rozetler</Link>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">Liderlik</Link>
-                  </Stack>
-                </Box>
+          {/* Hızlı Linkler */}
+          <Grid item xs={6} md={2}>
+            <Typography variant="h6" gutterBottom>
+              Hızlı Linkler
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+              >
+                Ana Sayfa
+              </Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/admin"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
+              >
+                Admin Panel
+              </Typography>
+            </Box>
+          </Grid>
 
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
-                    Destek & Yasal
-                  </Typography>
-                  <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap" useFlexGap>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">Yardım</Link>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">İletişim</Link>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">Gizlilik</Link>
-                    <Link href="#" color="text.secondary" underline="hover" fontSize="0.85rem">KVKK</Link>
-                  </Stack>
-                </Box>
-              </Stack>
-            ) : (
-              // Desktop: Grid layout
-              <Grid container spacing={4}>
-                {/* Quick Links */}
-                <Grid item sm={6} md={3}>
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                    Hızlı Erişim
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Link href="#" color="text.secondary" underline="hover">Ana Sayfa</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Kategoriler</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Rozetler</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Liderlik Tablosu</Link>
-                  </Box>
-                </Grid>
+          {/* Kategoriler */}
+          <Grid item xs={6} md={3}>
+            <Typography variant="h6" gutterBottom>
+              Kategoriler
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Typography variant="body2" color="text.secondary">Teknoloji</Typography>
+              <Typography variant="body2" color="text.secondary">Spor</Typography>
+              <Typography variant="body2" color="text.secondary">Sağlık</Typography>
+              <Typography variant="body2" color="text.secondary">Bilim</Typography>
+            </Box>
+          </Grid>
 
-                {/* Categories */}
-                <Grid item sm={6} md={3}>
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                    Kategoriler
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Link href="#" color="text.secondary" underline="hover">Teknoloji</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Ekonomi</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Bilim</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Sağlık</Link>
-                  </Box>
-                </Grid>
-
-                {/* Support */}
-                <Grid item sm={6} md={3}>
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                    Destek
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Link href="#" color="text.secondary" underline="hover">Yardım</Link>
-                    <Link href="#" color="text.secondary" underline="hover">İletişim</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Geri Bildirim</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Hakkımızda</Link>
-                  </Box>
-                </Grid>
-
-                {/* Legal */}
-                <Grid item sm={6} md={3}>
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                    Yasal
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Link href="#" color="text.secondary" underline="hover">Gizlilik</Link>
-                    <Link href="#" color="text.secondary" underline="hover">Kullanım Şartları</Link>
-                    <Link href="#" color="text.secondary" underline="hover">KVKK</Link>
-                  </Box>
-                </Grid>
-              </Grid>
-            )}
+          {/* Sosyal Medya */}
+          <Grid item xs={12} md={3}>
+            <Typography variant="h6" gutterBottom>
+              Bizi Takip Edin
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton color="primary" size="small">
+                <Facebook />
+              </IconButton>
+              <IconButton color="primary" size="small">
+                <Twitter />
+              </IconButton>
+              <IconButton color="primary" size="small">
+                <Instagram />
+              </IconButton>
+              <IconButton color="primary" size="small">
+                <LinkedIn />
+              </IconButton>
+            </Box>
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: { xs: 3, md: 4 } }} />
+        <Divider sx={{ my: 3 }} />
 
-        {/* Copyright */}
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: { xs: 'center', md: 'space-between' },
-          alignItems: 'center',
-          flexDirection: { xs: 'column', md: 'row' },
-          gap: { xs: 1, md: 2 },
-          textAlign: { xs: 'center', md: 'left' }
-        }}>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            fontSize={{ xs: '0.8rem', md: '0.875rem' }}
-          >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+          <Typography variant="body2" color="text.secondary">
             © 2025 Newscoon. Tüm hakları saklıdır.
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            fontSize={{ xs: '0.8rem', md: '0.875rem' }}
-          >
-            Haber okuma deneyimini yeniden keşfedin
+          <Typography variant="body2" color="text.secondary">
+            Route yapısı başarıyla kuruldu!
           </Typography>
         </Box>
       </Container>
