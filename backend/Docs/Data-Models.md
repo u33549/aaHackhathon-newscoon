@@ -23,6 +23,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   link: String,            // Haberin URL'i (zorunlu)
   title: String,           // Başlık (zorunlu)
   description: String,     // Açıklama (zorunlu)
+  newstext: String,        // Haber metni (opsiyonel)
   pubDate: String,         // RFC 2822 tarih (zorunlu)
   image: String,           // Görsel URL (opsiyonel)
   category: String,        // "gundem" | "dunya" | "ekonomi" | "spor" | "analiz" | "kultur"
@@ -100,6 +101,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   "link": "https://example.com/news/ekonomi-paketi",
   "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
   "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi...",
+  "newstext": "Bu haberin detaylı içeriği burada yer alır. Ekonomik teşvik paketi kapsamında yer alan tüm maddelerin açıklamaları, etkileri ve uygulama alanları bu bölümde detaylı olarak yer almaktadır.",
   "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
   "image": "https://example.com/images/ekonomi-paketi.jpg",
   "category": "ekonomi",

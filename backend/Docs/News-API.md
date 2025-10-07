@@ -105,13 +105,14 @@ Gövde:
   "link": "HABER_URL",
   "title": "HABER_BASLIGI",
   "description": "HABER_ACIKLAMASI",
+  "newstext": "HABER_METNI",
   "pubDate": "YAYIN_TARIHI_RFC_FORMAT",
   "image": "HABER_GORSEL_URL",
   "category": "HABER_KATEGORISI"
 }
 ```
 
-**Not:** `guid` alanı zorunludur ve benzersiz olmalıdır.
+**Not:** `guid` alanı zorunludur ve benzersiz olmalıdır. `newstext` alanı opsiyoneldir.
 
 Örnek İstek (curl):
 ```bash
@@ -123,6 +124,7 @@ curl -X POST "http://localhost:3000/api/news" \
     "link": "https://example.com/news/breaking-story",
     "title": "Önemli Gelişme: Yeni Ekonomik Paket Açıklandı",
     "description": "Hükümetten gelen son dakika açıklamasında yeni ekonomik teşvik paketi detayları paylaşıldı.",
+    "newstext": "Bu metin haberin tam içeriğini ve detaylarını açıklamak için kullanılır. Haberin uzun metni burada yer alır.",
     "pubDate": "Mon, 23 Oct 2023 15:30:00 GMT",
     "image": "https://example.com/images/economic-package.jpg",
     "category": "ekonomi"
@@ -155,8 +157,8 @@ Header:
 Gövde (dizi):
 ```json
 [
-  { "guid": "HABER_1_GUID", "link": "HABER_1_URL", "title": "HABER_1_BASLIK", "description": "HABER_1_ACIKLAMA", "pubDate": "HABER_1_TARIH", "category": "HABER_1_KATEGORI" },
-  { "guid": "HABER_2_GUID", "link": "HABER_2_URL", "title": "HABER_2_BASLIK", "description": "HABER_2_ACIKLAMA", "pubDate": "HABER_2_TARIH", "category": "HABER_2_KATEGORI" }
+  { "guid": "HABER_1_GUID", "link": "HABER_1_URL", "title": "HABER_1_BASLIK", "description": "HABER_1_ACIKLAMA", "newstext": "HABER_1_METNI", "pubDate": "HABER_1_TARIH", "category": "HABER_1_KATEGORI" },
+  { "guid": "HABER_2_GUID", "link": "HABER_2_URL", "title": "HABER_2_BASLIK", "description": "HABER_2_ACIKLAMA", "newstext": "HABER_2_METNI", "pubDate": "HABER_2_TARIH", "category": "HABER_2_KATEGORI" }
 ]
 ```
 
@@ -185,7 +187,7 @@ Header:
 URL Parametreleri:
 - guid (newsGuid): Haberin benzersiz GUID değeri
 
-Gövde (opsiyonel alanlar): title, description, link, image, category, isInAnyStack, isUsable
+Gövde (opsiyonel alanlar): title, description, newstext, link, image, category, isInAnyStack, isUsable
 
 Örnek İstek (curl):
 ```bash
@@ -195,6 +197,7 @@ curl -X PUT "http://localhost:3000/api/news/guid/breaking-news-2023-001" \
   -d '{
     "title": "Güncellendi: Ekonomik Paket Detayları Netleşti",
     "description": "Tüm detaylar açıklandı.",
+    "newstext": "Güncellenmiş haber metni burada yer alır. Yeni bilgiler ve detaylar eklendi.",
     "isInAnyStack": true
   }'
 ```

@@ -32,6 +32,7 @@ export const getNewsByGuid = async (guid) => {
  * @param {string} newsData.link - Haber URL'i (zorunlu)
  * @param {string} newsData.title - Haber başlığı (zorunlu)
  * @param {string} newsData.description - Haber açıklaması (zorunlu)
+ * @param {string} newsData.newstext - Haber metni (opsiyonel)
  * @param {string} newsData.pubDate - Yayın tarihi RFC formatında (zorunlu)
  * @param {string} newsData.image - Haber görsel URL'i (opsiyonel)
  * @param {string} newsData.category - Haber kategorisi (opsiyonel)

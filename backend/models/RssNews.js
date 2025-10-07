@@ -27,6 +27,10 @@ const rssNewsSchema = new mongoose.Schema({
     required: [true, 'Açıklama alanı zorunludur'],
     trim: true
   },
+  newstext: {
+    type: String,
+    trim: true
+  },
   pubDate: {
     type: String,
     required: [true, 'Yayın tarihi alanı zorunludur']

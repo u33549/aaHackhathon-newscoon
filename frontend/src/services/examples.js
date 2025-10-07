@@ -53,6 +53,7 @@ export const exampleCreateNews = async () => {
       guid: `news-${Date.now()}`,
       title: 'Örnek Haber Başlığı',
       description: 'Bu bir örnek haber açıklamasıdır.',
+      newstext: 'Bu haberin detaylı içeriği burada yer alır. Haberin tam metni, ayrıntıları ve ek bilgiler bu alanda saklanır.',
       link: 'https://example.com/news/example',
       pubDate: new Date().toUTCString(),
       category: 'gundem',
