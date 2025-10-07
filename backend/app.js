@@ -8,7 +8,6 @@ var cors = require('cors'); // CORS paketini ekledim
 
 // .env dosyasından ortam değişkenlerini yükle
 dotenv.config();
-console.log("version11111111111111111111111111111111111")
 // MongoDB bağlantısı
 const connectDB = require('./config/db');
 connectDB();
