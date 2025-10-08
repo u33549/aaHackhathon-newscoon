@@ -31,7 +31,8 @@ export {
   getApprovedStacks,
   getFeaturedStacks,
   getPopularStacks,
-  getStacksByTags
+  getStacksByTags,
+  getStacksByXP
 } from './stackService';
 
 // Haber Yığını Resimleri (Images) servisleri
@@ -78,7 +79,8 @@ export const stacksAPI = {
   getApproved: stackServices.getApprovedStacks,
   getFeatured: stackServices.getFeaturedStacks,
   getPopular: stackServices.getPopularStacks,
-  getByTags: stackServices.getStacksByTags
+  getByTags: stackServices.getStacksByTags,
+  getByXP: stackServices.getStacksByXP
 };
 
 export const imagesAPI = {

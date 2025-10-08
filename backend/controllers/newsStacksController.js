@@ -2,6 +2,12 @@ const NewsStacks = require('../models/NewsStacks');
 const RssNews = require('../models/RssNews');
 const NewsStackImages = require('../models/NewsStackImages');
 
+// XP hesaplama fonksiyonu
+const calculateXP = (newsCount) => {
+  const randomMultiplier = Math.floor(Math.random() * (52 - 45 + 1)) + 45; // 45-52 arası
+  return newsCount * randomMultiplier;
+};
+
 // Tüm haber yığınlarını getir
 exports.getAllNewsStacks = async (req, res) => {
   try {
@@ -106,6 +112,14 @@ exports.createNewsStack = async (req, res) => {
   try {
     const { title, description, news, status, tags, isFeatured } = req.body;
 
+    // En az 3 haber zorunluluğu kontrolü
+    if (!news || news.length < 3) {
+      return res.status(400).json({
+        success: false,
+        error: 'Bir haber yığını oluşturmak için en az 3 haber seçilmelidir'
+      });
+    }
+
     // Haber GUID'lerinin geçerli olup olmadığını kontrol et
     if (news && news.length > 0) {
       const newsExists = await RssNews.find({ guid: { $in: news } });
@@ -140,6 +154,15 @@ exports.createNewsStack = async (req, res) => {
       data: populatedNewsStack
     });
   } catch (error) {
+    // Mongoose validation hatalarını özel olarak yakala
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        error: validationErrors.join(', ')
+      });
+    }
+
     res.status(400).json({
       success: false,
       error: error.message
@@ -159,8 +182,19 @@ exports.updateNewsStack = async (req, res) => {
       });
     }
 
+    // XP alanını request body'den kaldır - otomatik hesaplanacak
+    delete req.body.xp;
+
     // Eğer news array'i güncelleniyor ise
     if (req.body.news) {
+      // En az 3 haber zorunluluğu kontrolü
+      if (req.body.news.length < 3) {
+        return res.status(400).json({
+          success: false,
+          error: 'Bir haber yığını için en az 3 haber gereklidir'
+        });
+      }
+
       // Eski haberlerin isInAnyStack durumunu kontrol et
       const oldNewsGuids = newsStack.news;
       const newNewsGuids = req.body.news;
@@ -191,6 +225,9 @@ exports.updateNewsStack = async (req, res) => {
 
       // Haber listesi değiştiği için fotoğraf güncelliği durumunu false yap
       req.body.isPhotoUpToDate = false;
+
+      // XP'yi yeniden hesapla
+      req.body.xp = calculateXP(req.body.news.length);
     }
 
     const updatedNewsStack = await NewsStacks.findByIdAndUpdate(
@@ -204,6 +241,15 @@ exports.updateNewsStack = async (req, res) => {
       data: updatedNewsStack
     });
   } catch (error) {
+    // Mongoose validation hatalarını özel olarak yakala
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        error: validationErrors.join(', ')
+      });
+    }
+
     res.status(400).json({
       success: false,
       error: error.message
@@ -320,6 +366,14 @@ exports.removeNewsFromStack = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Bu haber zaten yığında mevcut değil'
+      });
+    }
+
+    // En az 3 haber zorunluluğu kontrolü - haber çıkarıldıktan sonra en az 3 haber kalmalı
+    if (newsStack.news.length <= 3) {
+      return res.status(400).json({
+        success: false,
+        error: 'Bir haber yığınında en az 3 haber bulunmalıdır. Bu haberi çıkaramazsınız.'
       });
     }
 

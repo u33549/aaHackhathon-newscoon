@@ -74,6 +74,7 @@ GET /api/stacks?limit=2&sortBy=viewCount&sortOrder=desc
       ],
       "status": "approved",
       "viewCount": 142,
+      "xp": 147,
       "tags": ["ekonomi", "gündem"],
       "isFeatured": true,
       "isPhotoUpToDate": true,
@@ -88,6 +89,7 @@ GET /api/stacks?limit=2&sortBy=viewCount&sortOrder=desc
       "news": [],
       "status": "pending",
       "viewCount": 0,
+      "xp": 0,
       "tags": ["spor"],
       "isFeatured": false,
       "isPhotoUpToDate": false,
@@ -142,6 +144,7 @@ GET /api/stacks/609e1e24a12a452a3c4c5e25
     ],
     "status": "approved",
     "viewCount": 143,
+    "xp": 147,
     "tags": ["ekonomi", "gündem"],
     "isFeatured": true,
     "isPhotoUpToDate": true,
@@ -160,6 +163,8 @@ GET /api/stacks/609e1e24a12a452a3c4c5e25
 POST /api/stacks
 ```
 
+**ÖNEMLI: Bir haber yığını oluşturmak için en az 3 haber gereklidir.**
+
 İstek Şablonu:
 - Yöntem: POST
 - Yol: /api/stacks
@@ -170,14 +175,19 @@ POST /api/stacks
 {
   "title": "HABER_YIGINI_BASLIGI",
   "description": "HABER_YIGINI_ACIKLAMASI",
-  "news": ["<newsGuid>", "<newsGuid>"],
+  "news": ["<newsGuid>", "<newsGuid>", "<newsGuid>"],
   "status": "pending",
   "tags": ["ETIKET_1", "ETIKET_2"],
   "isFeatured": false
 }
 ```
 
-**Not:** `news` dizisinde haber GUID'leri kullanılır.
+**Zorunlu Alanlar:**
+- `title`: Haber yığını başlığı
+- `description`: Haber yığını açıklaması
+- `news`: En az 3 geçerli haber GUID'i içeren dizi
+
+**Not:** `news` dizisinde haber GUID'leri kullanılır ve en az 3 adet olmalıdır.
 
 Örnek İstek (curl):
 ```bash
@@ -187,12 +197,17 @@ curl -X POST "http://localhost:3000/api/stacks" \
   -d '{
     "title": "Gündem: Ekonomik Gelişmeler",
     "description": "Bu hafta yaşanan gelişmeler",
-    "news": ["aa-news-20231002-001"],
+    "news": ["aa-news-20231002-001", "aa-news-20231002-002", "aa-news-20231002-003"],
     "status": "pending",
     "tags": ["ekonomi", "gündem"],
     "isFeatured": true
   }'
 ```
+
+Olası Hatalar:
+- 400 En az 3 haber gerekli: "Bir haber yığını oluşturmak için en az 3 haber seçilmelidir"
+- 400 Geçersiz haber GUID'leri: "Bir veya daha fazla geçersiz haber GUID'si"
+- 400 Validation hatası: Model seviyesi validation hataları
 
 Örnek Yanıt (tam, 201):
 ```json
@@ -232,6 +247,8 @@ curl -X POST "http://localhost:3000/api/stacks" \
 PUT /api/stacks/:id
 ```
 
+**ÖNEMLI: Haber yığını güncellenirken news dizisi değiştiriliyorsa, en az 3 haber gereklidir.**
+
 İstek Şablonu:
 - Yöntem: PUT
 - Yol: /api/stacks/:id
@@ -241,7 +258,9 @@ PUT /api/stacks/:id
   - id (stackId): Haber yığınının MongoDB ObjectId değeri
 - Gövde (opsiyonel): title, description, status, isFeatured, tags, news[]
 
-**Not:** `news` dizisi güncellenirken haber GUID'leri kullanılır.
+**Not:** 
+- `news` dizisi güncellenirken haber GUID'leri kullanılır ve en az 3 adet olmalıdır.
+- Sadece diğer alanlar güncelleniyorsa (title, description, status, vb.) bu kısıtlama uygulanmaz.
 
 Örnek İstek (curl):
 ```bash
@@ -255,39 +274,11 @@ curl -X PUT "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25" \
   }'
 ```
 
-Örnek Yanıt (tam, 200):
-```json
-{
-  "success": true,
-  "data": {
-    "_id": "609e1e24a12a452a3c4c5e25",
-    "title": "Güncel: Ekonomik Gelişmeler",
-    "description": "Bu hafta yaşanan gelişmeler",
-    "news": [
-      {
-        "_id": "aa-news-20231002-001",
-        "guid": "aa-news-20231002-001",
-        "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
-        "link": "https://example.com/news/ekonomi-paketi",
-        "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
-        "image": "https://example.com/images/ekonomi-paketi.jpg",
-        "category": "ekonomi"
-      }
-    ],
-    "status": "approved",
-    "viewCount": 142,
-    "tags": ["ekonomi", "gündem"],
-    "isFeatured": true,
-    "isPhotoUpToDate": false,
-    "createdAt": "2023-10-02T12:00:00.000Z",
-    "updatedAt": "2023-10-02T14:00:00.000Z"
-  }
-}
-```
-
 Olası Hatalar:
 - 404 Haber yığını bulunamadı
+- 400 En az 3 haber gerekli: "Bir haber yığını için en az 3 haber gereklidir" (news[] güncellenirken)
 - 400 Geçersiz haber GUID'leri (news[] güncellenirken)
+- 400 Validation hatası: Model seviyesi validation hataları
 
 ---
 
@@ -297,22 +288,29 @@ Olası Hatalar:
 DELETE /api/stacks/:id
 ```
 
+Açıklama: Belirtilen ID'ye sahip haber yığını silinir.
+
 İstek Şablonu:
 - Yöntem: DELETE
 - Yol: /api/stacks/:id
-- Başlıklar:
-  - x-api-key: YOUR_API_KEY
 - URL Parametreleri:
   - id (stackId): Haber yığınının MongoDB ObjectId değeri
 
-Örnek Yanıt (200):
+Örnek İstek:
+```
+DELETE /api/stacks/609e1e24a12a452a3c4c5e25
+```
+
+Örnek Yanıt (tam, 200):
 ```json
 {
   "success": true,
-  "message": "Haber yığını başarıyla silindi",
-  "data": {}
+  "message": "Haber yığını başarıyla silindi."
 }
 ```
+
+Olası Hatalar:
+- 404 Haber yığını bulunamadı
 
 ---
 
@@ -322,7 +320,7 @@ DELETE /api/stacks/:id
 POST /api/stacks/:id/addNews
 ```
 
-Açıklama: Mevcut bir haber yığınına yeni bir haber (RssNews kaydı) ekler. `id (stackId)` ve `newsGuid` farklı kaynakları temsil eder; biri NewsStacks, diğeri RssNews belgesidir.
+Açıklama: Mevcut bir haber yığınına yeni haber ekler, `viewCount` değerini 1 artırır.
 
 İstek Şablonu:
 - Yöntem: POST
@@ -330,13 +328,15 @@ Açıklama: Mevcut bir haber yığınına yeni bir haber (RssNews kaydı) ekler.
 - Başlıklar:
   - x-api-key: YOUR_API_KEY
 - URL Parametreleri:
-  - id (stackId): Haber Yığınının MongoDB ObjectId değeri
+  - id (stackId): Haber yığınının MongoDB ObjectId değeri
 - Gövde (şema):
 ```json
 { "newsGuid": "EKLENECEK_HABERIN_GUID" }
 ```
 
-**Not:** `newsGuid` parametresi RssNews belgesinin GUID değeridir.
+**Not:** 
+- `newsGuid` parametresi RssNews belgesinin GUID değeridir.
+- Eklenen haber yığında zaten varsa 400 hata kodu döner.
 
 Örnek İstek (curl):
 ```bash
@@ -365,6 +365,15 @@ curl -X POST "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25/addNews"
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
         "image": "https://example.com/images/ekonomi-paketi.jpg",
         "category": "ekonomi"
+      },
+      {
+        "_id": "aa-news-20231002-002",
+        "guid": "aa-news-20231002-002",
+        "title": "Diğer Ekonomik Haber",
+        "link": "https://example.com/news/diger-haber",
+        "pubDate": "Mon, 02 Oct 2023 16:30:00 GMT",
+        "image": "https://example.com/images/diger-haber.jpg",
+        "category": "ekonomi"
       }
     ],
     "status": "pending",
@@ -378,9 +387,8 @@ curl -X POST "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25/addNews"
 }
 ```
 
-Olası Hata Yanıtları:
+Olası Hatalar:
 - 404 Haber yığını bulunamadı
-- 404 Haber bulunamadı
 - 400 Bu haber zaten yığında mevcut
 
 ---
@@ -390,6 +398,8 @@ Olası Hata Yanıtları:
 ```http
 POST /api/stacks/:id/removeNews
 ```
+
+**ÖNEMLI: Haber çıkarıldıktan sonra yığında en az 3 haber kalmalıdır.**
 
 İstek Şablonu:
 - Yöntem: POST
@@ -403,7 +413,19 @@ POST /api/stacks/:id/removeNews
 { "newsGuid": "CIKARILACAK_HABERIN_GUID" }
 ```
 
-**Not:** `newsGuid` parametresi RssNews belgesinin GUID değeridir.
+**Not:** 
+- `newsGuid` parametresi RssNews belgesinin GUID değeridir.
+- Haber çıkarıldıktan sonra yığında en az 3 haber kalmalıdır.
+
+Örnek İstek (curl):
+```bash
+curl -X POST "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25/removeNews" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{
+    "newsGuid": "aa-news-20231002-001"
+  }'
+```
 
 Örnek Başarılı Yanıt (tam, 200):
 ```json
@@ -413,7 +435,26 @@ POST /api/stacks/:id/removeNews
     "_id": "609e1e24a12a452a3c4c5e25",
     "title": "Gündem: Ekonomik Gelişmeler",
     "description": "Bu hafta yaşanan gelişmeler",
-    "news": [],
+    "news": [
+      {
+        "_id": "aa-news-20231002-002",
+        "guid": "aa-news-20231002-002",
+        "title": "Diğer Ekonomik Haber",
+        "link": "https://example.com/news/diger-haber",
+        "pubDate": "Mon, 02 Oct 2023 16:30:00 GMT",
+        "image": "https://example.com/images/diger-haber.jpg",
+        "category": "ekonomi"
+      },
+      {
+        "_id": "aa-news-20231002-003",
+        "guid": "aa-news-20231002-003",
+        "title": "Üçüncü Ekonomik Haber",
+        "link": "https://example.com/news/ucuncu-haber",
+        "pubDate": "Mon, 02 Oct 2023 17:30:00 GMT",
+        "image": "https://example.com/images/ucuncu-haber.jpg",
+        "category": "ekonomi"
+      }
+    ],
     "status": "pending",
     "viewCount": 0,
     "tags": ["ekonomi", "gündem"],
@@ -428,12 +469,27 @@ POST /api/stacks/:id/removeNews
 Olası Hatalar:
 - 404 Haber yığını bulunamadı
 - 400 Bu haber zaten yığında mevcut değil
+- 400 Minimum haber sayısı: "Bir haber yığınında en az 3 haber bulunmalıdır. Bu haberi çıkaramazsınız."
 
 ---
 
 ## Önemli Notlar
 
+### XP (Experience Points) Sistemi:
+- **XP Hesaplama**: XP = Haber Sayısı × (45-52 arası rastgele sayı)
+- **Otomatik Hesaplama**: XP değeri otomatik olarak hesaplanır ve güncellenemez
+- **Güncelleme**: Haber eklendiğinde/çıkarıldığında XP otomatik yeniden hesaplanır
+- **Dışarıdan Güncelleme**: XP alanı API'den güncellenemez, otomatik hesaplanır
+
+### Haber Yığını Minimum Haber Kuralları:
+- **Yeni yığın oluştururken**: En az 3 haber gereklidir
+- **Yığın güncellerken**: `news` dizisi değiştiriliyorsa en az 3 haber gereklidir  
+- **Haber eklerken**: Kısıtlama yoktur (zaten var olan yığına ekleme)
+- **Haber çıkarırken**: Çıkarıldıktan sonra en az 3 haber kalmalıdır
+
+### Diğer Önemli Bilgiler:
 - GET /api/stacks yanıtlarında varsa kapağın URL'si `photoUrl` alanında döner.
 - Haber eklendiğinde/çıkarıldığında ilgili yığının `isPhotoUpToDate` alanı `false` yapılır (iş mantığı).
 - GET /api/stacks/:id çağrısı görüntülenme sayısını artırır.
 - Haber referansları artık GUID üzerinden yapılır, `newsId` yerine `newsGuid` kullanılır.
+- Tüm yazma işlemleri için `x-api-key` header'ı zorunludur.
