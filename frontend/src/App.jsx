@@ -6,6 +6,7 @@ import { newscoonTheme } from './theme/theme';
 // Layout Components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import ToastNotification from './components/notifications/ToastNotification';
 
 // Pages
 import MainPage from './pages/MainPage';
@@ -28,6 +29,9 @@ function App() {
           <Route path="/test" element={<TestPage />} />
         </Routes>
         <Footer />
+
+        {/* Global Toast Notifications */}
+        <ToastNotification />
       </div>
     </ThemeProvider>
   );

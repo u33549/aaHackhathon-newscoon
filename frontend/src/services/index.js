@@ -51,7 +51,6 @@ export {
 } from './imageService';
 
 // Hızlı kullanım için gruplandırılmış objeler
-// Re-export edilen fonksiyonları kullanarak objeler oluştur
 import * as newsServices from './newsService';
 import * as stackServices from './stackService';
 import * as imageServices from './imageService';
