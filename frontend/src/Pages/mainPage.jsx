@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 // Components
 import Hero from '../components/sections/Hero';
 import NewsSection from '../components/sections/NewsSection';
-import VideoCard from '../components/cards/VideoCard';
+import NewsCard from '../components/cards/NewsCard';
 import FeaturedNewsCard from '../components/cards/FeaturedNewsCard';
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
@@ -40,6 +41,8 @@ const MainPage = () => {
   const toastTimerRef = useRef(null);
   const notificationTimerRef = useRef(null);
 
+  const navigate = useNavigate();
+
   // Utility functions
   const calculateLevel = (xp) => {
     let level = 1;
@@ -58,7 +61,7 @@ const MainPage = () => {
   const nextLevelXp = levelThresholds[currentLevel] ?? Infinity;
 
   // Event handlers
-  const handleVideoCardClick = (articleId) => {
+  const handleNewsCardClick = (articleId) => {
     const articleToOpen = news.find(slide => slide.id === articleId);
     if (articleToOpen) {
       setSelectedArticle(articleToOpen);
@@ -77,15 +80,40 @@ const MainPage = () => {
   let filteredNews = selectedCategory === 'all' ? news : news.filter(article => article.category === selectedCategory);
 
   if (searchQuery) {
-    filteredNews = filteredNews.filter(article =>
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.content?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    filteredNews = filteredNews.filter(article => {
+      const title = article.title?.toLowerCase() || '';
+      const summary = article.summary?.toLowerCase() || '';
+
+      // content array'ini string'e çevir
+      let contentText = '';
+      if (Array.isArray(article.content)) {
+        contentText = article.content
+          .map(item => `${item.title || ''} ${item.paragraph || ''}`)
+          .join(' ')
+          .toLowerCase();
+      } else if (typeof article.content === 'string') {
+        contentText = article.content.toLowerCase();
+      }
+
+      const searchTerm = searchQuery.toLowerCase();
+      return title.includes(searchTerm) ||
+             summary.includes(searchTerm) ||
+             contentText.includes(searchTerm);
+    });
   }
+
+  // Timeline'a göre sıralanan tüm haberler (son 20)
+  const allNewsTimeline = [...news]
+    .sort((a, b) => {
+      const dateA = new Date(a.pubDate || Date.now());
+      const dateB = new Date(b.pubDate || Date.now());
+      return dateB - dateA; // En yeni haberler önce
+    })
+    .slice(0, 20);
 
   const filteredFeaturedNews = selectedCategory === 'all'
     ? featuredNews
-    : featuredNews.filter(item => item.category.toLowerCase() === selectedCategory);
+    : featuredNews.filter(item => item.category === selectedCategory);
 
   // Generate recommendations
   const readArticleIds = new Set(readArticles.map(a => a.id));
@@ -95,26 +123,26 @@ const MainPage = () => {
       .map(slide => slide.category)
   );
 
-  const allArticlesAsVideos = filteredNews.map(slide => ({
+  const allArticlesAsNews = filteredNews.map(slide => ({
     id: slide.id,
     thumbnailUrl: slide.imageUrl,
-    duration: slide.category.charAt(0).toUpperCase() + slide.category.slice(1),
-    channelIconUrl: `https://picsum.photos/seed/source${slide.id}/40/40`,
+    imageUrl: slide.imageUrl,
+    category: slide.category,
     title: slide.title,
     age: 'Öneri',
   }));
 
   let recommendedNews;
   if (readCategories.size > 0) {
-    const recommendations = allArticlesAsVideos.filter(video => {
-      const slide = news.find(s => s.id === video.id);
-      return !readArticleIds.has(video.id) && readCategories.has(slide.category);
+    const recommendations = allArticlesAsNews.filter(newsItem => {
+      const slide = news.find(s => s.id === newsItem.id);
+      return !readArticleIds.has(newsItem.id) && readCategories.has(slide.category);
     });
     recommendedNews = recommendations.length > 0
       ? recommendations.slice(0, 8)
-      : allArticlesAsVideos.filter(video => !readArticleIds.has(video.id)).slice(0, 8);
+      : allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
   } else {
-    recommendedNews = allArticlesAsVideos.filter(video => !readArticleIds.has(video.id)).slice(0, 8);
+    recommendedNews = allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
   }
 
   return (
@@ -161,34 +189,47 @@ const MainPage = () => {
         {/* News Sections */}
         <Box sx={{ py: 2 }}>
           <NewsSection title="Sana Özel Haberler">
-            {recommendedNews.map(video => (
-              <VideoCard
-                key={video.id}
-                video={video}
-                onClick={() => handleVideoCardClick(video.id)}
-              />
-            ))}
+            <NewsCard
+              articles={recommendedNews}
+              variant="horizontal"
+              onClick={(newsId) => handleNewsCardClick(newsId)}
+            />
           </NewsSection>
 
-          <NewsSection title="Öne Çıkan Haberler">
-            {filteredFeaturedNews.map(newsItem => (
-              <FeaturedNewsCard
-                key={newsItem.id}
-                news={newsItem}
-              />
-            ))}
+          <NewsSection
+            title="Tüm Haberler"
+            action={
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => navigate('/all-news')}
+                sx={{ minWidth: 'auto' }}
+              >
+                Tümünü Gör
+              </Button>
+            }
+          >
+            <NewsCard
+              articles={allNewsTimeline.map(newsItem => ({
+                id: newsItem.id,
+                thumbnailUrl: newsItem.imageUrl,
+                imageUrl: newsItem.imageUrl,
+                category: newsItem.category,
+                title: newsItem.title,
+                age: new Date(newsItem.pubDate || Date.now()).toLocaleDateString('tr-TR')
+              }))}
+              variant="horizontal"
+              onClick={(newsId) => handleNewsCardClick(newsId)}
+            />
           </NewsSection>
 
           <NewsSection title="Son okunan haberler">
             {readArticles.length > 0 ? (
-              readArticles.map(video => (
-                <VideoCard
-                  key={video.id}
-                  video={video}
-                  variant="portrait"
-                  onClick={() => handleVideoCardClick(video.id)}
-                />
-              ))
+              <NewsCard
+                articles={readArticles}
+                variant="horizontal"
+                onClick={(newsId) => handleNewsCardClick(newsId)}
+              />
             ) : (
               <Box sx={{ px: 2, color: 'text.secondary' }}>
                 Henüz hiç haber okumadınız. Okumaya başlamak için manşetlerden birini seçin!
