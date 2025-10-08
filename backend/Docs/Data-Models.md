@@ -6,6 +6,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 
 - [RSS Haber Modeli (RssNews)](#rss-haber-modeli-rssnews)
 - [Haber Yığını Modeli (NewsStacks)](#haber-yığını-modeli-newsstacks)
+  - [Kategori Sistemi](#kategori-sistemi)
   - [Fotoğraf Güncelleme Sistemi](#fotoğraf-güncelleme-sistemi)
 - [Haber Yığını Resim Modeli (NewsStackImages)](#haber-yığını-resim-modeli-newsstackimages)
 - [İlişkiler](#ilişkiler)
@@ -45,8 +46,11 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   title: String,           // Yığın başlığı (zorunlu)
   description: String,     // Açıklama (opsiyonel)
   news: [String],          // Haber GUID referansları
+  categories: [String],    // Benzersiz kategoriler ("gundem" | "dunya" | "ekonomi" | "spor" | "analiz" | "kultur")
+  mainCategory: String,    // En çok temsil edilen kategori ("gundem" | "dunya" | "ekonomi" | "spor" | "analiz" | "kultur")
   status: String,          // "pending" | "approved" | "rejected" (varsayılan: "pending")
   viewCount: Number,       // Varsayılan: 0
+  xp: Number,              // Otomatik hesaplanan (Haber Sayısı × 45-52 arası rastgele sayı)
   tags: [String],          // Opsiyonel
   isFeatured: Boolean,     // Varsayılan: false
   isPhotoUpToDate: Boolean,// Varsayılan: false
@@ -54,6 +58,13 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   updatedAt: Date
 }
 ```
+
+### Kategori Sistemi
+
+- **categories**: Yığındaki haberlerin benzersiz kategorilerini içeren dizi (Set benzeri davranış)
+- **mainCategory**: En çok temsil edilen kategori (en fazla haberi olan kategori)
+- **Otomatik Hesaplama**: Haber eklendiğinde/çıkarıldığında kategoriler otomatik hesaplanır
+- **CRUD Kısıtlamaları**: API'den manuel olarak categories ve mainCategory güncellenemez (otomatik hesaplanır)
 
 ### Fotoğraf Güncelleme Sistemi
 
@@ -120,6 +131,8 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
     "aa-news-20231002-001",
     "aa-news-20231002-002"
   ],
+  "categories": ["ekonomi", "gündem"],
+  "mainCategory": "ekonomi",
   "status": "approved",
   "viewCount": 142,
   "tags": ["ekonomi", "gündem"],

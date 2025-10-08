@@ -15,6 +15,8 @@ exports.getAllNewsStacks = async (req, res) => {
       status,
       isFeatured,
       tags,
+      categories,
+      mainCategory,
       limit = -1,
       sortBy = 'createdAt',
       sortOrder = 'desc'
@@ -34,6 +36,15 @@ exports.getAllNewsStacks = async (req, res) => {
     if (tags) {
       const tagArray = tags.split(',').map(tag => tag.trim());
       filter.tags = { $in: tagArray };
+    }
+
+    if (categories) {
+      const categoryArray = categories.split(',').map(cat => cat.trim());
+      filter.categories = { $in: categoryArray };
+    }
+
+    if (mainCategory) {
+      filter.mainCategory = mainCategory;
     }
 
     // Sort objesi oluştur
@@ -182,8 +193,10 @@ exports.updateNewsStack = async (req, res) => {
       });
     }
 
-    // XP alanını request body'den kaldır - otomatik hesaplanacak
+    // XP ve categories alanlarını request body'den kaldır - otomatik hesaplanacak
     delete req.body.xp;
+    delete req.body.categories;
+    delete req.body.mainCategory;
 
     // Eğer news array'i güncelleniyor ise
     if (req.body.news) {
@@ -228,6 +241,11 @@ exports.updateNewsStack = async (req, res) => {
 
       // XP'yi yeniden hesapla
       req.body.xp = calculateXP(req.body.news.length);
+
+      // Kategorileri yeniden hesapla
+      const categoryData = await NewsStacks.calculateCategoriesFromNews(req.body.news);
+      req.body.categories = categoryData.categories;
+      req.body.mainCategory = categoryData.mainCategory;
     }
 
     const updatedNewsStack = await NewsStacks.findByIdAndUpdate(

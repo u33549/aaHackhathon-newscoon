@@ -15,6 +15,16 @@ const newsStacksSchema = new mongoose.Schema({
     type: String,
     ref: 'RssNews'
   }],
+  categories: [{
+    type: String,
+    enum: ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'],
+    trim: true
+  }],
+  mainCategory: {
+    type: String,
+    enum: ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'],
+    trim: true
+  },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
@@ -52,10 +62,89 @@ function calculateXP(newsCount) {
   return newsCount * randomMultiplier;
 }
 
-// Pre-save middleware - XP otomatik hesaplama
-newsStacksSchema.pre('save', function(next) {
+// Kategorileri hesaplama metodları
+newsStacksSchema.methods.updateCategories = async function() {
+  if (this.news && this.news.length > 0) {
+    // Populate edilmiş haberleri al
+    const populatedDoc = await this.populate('news', 'category');
+
+    // Kategorileri topla ve sayılarını hesapla
+    const categoryCount = {};
+    const uniqueCategories = new Set();
+
+    populatedDoc.news.forEach(newsItem => {
+      if (newsItem && newsItem.category) {
+        uniqueCategories.add(newsItem.category);
+        categoryCount[newsItem.category] = (categoryCount[newsItem.category] || 0) + 1;
+      }
+    });
+
+    // Categories dizisini güncelle (benzersiz kategoriler)
+    this.categories = Array.from(uniqueCategories);
+
+    // En çok temsil edilen kategoriyi bul
+    let maxCount = 0;
+    let mainCat = null;
+
+    for (const [category, count] of Object.entries(categoryCount)) {
+      if (count > maxCount) {
+        maxCount = count;
+        mainCat = category;
+      }
+    }
+
+    this.mainCategory = mainCat;
+  } else {
+    this.categories = [];
+    this.mainCategory = null;
+  }
+};
+
+// Static method for updating categories by news array
+newsStacksSchema.statics.calculateCategoriesFromNews = async function(newsGuids) {
+  const RssNews = mongoose.model('RssNews');
+  const newsItems = await RssNews.find({ guid: { $in: newsGuids } }, 'category');
+
+  const categoryCount = {};
+  const uniqueCategories = new Set();
+
+  newsItems.forEach(newsItem => {
+    if (newsItem && newsItem.category) {
+      uniqueCategories.add(newsItem.category);
+      categoryCount[newsItem.category] = (categoryCount[newsItem.category] || 0) + 1;
+    }
+  });
+
+  // En çok temsil edilen kategoriyi bul
+  let maxCount = 0;
+  let mainCategory = null;
+
+  for (const [category, count] of Object.entries(categoryCount)) {
+    if (count > maxCount) {
+      maxCount = count;
+      mainCategory = category;
+    }
+  }
+
+  return {
+    categories: Array.from(uniqueCategories),
+    mainCategory: mainCategory
+  };
+};
+
+// Pre-save middleware - XP ve kategorileri otomatik hesaplama
+newsStacksSchema.pre('save', async function(next) {
   if (this.isModified('news') || this.isNew) {
     this.xp = calculateXP(this.news.length);
+
+    // Kategorileri güncelle
+    if (this.news && this.news.length > 0) {
+      try {
+        await this.updateCategories();
+      } catch (error) {
+        console.error('Kategoriler güncellenirken hata:', error);
+      }
+    }
   }
   next();
 });
@@ -81,5 +170,7 @@ newsStacksSchema.index({ isFeatured: 1 });
 newsStacksSchema.index({ viewCount: -1 });
 newsStacksSchema.index({ xp: -1 });
 newsStacksSchema.index({ tags: 1 });
+newsStacksSchema.index({ categories: 1 });
+newsStacksSchema.index({ mainCategory: 1 });
 
 module.exports = mongoose.model('NewsStacks', newsStacksSchema);

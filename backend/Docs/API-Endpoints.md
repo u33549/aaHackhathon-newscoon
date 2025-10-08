@@ -36,7 +36,7 @@ Not: Hızlı referans tablosu sadece endpoint kapsamını gösterir; parametrele
 
 | Endpoint | Metod | Açıklama | Parametreler |
 |----------|-------|----------|-------------|
-| `/api/stacks` | GET | Tüm haber yığınlarını listele | `status`, `isFeatured`, `tags`, `limit`, `sortBy`, `sortOrder` |
+| `/api/stacks` | GET | Tüm haber yığınlarını listele | `status`, `isFeatured`, `tags`, `categories`, `mainCategory`, `limit`, `sortBy`, `sortOrder` |
 | `/api/stacks` | POST | Yeni haber yığını ekle | - |
 | `/api/stacks/:id` | GET | ID'ye (stackId) göre haber yığını getir | - |
 | `/api/stacks/:id` | PUT | ID'ye (stackId) göre haber yığını güncelle | - |
@@ -97,10 +97,17 @@ GET /api/stacks?isFeatured=true
 # Etiketlere göre filtreleme
 GET /api/stacks?tags=politika,gündem
 
+# Kategorilere göre filtreleme
+GET /api/stacks?categories=ekonomi,spor
+
+# Ana kategoriye göre filtreleme
+GET /api/stacks?mainCategory=ekonomi
+
 # Sıralama
 GET /api/stacks?sortBy=viewCount&sortOrder=desc
 
 # Kombinasyon örnekleri
 GET /api/stacks?status=approved&isFeatured=true&limit=3
+GET /api/stacks?categories=ekonomi&mainCategory=ekonomi&limit=5
 GET /api/stacks?limit=5&sortBy=viewCount&sortOrder=desc
 ```

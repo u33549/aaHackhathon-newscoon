@@ -38,6 +38,8 @@ Açıklama: Haber yığınlarını filtreli şekilde getirir; her yığın için
   - status: "pending" | "approved" | "rejected"
   - isFeatured: "true" | "false"
   - tags: virgülle ayrılmış etiketler (örn: politika,gündem)
+  - categories: virgülle ayrılmış kategoriler (örn: ekonomi,spor)
+  - mainCategory: tek kategori (örn: ekonomi)
   - limit: sonuç sayısı (pozitif tam sayı)
   - sortBy: createdAt | viewCount | title (varsayılan: createdAt)
   - sortOrder: asc | desc (varsayılan: desc)
@@ -48,6 +50,8 @@ GET /api/stacks
 GET /api/stacks?status=approved
 GET /api/stacks?isFeatured=true
 GET /api/stacks?tags=politika,gündem
+GET /api/stacks?categories=ekonomi,spor
+GET /api/stacks?mainCategory=ekonomi
 GET /api/stacks?limit=2&sortBy=viewCount&sortOrder=desc
 ```
 
@@ -480,6 +484,13 @@ Olası Hatalar:
 - **Otomatik Hesaplama**: XP değeri otomatik olarak hesaplanır ve güncellenemez
 - **Güncelleme**: Haber eklendiğinde/çıkarıldığında XP otomatik yeniden hesaplanır
 - **Dışarıdan Güncelleme**: XP alanı API'den güncellenemez, otomatik hesaplanır
+
+### Kategori Sistemi:
+- **categories**: Yığındaki haberlerin benzersiz kategorilerini içeren dizi (Set benzeri davranış)
+- **mainCategory**: En çok temsil edilen kategori (en fazla haberi olan kategori)
+- **Otomatik Hesaplama**: Haber eklendiğinde/çıkarıldığında/güncellendiğinde kategoriler otomatik hesaplanır
+- **CRUD Kısıtlamaları**: API'den manuel olarak categories ve mainCategory güncellenemez (otomatik hesaplanır)
+- **Filtreleme**: categories (virgülle ayrılmış) ve mainCategory parametreleriyle filtrelenebilir
 
 ### Haber Yığını Minimum Haber Kuralları:
 - **Yeni yığın oluştururken**: En az 3 haber gereklidir
