@@ -51,7 +51,6 @@ export {
 } from './imageService';
 
 // Hızlı kullanım için gruplandırılmış objeler
-// Re-export edilen fonksiyonları kullanarak objeler oluştur
 import * as newsServices from './newsService';
 import * as stackServices from './stackService';
 import * as imageServices from './imageService';
@@ -80,7 +79,8 @@ export const stacksAPI = {
   getFeatured: stackServices.getFeaturedStacks,
   getPopular: stackServices.getPopularStacks,
   getByTags: stackServices.getStacksByTags,
-  getByXP: stackServices.getStacksByXP
+  getByXP: stackServices.getStacksByXP,
+  getLatest: stackServices.getLatestStacks
 };
 
 export const imagesAPI = {

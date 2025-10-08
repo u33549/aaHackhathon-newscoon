@@ -2,6 +2,37 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+// Redux hooks
+import { useAppDispatch } from '../hooks/redux';
+import {
+  useNews,
+  useNewsLoading,
+  useSearchQuery,
+  useActiveCategory,
+  useStacks,
+  useStacksLoading,
+  usePopularStacks,
+  useLatestStacks
+} from '../hooks/redux';
+import {
+  fetchAllNews,
+  setSelectedNews
+} from '../store/slices/newsSlice';
+import {
+  fetchPopularStacks,
+  fetchLatestStacks,
+  setSelectedStack
+} from '../store/slices/stackSlice';
+import {
+  setSearchQuery,
+  setActiveCategory,
+  addToast,
+  openBadgeModal
+} from '../store/slices/uiSlice';
+
+// API Services
+import { getAllStackImages } from '../services';
+
 // Components
 import Hero from '../components/sections/Hero';
 import NewsSection from '../components/sections/NewsSection';
@@ -23,25 +54,60 @@ import {
 } from '../constants/index.jsx';
 
 const MainPage = () => {
-  // State management
-  const [news] = useState(heroSlides);
-  const [selectedArticle, setSelectedArticle] = useState(null);
+  // Redux state
+  const dispatch = useAppDispatch();
+  const { news, selectedNews } = useNews();
+  const popularStacks = usePopularStacks();
+  const latestStacks = useLatestStacks();
+  const stacksLoading = useStacksLoading();
+  const isLoading = useNewsLoading();
+  const searchQuery = useSearchQuery();
+  const selectedCategory = useActiveCategory();
+
+  // Local state (will gradually move to Redux)
   const [totalXp, setTotalXp] = useState(0);
   const [readArticles, setReadArticles] = useState([]);
   const [earnedBadges, setEarnedBadges] = useState([]);
-  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
-  const [newBadgeToast, setNewBadgeToast] = useState(null);
   const [notificationToast, setNotificationToast] = useState(null);
   const [streakData, setStreakData] = useState({ current: 0, lastDate: null });
   const [earnedAchievements, setEarnedAchievements] = useState(new Set());
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Refs for timers
   const toastTimerRef = useRef(null);
   const notificationTimerRef = useRef(null);
 
   const navigate = useNavigate();
+
+  // Load data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        if (news.length === 0) {
+          dispatch(fetchAllNews());
+        }
+      } catch (error) {
+        console.warn('News API hatası:', error);
+      }
+
+      try {
+        if (popularStacks.length === 0) {
+          dispatch(fetchPopularStacks(20)); // En popüler 20 stack'i getir
+        }
+      } catch (error) {
+        console.warn('Popular Stacks API hatası:', error);
+      }
+
+      try {
+        if (latestStacks.length === 0) {
+          dispatch(fetchLatestStacks(20)); // En son 20 stack'i getir
+        }
+      } catch (error) {
+        console.warn('Latest Stacks API hatası:', error);
+      }
+    };
+
+    loadData();
+  }, [dispatch, news.length, popularStacks.length, latestStacks.length]);
 
   // Utility functions
   const calculateLevel = (xp) => {
@@ -62,27 +128,56 @@ const MainPage = () => {
 
   // Event handlers
   const handleNewsCardClick = (articleId) => {
-    const articleToOpen = news.find(slide => slide.id === articleId);
+    // Use Redux data if available, fallback to heroSlides
+    const newsData = news.length > 0 ? news : heroSlides;
+    const articleToOpen = newsData.find(slide => slide.id === articleId || slide.guid === articleId);
     if (articleToOpen) {
-      setSelectedArticle(articleToOpen);
+      dispatch(setSelectedNews(articleToOpen));
+      // Navigate to article page
+      navigate(`/article/${articleToOpen.guid || articleToOpen.id}`);
     }
   };
 
   const handleSearchChange = (query) => {
-    setSearchQuery(query);
+    dispatch(setSearchQuery(query));
   };
 
   const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
+    dispatch(setActiveCategory(categoryId));
   };
 
+  const handleBadgeEarned = (badge) => {
+    dispatch(addToast({
+      type: 'success',
+      title: 'Yeni Rozet!',
+      message: `${badge.name} rozetini kazandınız!`,
+      duration: 5000
+    }));
+    dispatch(openBadgeModal(badge));
+  };
+
+  const handleStackClick = (stackId) => {
+    // Stack'e tıklandığında stack detay sayfasına yönlendir
+    const allStacks = [...popularStacks, ...latestStacks];
+    const stackToOpen = allStacks.find(stack => stack._id === stackId);
+    if (stackToOpen) {
+      dispatch(setSelectedStack(stackToOpen));
+      navigate(`/stack/${stackId}`);
+    }
+  };
+
+  // Use Redux data if available, fallback to static data
+  const newsData = news.length > 0 ? news : heroSlides;
+
   // Filter news by category and search
-  let filteredNews = selectedCategory === 'all' ? news : news.filter(article => article.category === selectedCategory);
+  let filteredNews = selectedCategory === 'all' || !selectedCategory
+    ? newsData
+    : newsData.filter(article => article.category === selectedCategory);
 
   if (searchQuery) {
     filteredNews = filteredNews.filter(article => {
       const title = article.title?.toLowerCase() || '';
-      const summary = article.summary?.toLowerCase() || '';
+      const summary = article.summary?.toLowerCase() || article.description?.toLowerCase() || '';
 
       // content array'ini string'e çevir
       let contentText = '';
@@ -103,30 +198,30 @@ const MainPage = () => {
   }
 
   // Timeline'a göre sıralanan tüm haberler (son 20)
-  const allNewsTimeline = [...news]
+  const allNewsTimeline = [...filteredNews]
     .sort((a, b) => {
-      const dateA = new Date(a.pubDate || Date.now());
-      const dateB = new Date(b.pubDate || Date.now());
+      const dateA = new Date(a.pubDate || a.createdAt || Date.now());
+      const dateB = new Date(b.pubDate || b.createdAt || Date.now());
       return dateB - dateA; // En yeni haberler önce
     })
     .slice(0, 20);
 
-  const filteredFeaturedNews = selectedCategory === 'all'
+  const filteredFeaturedNews = selectedCategory === 'all' || !selectedCategory
     ? featuredNews
     : featuredNews.filter(item => item.category === selectedCategory);
 
   // Generate recommendations
-  const readArticleIds = new Set(readArticles.map(a => a.id));
+  const readArticleIds = new Set(readArticles.map(a => a.id || a.guid));
   const readCategories = new Set(
-    news
-      .filter(slide => readArticleIds.has(slide.id))
+    filteredNews
+      .filter(slide => readArticleIds.has(slide.id || slide.guid))
       .map(slide => slide.category)
   );
 
   const allArticlesAsNews = filteredNews.map(slide => ({
-    id: slide.id,
-    thumbnailUrl: slide.imageUrl,
-    imageUrl: slide.imageUrl,
+    id: slide.id || slide.guid,
+    thumbnailUrl: slide.imageUrl || slide.image,
+    imageUrl: slide.imageUrl || slide.image,
     category: slide.category,
     title: slide.title,
     age: 'Öneri',
@@ -135,14 +230,70 @@ const MainPage = () => {
   let recommendedNews;
   if (readCategories.size > 0) {
     const recommendations = allArticlesAsNews.filter(newsItem => {
-      const slide = news.find(s => s.id === newsItem.id);
-      return !readArticleIds.has(newsItem.id) && readCategories.has(slide.category);
+      const slide = filteredNews.find(s => (s.id || s.guid) === newsItem.id);
+      return !readArticleIds.has(newsItem.id) && readCategories.has(slide?.category);
     });
     recommendedNews = recommendations.length > 0
       ? recommendations.slice(0, 8)
       : allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
   } else {
     recommendedNews = allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
+  }
+
+  // Convert stacks to NewsCard format
+  const convertStackToNewsCard = (stack) => {
+    // Stack'in kendi resim verilerini kullan
+    let imageUrl = null;
+
+    // Önce stack'in kendi imageUrl'ini kontrol et (Redux'tan gelen)
+    if (stack.imageUrl) {
+      imageUrl = stack.imageUrl;
+    }
+    // Eğer stack'te photoUrl field'ı varsa onu kullan
+    else if (stack.photoUrl) {
+      imageUrl = stack.photoUrl;
+    }
+    // Stack'teki son haberin resmini kullan
+    else if (stack.news && stack.news.length > 0) {
+      const firstNews = stack.news[stack.news.length-1];
+      if (typeof firstNews === 'object' && firstNews.image) {
+        imageUrl = firstNews.image;
+      }
+    }
+
+    return {
+      id: stack._id,
+      thumbnailUrl: imageUrl,
+      imageUrl: imageUrl,
+      category: stack.tags?.[0] || 'genel',
+      title: stack.title,
+      age: new Date(stack.createdAt).toLocaleDateString('tr-TR'),
+      xp: stack.xp || 0,
+      viewCount: stack.viewCount || 0,
+      newsCount: stack.news?.length || 0
+    };
+  };
+
+  // Convert popular stacks to NewsCard format
+  const popularStacksAsNews = popularStacks.map(convertStackToNewsCard);
+
+  // Convert latest stacks to NewsCard format - paylaşılma tarihine göre sıralı
+  const latestStacksAsNews = latestStacks.map(convertStackToNewsCard);
+
+  console.log('Popular stacks:', popularStacksAsNews);
+  console.log('Latest stacks:', latestStacksAsNews);
+
+  if (isLoading || stacksLoading) {
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh'
+      }}>
+        {isLoading ? 'Haberler' : 'Haber yığınları'} yükleniyor...
+      </Box>
+    );
   }
 
   return (
@@ -152,13 +303,11 @@ const MainPage = () => {
       color: 'text.primary'
     }}>
       {/* Toast Notifications */}
-      <BadgeToast data={newBadgeToast} />
+      <BadgeToast />
       <AchievementToast data={notificationToast} />
 
       {/* Badge Modal */}
       <BadgeModal
-        isOpen={isBadgeModalOpen}
-        onClose={() => setIsBadgeModalOpen(false)}
         badges={earnedBadges}
         totalXp={totalXp}
         earnedAchievements={earnedAchievements}
@@ -169,7 +318,7 @@ const MainPage = () => {
         {/* Hero Section */}
         <Hero
           slides={filteredNews}
-          onArticleSelect={setSelectedArticle}
+          onArticleSelect={(article) => dispatch(setSelectedNews(article))}
         />
 
         {/* Search and Category Section */}
@@ -181,23 +330,23 @@ const MainPage = () => {
           />
 
           <CategoryPills
-            selectedCategory={selectedCategory}
+            selectedCategory={selectedCategory || 'all'}
             onCategoryChange={handleCategoryChange}
           />
         </Box>
 
         {/* News Sections */}
         <Box sx={{ py: 2 }}>
-          <NewsSection title="Sana Özel Haberler">
+          <NewsSection title="En Popüler Haberler">
             <NewsCard
-              articles={recommendedNews}
+              articles={popularStacksAsNews}
               variant="horizontal"
-              onClick={(newsId) => handleNewsCardClick(newsId)}
+              onClick={(stackId) => handleStackClick(stackId)}
             />
           </NewsSection>
 
           <NewsSection
-            title="Tüm Haberler"
+            title="En Son Paylaşılan Haberler"
             action={
               <Button
                 variant="outlined"
@@ -210,16 +359,9 @@ const MainPage = () => {
             }
           >
             <NewsCard
-              articles={allNewsTimeline.map(newsItem => ({
-                id: newsItem.id,
-                thumbnailUrl: newsItem.imageUrl,
-                imageUrl: newsItem.imageUrl,
-                category: newsItem.category,
-                title: newsItem.title,
-                age: new Date(newsItem.pubDate || Date.now()).toLocaleDateString('tr-TR')
-              }))}
+              articles={latestStacksAsNews}
               variant="horizontal"
-              onClick={(newsId) => handleNewsCardClick(newsId)}
+              onClick={(stackId) => handleStackClick(stackId)}
             />
           </NewsSection>
 
