@@ -4,7 +4,6 @@ import {
   Container,
   Typography,
   IconButton,
-  Chip,
   useTheme,
   useMediaQuery,
   Fade,
@@ -221,24 +220,11 @@ const Hero = ({ onStackClick }) => {
           left: 0,
           padding: isMobile ? 2 : 3,
           paddingBottom: isMobile ? 2 : 3,
+          paddingRight: isMobile ? 5 : 12, // Sağ tarafta dot'lar için yer açıyoruz
           zIndex: 3,
-          maxWidth: isMobile ? '100%' : '60%'
+          maxWidth: isMobile ? '100%' : '60%' // Genişliği biraz azaltıyoruz
         }}
       >
-        {/* Category Chip */}
-        <Chip
-          label={category.charAt(0).toUpperCase() + category.slice(1)}
-          sx={{
-            bgcolor: categoryColor,
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: isMobile ? '0.75rem' : '0.875rem',
-            marginBottom: 2,
-            borderRadius: '16px',
-            textTransform: 'uppercase',
-            letterSpacing: 1
-          }}
-        />
 
         {/* Title */}
         <Typography
@@ -262,10 +248,15 @@ const Hero = ({ onStackClick }) => {
           variant="body2"
           sx={{
             color: 'grey.300',
-            maxWidth: '500px',
+            maxWidth: isMobile ? '100%' : '800px', // Mobile'da tam genişlik, desktop'ta 800px
             lineHeight: 1.5,
             fontSize: isMobile ? '0.875rem' : '1rem',
-            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
           }}
         >
           {currentStack?.description}
@@ -320,11 +311,12 @@ const Hero = ({ onStackClick }) => {
         <Box
           sx={{
             position: 'absolute',
-            bottom: isMobile ? 16 : 24,
-            right: isMobile ? 16 : 24,
+            bottom: isMobile ? 20 : 30,
+            right: isMobile ? 20 : 30,
             display: 'flex',
+            flexDirection: 'column', // Dikey sıralama
             gap: 1,
-            zIndex: 3
+            zIndex: 4 // Content'ten daha üstte
           }}
         >
           {heroStacks.map((_, index) => (
