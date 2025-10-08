@@ -265,7 +265,7 @@ const MainPage = () => {
       id: stack._id,
       thumbnailUrl: imageUrl,
       imageUrl: imageUrl,
-      category: stack.tags?.[0] || 'genel',
+      category: stack.mainCategory || 'genel', // mainCategory field'ını kullan
       title: stack.title,
       age: new Date(stack.createdAt).toLocaleDateString('tr-TR'),
       xp: stack.xp || 0,
@@ -274,11 +274,47 @@ const MainPage = () => {
     };
   };
 
-  // Convert popular stacks to NewsCard format
-  const popularStacksAsNews = popularStacks.map(convertStackToNewsCard);
+  // Convert popular stacks to NewsCard format with category filtering
+  const popularStacksAsNews = popularStacks
+    .filter(stack => {
+      // Kategori filtresi uygula
+      if (selectedCategory === 'all' || !selectedCategory) {
+        return true;
+      }
+      return stack.mainCategory === selectedCategory;
+    })
+    .filter(stack => {
+      // Arama filtresi uygula
+      if (!searchQuery) return true;
 
-  // Convert latest stacks to NewsCard format - paylaşılma tarihine göre sıralı
-  const latestStacksAsNews = latestStacks.map(convertStackToNewsCard);
+      const searchTerm = searchQuery.toLowerCase();
+      const title = stack.title?.toLowerCase() || '';
+      const description = stack.description?.toLowerCase() || '';
+
+      return title.includes(searchTerm) || description.includes(searchTerm);
+    })
+    .map(convertStackToNewsCard);
+
+  // Convert latest stacks to NewsCard format with category filtering
+  const latestStacksAsNews = latestStacks
+    .filter(stack => {
+      // Kategori filtresi uygula
+      if (selectedCategory === 'all' || !selectedCategory) {
+        return true;
+      }
+      return stack.mainCategory === selectedCategory;
+    })
+    .filter(stack => {
+      // Arama filtresi uygula
+      if (!searchQuery) return true;
+
+      const searchTerm = searchQuery.toLowerCase();
+      const title = stack.title?.toLowerCase() || '';
+      const description = stack.description?.toLowerCase() || '';
+
+      return title.includes(searchTerm) || description.includes(searchTerm);
+    })
+    .map(convertStackToNewsCard);
 
   console.log('Popular stacks:', popularStacksAsNews);
   console.log('Latest stacks:', latestStacksAsNews);
