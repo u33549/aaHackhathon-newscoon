@@ -276,7 +276,13 @@ const MainPage = () => {
 
   // Convert popular stacks to NewsCard format
   const popularStacksAsNews = popularStacks.map(convertStackToNewsCard);
-  console.log(popularStacksAsNews);
+
+  // Convert latest stacks to NewsCard format - paylaşılma tarihine göre sıralı
+  const latestStacksAsNews = latestStacks.map(convertStackToNewsCard);
+
+  console.log('Popular stacks:', popularStacksAsNews);
+  console.log('Latest stacks:', latestStacksAsNews);
+
   if (isLoading || stacksLoading) {
     return (
       <Box sx={{
@@ -340,7 +346,7 @@ const MainPage = () => {
           </NewsSection>
 
           <NewsSection
-            title="Tüm Haberler"
+            title="En Son Paylaşılan Haberler"
             action={
               <Button
                 variant="outlined"
@@ -353,16 +359,9 @@ const MainPage = () => {
             }
           >
             <NewsCard
-              articles={allNewsTimeline.map(newsItem => ({
-                id: newsItem.id || newsItem.guid,
-                thumbnailUrl: newsItem.imageUrl || newsItem.image,
-                imageUrl: newsItem.imageUrl || newsItem.image,
-                category: newsItem.category,
-                title: newsItem.title,
-                age: new Date(newsItem.pubDate || newsItem.createdAt || Date.now()).toLocaleDateString('tr-TR')
-              }))}
+              articles={latestStacksAsNews}
               variant="horizontal"
-              onClick={(newsId) => handleNewsCardClick(newsId)}
+              onClick={(stackId) => handleStackClick(stackId)}
             />
           </NewsSection>
 
