@@ -8,12 +8,21 @@ import {
   useNews,
   useNewsLoading,
   useSearchQuery,
-  useActiveCategory
+  useActiveCategory,
+  useStacks,
+  useStacksLoading,
+  usePopularStacks,
+  useLatestStacks
 } from '../hooks/redux';
 import {
   fetchAllNews,
   setSelectedNews
 } from '../store/slices/newsSlice';
+import {
+  fetchPopularStacks,
+  fetchLatestStacks,
+  setSelectedStack
+} from '../store/slices/stackSlice';
 import {
   setSearchQuery,
   setActiveCategory,
@@ -45,6 +54,9 @@ const MainPage = () => {
   // Redux state
   const dispatch = useAppDispatch();
   const { news, selectedNews } = useNews();
+  const popularStacks = usePopularStacks();
+  const latestStacks = useLatestStacks();
+  const stacksLoading = useStacksLoading();
   const isLoading = useNewsLoading();
   const searchQuery = useSearchQuery();
   const selectedCategory = useActiveCategory();
@@ -63,12 +75,36 @@ const MainPage = () => {
 
   const navigate = useNavigate();
 
-  // Load news data on component mount
+  // Load data on component mount
   useEffect(() => {
-    if (news.length === 0) {
-      dispatch(fetchAllNews());
-    }
-  }, [dispatch, news.length]);
+    const loadData = async () => {
+      try {
+        if (news.length === 0) {
+          dispatch(fetchAllNews());
+        }
+      } catch (error) {
+        console.warn('News API hatası:', error);
+      }
+
+      try {
+        if (popularStacks.length === 0) {
+          dispatch(fetchPopularStacks(20)); // En popüler 20 stack'i getir
+        }
+      } catch (error) {
+        console.warn('Popular Stacks API hatası:', error);
+      }
+
+      try {
+        if (latestStacks.length === 0) {
+          dispatch(fetchLatestStacks(20)); // En son 20 stack'i getir
+        }
+      } catch (error) {
+        console.warn('Latest Stacks API hatası:', error);
+      }
+    };
+
+    loadData();
+  }, [dispatch, news.length, popularStacks.length, latestStacks.length]);
 
   // Utility functions
   const calculateLevel = (xp) => {
@@ -115,6 +151,16 @@ const MainPage = () => {
       duration: 5000
     }));
     dispatch(openBadgeModal(badge));
+  };
+
+  const handleStackClick = (stackId) => {
+    // Stack'e tıklandığında stack detay sayfasına yönlendir
+    const allStacks = [...popularStacks, ...latestStacks];
+    const stackToOpen = allStacks.find(stack => stack._id === stackId);
+    if (stackToOpen) {
+      dispatch(setSelectedStack(stackToOpen));
+      navigate(`/stack/${stackId}`);
+    }
   };
 
   // Use Redux data if available, fallback to static data
@@ -191,7 +237,23 @@ const MainPage = () => {
     recommendedNews = allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
   }
 
-  if (isLoading) {
+  // Convert stacks to NewsCard format
+  const convertStackToNewsCard = (stack) => ({
+    id: stack._id,
+    thumbnailUrl: stack.imageUrl || `https://picsum.photos/seed/${stack._id}/400/300`,
+    imageUrl: stack.imageUrl || `https://picsum.photos/seed/${stack._id}/400/300`,
+    category: stack.tags?.[0] || 'genel',
+    title: stack.title,
+    age: new Date(stack.createdAt).toLocaleDateString('tr-TR'),
+    xp: stack.xp || 0,
+    viewCount: stack.viewCount || 0,
+    newsCount: stack.news?.length || 0
+  });
+
+  // Convert popular stacks to NewsCard format
+  const popularStacksAsNews = popularStacks.map(convertStackToNewsCard);
+
+  if (isLoading || stacksLoading) {
     return (
       <Box sx={{
         display: 'flex',
@@ -199,7 +261,7 @@ const MainPage = () => {
         alignItems: 'center',
         minHeight: '100vh'
       }}>
-        Haberler yükleniyor...
+        {isLoading ? 'Haberler' : 'Haber yığınları'} yükleniyor...
       </Box>
     );
   }
@@ -245,11 +307,11 @@ const MainPage = () => {
 
         {/* News Sections */}
         <Box sx={{ py: 2 }}>
-          <NewsSection title="Sana Özel Haberler">
+          <NewsSection title="En Popüler Haberler">
             <NewsCard
-              articles={recommendedNews}
+              articles={popularStacksAsNews}
               variant="horizontal"
-              onClick={(newsId) => handleNewsCardClick(newsId)}
+              onClick={(stackId) => handleStackClick(stackId)}
             />
           </NewsSection>
 

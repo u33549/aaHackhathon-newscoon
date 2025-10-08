@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Axios instance oluştur - backend ile iletişim için temel yapılandırma
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '', // Proxy kullanımı için boş string
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

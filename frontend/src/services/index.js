@@ -79,7 +79,8 @@ export const stacksAPI = {
   getFeatured: stackServices.getFeaturedStacks,
   getPopular: stackServices.getPopularStacks,
   getByTags: stackServices.getStacksByTags,
-  getByXP: stackServices.getStacksByXP
+  getByXP: stackServices.getStacksByXP,
+  getLatest: stackServices.getLatestStacks
 };
 
 export const imagesAPI = {

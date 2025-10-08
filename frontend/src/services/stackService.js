@@ -137,3 +137,16 @@ export const getStacksByXP = async (limit = 10) => {
     limit
   });
 };
+
+/**
+ * En son eklenen haber yığınlarını getir (oluşturulma tarihine göre)
+ * @param {number} limit - Maksimum sonuç sayısı
+ */
+export const getLatestStacks = async (limit = 20) => {
+  return await getAllStacks({
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    status: 'approved', // Sadece onaylanmış stackleri getir
+    limit
+  });
+};

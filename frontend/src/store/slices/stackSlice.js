@@ -62,8 +62,47 @@ export const deleteStack = createAsyncThunk(
   }
 );
 
+export const fetchFeaturedStacks = createAsyncThunk(
+  'stacks/fetchFeatured',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await stacksAPI.getFeatured();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const fetchPopularStacks = createAsyncThunk(
+  'stacks/fetchPopular',
+  async (limit = 20, { rejectWithValue }) => {
+    try {
+      const response = await stacksAPI.getPopular(limit);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const fetchLatestStacks = createAsyncThunk(
+  'stacks/fetchLatest',
+  async (limit = 20, { rejectWithValue }) => {
+    try {
+      const response = await stacksAPI.getLatest(limit);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   stacks: [],
+  featuredStacks: [],
+  popularStacks: [],
+  latestStacks: [],
   selectedStack: null,
   loading: false,
   error: null,
@@ -175,6 +214,45 @@ const stackSlice = createSlice({
         }
       })
       .addCase(deleteStack.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Featured Stacks
+      .addCase(fetchFeaturedStacks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFeaturedStacks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.featuredStacks = action.payload;
+      })
+      .addCase(fetchFeaturedStacks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Popular Stacks
+      .addCase(fetchPopularStacks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPopularStacks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.popularStacks = action.payload;
+      })
+      .addCase(fetchPopularStacks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Latest Stacks
+      .addCase(fetchLatestStacks.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchLatestStacks.fulfilled, (state, action) => {
+        state.loading = false;
+        state.latestStacks = action.payload;
+      })
+      .addCase(fetchLatestStacks.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

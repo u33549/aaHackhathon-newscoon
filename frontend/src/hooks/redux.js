@@ -90,3 +90,16 @@ export const useAuthError = () => {
 export const useAuthLoading = () => {
   return useAppSelector((state) => state.auth.loading);
 };
+
+// Stack selectors
+export const useFeaturedStacks = () => {
+  return useAppSelector((state) => state.stacks.featuredStacks);
+};
+
+export const usePopularStacks = () => {
+  return useAppSelector((state) => state.stacks.popularStacks);
+};
+
+export const useLatestStacks = () => {
+  return useAppSelector((state) => state.stacks.latestStacks);
+};
