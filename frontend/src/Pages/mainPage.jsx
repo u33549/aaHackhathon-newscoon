@@ -9,7 +9,6 @@ import {
   useNewsLoading,
   useSearchQuery,
   useActiveCategory,
-  useStacks,
   useStacksLoading,
   usePopularStacks,
   useLatestStacks
@@ -30,14 +29,10 @@ import {
   openBadgeModal
 } from '../store/slices/uiSlice';
 
-// API Services
-import { getAllStackImages } from '../services';
-
 // Components
 import Hero from '../components/sections/Hero';
 import NewsSection from '../components/sections/NewsSection';
 import NewsCard from '../components/cards/NewsCard';
-import FeaturedNewsCard from '../components/cards/FeaturedNewsCard';
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
 import BadgeModal from '../components/modals/BadgeModal';
@@ -46,8 +41,6 @@ import BadgeToast from '../components/notifications/BadgeToast';
 
 // Data and utilities
 import {
-  heroSlides,
-  featuredNews,
   allBadges,
   levelThresholds,
   allAchievements
@@ -128,9 +121,9 @@ const MainPage = () => {
 
   // Event handlers
   const handleNewsCardClick = (articleId) => {
-    // Use Redux data if available, fallback to heroSlides
-    const newsData = news.length > 0 ? news : heroSlides;
-    const articleToOpen = newsData.find(slide => slide.id === articleId || slide.guid === articleId);
+    // Use Redux data if available
+    const newsData = news.length > 0 ? news : [];
+    const articleToOpen = newsData.find(article => article.id === articleId || article.guid === articleId);
     if (articleToOpen) {
       dispatch(setSelectedNews(articleToOpen));
       // Navigate to article page
@@ -166,8 +159,8 @@ const MainPage = () => {
     }
   };
 
-  // Use Redux data if available, fallback to static data
-  const newsData = news.length > 0 ? news : heroSlides;
+  // Use Redux data
+  const newsData = news.length > 0 ? news : [];
 
   // Filter news by category and search
   let filteredNews = selectedCategory === 'all' || !selectedCategory
@@ -205,10 +198,6 @@ const MainPage = () => {
       return dateB - dateA; // En yeni haberler önce
     })
     .slice(0, 20);
-
-  const filteredFeaturedNews = selectedCategory === 'all' || !selectedCategory
-    ? featuredNews
-    : featuredNews.filter(item => item.category === selectedCategory);
 
   // Generate recommendations
   const readArticleIds = new Set(readArticles.map(a => a.id || a.guid));
@@ -316,9 +305,6 @@ const MainPage = () => {
     })
     .map(convertStackToNewsCard);
 
-  console.log('Popular stacks:', popularStacksAsNews);
-  console.log('Latest stacks:', latestStacksAsNews);
-
   if (isLoading || stacksLoading) {
     return (
       <Box sx={{
@@ -351,11 +337,8 @@ const MainPage = () => {
       />
 
       <Box component="main">
-        {/* Hero Section */}
-        <Hero
-          slides={filteredNews}
-          onArticleSelect={(article) => dispatch(setSelectedNews(article))}
-        />
+        {/* Hero Section - Her kategoriden 2 stack gösterir */}
+        <Hero onStackClick={handleStackClick} />
 
         {/* Search and Category Section */}
         <Box sx={{ backgroundColor: 'background.default', pt: 3 }}>

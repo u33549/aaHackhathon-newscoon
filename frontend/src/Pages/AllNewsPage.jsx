@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -14,33 +14,58 @@ import {
 } from '@mui/material';
 import { ArrowBack, AccessTime } from '@mui/icons-material';
 
+// Redux hooks
+import { useAppDispatch } from '../hooks/redux';
+import {
+  useNews,
+  useNewsLoading,
+  useSearchQuery,
+  useActiveCategory
+} from '../hooks/redux';
+import {
+  fetchAllNews
+} from '../store/slices/newsSlice';
+import {
+  setSearchQuery,
+  setActiveCategory
+} from '../store/slices/uiSlice';
+
 // Components
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
 
-// Data
-import { heroSlides } from '../constants/index.jsx';
-
 const AllNewsPage = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const dispatch = useAppDispatch();
 
-  // Timeline'a göre sıralanan tüm haberler
-  const allNews = [...heroSlides].sort((a, b) => 
-    new Date(b.pubDate || Date.now()) - new Date(a.pubDate || Date.now())
+  // Redux state kullan
+  const { news } = useNews();
+  const isLoading = useNewsLoading();
+  const searchQuery = useSearchQuery();
+  const selectedCategory = useActiveCategory();
+
+  // Component mount olduğunda haberleri getir
+  useEffect(() => {
+    if (news.length === 0) {
+      dispatch(fetchAllNews());
+    }
+  }, [dispatch, news.length]);
+
+  // Timeline'a göre sıralanan tüm haberler (Redux'tan gelen gerçek veriler)
+  const allNews = [...news].sort((a, b) =>
+    new Date(b.pubDate || b.createdAt || Date.now()) - new Date(a.pubDate || a.createdAt || Date.now())
   );
 
   // Filter news by category and search
-  let filteredNews = selectedCategory === 'all' 
-    ? allNews 
+  let filteredNews = selectedCategory === 'all' || !selectedCategory
+    ? allNews
     : allNews.filter(article => article.category === selectedCategory);
 
   if (searchQuery) {
     filteredNews = filteredNews.filter(article => {
       const title = article.title?.toLowerCase() || '';
-      const summary = article.summary?.toLowerCase() || '';
-      
+      const summary = article.summary?.toLowerCase() || article.description?.toLowerCase() || '';
+
       // content array'ini string'e çevir
       let contentText = '';
       if (Array.isArray(article.content)) {
@@ -60,11 +85,11 @@ const AllNewsPage = () => {
   }
 
   const handleSearchChange = (query) => {
-    setSearchQuery(query);
+    dispatch(setSearchQuery(query));
   };
 
   const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
+    dispatch(setActiveCategory(categoryId));
   };
 
   const handleNewsClick = (newsId) => {
@@ -82,6 +107,18 @@ const AllNewsPage = () => {
       minute: '2-digit'
     });
   };
+
+  if (isLoading && news.length === 0) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <Typography variant="h6" color="text.secondary">
+            Haberler yükleniyor...
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -113,7 +150,7 @@ const AllNewsPage = () => {
         />
         
         <CategoryPills
-          selectedCategory={selectedCategory}
+          selectedCategory={selectedCategory || 'all'}
           onCategoryChange={handleCategoryChange}
         />
       </Box>
@@ -122,8 +159,8 @@ const AllNewsPage = () => {
       <Grid container spacing={3}>
         {filteredNews.length > 0 ? (
           filteredNews.map((news) => (
-            <Grid item xs={12} key={news.id}>
-              <Card 
+            <Grid item xs={12} key={news.id || news.guid}>
+              <Card
                 sx={{ 
                   display: 'flex',
                   flexDirection: { xs: 'column', sm: 'row' },
@@ -134,7 +171,7 @@ const AllNewsPage = () => {
                     boxShadow: 3
                   }
                 }}
-                onClick={() => handleNewsClick(news.id)}
+                onClick={() => handleNewsClick(news.id || news.guid)}
               >
                 {/* News Image */}
                 <CardMedia
@@ -144,7 +181,7 @@ const AllNewsPage = () => {
                     height: { xs: 200, sm: 150 },
                     objectFit: 'cover'
                   }}
-                  image={news.imageUrl}
+                  image={news.imageUrl || news.image || 'https://via.placeholder.com/250x150'}
                   alt={news.title}
                 />
                 
@@ -152,19 +189,11 @@ const AllNewsPage = () => {
                 <CardContent sx={{ flex: 1, p: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Chip
-                      label={news.category.charAt(0).toUpperCase() + news.category.slice(1)}
+                      label={news.category?.charAt(0).toUpperCase() + news.category?.slice(1) || 'Genel'}
                       size="small"
                       color="primary"
                       sx={{ mr: 1 }}
                     />
-                    {news.superTitle && (
-                      <Chip
-                        label={news.superTitle}
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                      />
-                    )}
                   </Box>
                   
                   <Typography
@@ -183,22 +212,6 @@ const AllNewsPage = () => {
                     {news.title}
                   </Typography>
                   
-                  {news.subtitle && (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        mb: 2,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      {news.subtitle}
-                    </Typography>
-                  )}
-                  
                   <Typography
                     variant="body2"
                     color="text.secondary"
@@ -210,13 +223,13 @@ const AllNewsPage = () => {
                       overflow: 'hidden'
                     }}
                   >
-                    {news.summary}
+                    {news.description || news.summary || 'Açıklama bulunmuyor'}
                   </Typography>
                   
                   <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
                     <AccessTime sx={{ fontSize: 16, mr: 0.5 }} />
                     <Typography variant="caption">
-                      {formatDate(news.pubDate)}
+                      {formatDate(news.pubDate || news.createdAt)}
                     </Typography>
                   </Box>
                 </CardContent>

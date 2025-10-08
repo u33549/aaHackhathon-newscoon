@@ -1,35 +1,81 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
   Box,
+  Container,
   Typography,
+  IconButton,
+  Chip,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Fade,
+  Slide
 } from '@mui/material';
-import { mockNews, categoryColors } from '../../constants/index.jsx';
+import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
+import { usePopularStacks, useLatestStacks, useStacksLoading } from '../../hooks/redux';
+import { fetchPopularStacks, fetchLatestStacks } from '../../store/slices/stackSlice';
+import { categoryColors } from '../../constants';
 
-const Hero = () => {
+const Hero = ({ onStackClick }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const [currentNews, setCurrentNews] = useState(mockNews[0]);
+  const dispatch = useDispatch();
+  const heroRef = useRef(null);
+
+  const popularStacks = usePopularStacks();
+  const latestStacks = useLatestStacks();
+  const loading = useStacksLoading();
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slideDirection, setSlideDirection] = useState('left');
 
   // Touch/Swipe için state'ler
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
-  const heroRef = useRef(null);
 
-  // Auto-rotate news every 5 seconds
+  // Sayfa yüklendiğinde stack'leri getir
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentNewsIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % mockNews.length;
-        setCurrentNews(mockNews[nextIndex]);
-        return nextIndex;
-      });
-    }, 5000);
+    if (popularStacks.length === 0) {
+      dispatch(fetchPopularStacks(20));
+    }
+    if (latestStacks.length === 0) {
+      dispatch(fetchLatestStacks(20));
+    }
+  }, [dispatch, popularStacks.length, latestStacks.length]);
 
-    return () => clearInterval(interval);
-  }, []);
+  // Her kategoriden 2 stack seç
+  const heroStacks = useMemo(() => {
+    const allStacks = [...popularStacks, ...latestStacks];
+
+    const stacksByCategory = allStacks.reduce((acc, stack) => {
+      const category = stack.category || stack.mainCategory || 'gundem';
+
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+
+      const exists = acc[category].some(s => s._id === stack._id);
+      if (!exists && acc[category].length < 2) {
+        acc[category].push(stack);
+      }
+
+      return acc;
+    }, {});
+
+    return Object.values(stacksByCategory).flat().slice(0, 5); // 5 slide
+  }, [popularStacks, latestStacks]);
+
+  // Auto slide
+  useEffect(() => {
+    if (heroStacks.length > 1) {
+      const interval = setInterval(() => {
+        setSlideDirection('left');
+        setCurrentSlide((prev) => (prev + 1) % heroStacks.length);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [heroStacks.length]);
 
   // Swipe için minimum mesafe
   const minSwipeDistance = 50;
@@ -52,36 +98,70 @@ const Hero = () => {
 
     if (isLeftSwipe) {
       // Sol kaydırma - sonraki haber
-      nextNews();
+      nextSlide();
     }
     if (isRightSwipe) {
       // Sağ kaydırma - önceki haber
-      prevNews();
+      prevSlide();
     }
   };
 
-  const nextNews = () => {
-    setCurrentNewsIndex((prevIndex) => {
-      const nextIndex = (prevIndex + 1) % mockNews.length;
-      setCurrentNews(mockNews[nextIndex]);
-      return nextIndex;
-    });
+  const nextSlide = () => {
+    setSlideDirection('left');
+    setCurrentSlide((prev) => (prev + 1) % heroStacks.length);
   };
 
-  const prevNews = () => {
-    setCurrentNewsIndex((prevIndex) => {
-      const nextIndex = (prevIndex - 1 + mockNews.length) % mockNews.length;
-      setCurrentNews(mockNews[nextIndex]);
-      return nextIndex;
-    });
+  const prevSlide = () => {
+    setSlideDirection('right');
+    setCurrentSlide((prev) => (prev - 1 + heroStacks.length) % heroStacks.length);
   };
 
-  const goToNews = (index) => {
-    setCurrentNewsIndex(index);
-    setCurrentNews(mockNews[index]);
+  const goToSlide = (index) => {
+    setSlideDirection(index > currentSlide ? 'left' : 'right');
+    setCurrentSlide(index);
   };
 
-  const categoryColor = categoryColors[currentNews.category?.toLowerCase()] || '#FFD700';
+  const handleSlideClick = (stack) => {
+    if (onStackClick) {
+      onStackClick(stack._id);
+    }
+  };
+
+  if (loading && heroStacks.length === 0) {
+    return (
+      <Box sx={{
+        height: isMobile ? '50vh' : '70vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <Typography variant="h4" color="white" fontWeight="bold">
+          Haberler Yükleniyor...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (heroStacks.length === 0) {
+    return (
+      <Box sx={{
+        height: isMobile ? '50vh' : '70vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <Typography variant="h4" color="white" fontWeight="bold">
+          Henüz haber yığını bulunmuyor
+        </Typography>
+      </Box>
+    );
+  }
+
+  const currentStack = heroStacks[currentSlide];
+  const category = currentStack?.category || currentStack?.mainCategory || 'gundem';
+  const categoryColor = categoryColors[category] || '#3B82F6';
 
   return (
     <Box
@@ -111,7 +191,7 @@ const Hero = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: `url(${currentNews.image})`,
+          backgroundImage: `url(${currentStack?.imageUrl || currentStack?.photoUrl || `https://picsum.photos/1920/1080?random=${currentSlide}`})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -149,14 +229,15 @@ const Hero = () => {
         <Typography
           variant="body2"
           sx={{
-            color: 'grey.400',
+            color: categoryColor,
             textTransform: 'uppercase',
             letterSpacing: 1,
             marginBottom: 1,
-            fontSize: isMobile ? '0.75rem' : '0.875rem'
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
+            fontWeight: 'bold'
           }}
         >
-          {currentNews.category}
+          {category.charAt(0).toUpperCase() + category.slice(1)}
         </Typography>
 
         {/* Title */}
@@ -168,10 +249,12 @@ const Hero = () => {
             marginBottom: 1,
             lineHeight: 1.1,
             textShadow: '2px 2px 8px rgba(0, 0, 0, 0.9)',
-            fontSize: isMobile ? '1.75rem' : '3rem'
+            fontSize: isMobile ? '1.75rem' : '3rem',
+            cursor: 'pointer'
           }}
+          onClick={() => handleSlideClick(currentStack)}
         >
-          {currentNews.title}
+          {currentStack?.title}
         </Typography>
 
         {/* Description */}
@@ -182,43 +265,120 @@ const Hero = () => {
             maxWidth: '500px',
             lineHeight: 1.5,
             fontSize: isMobile ? '0.875rem' : '1rem',
-            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
+            marginBottom: 2
           }}
         >
-          {currentNews.description}
+          {currentStack?.description}
         </Typography>
+
+        {/* Stack Info */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 3,
+          flexWrap: 'wrap'
+        }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'rgba(255,255,255,0.8)',
+              textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+            }}
+          >
+            {currentStack?.news?.length || 0} Haber
+          </Typography>
+
+          {currentStack?.xp && (
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#FFD700',
+                fontWeight: 'bold',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
+              }}
+            >
+              {currentStack.xp} XP
+            </Typography>
+          )}
+        </Box>
       </Box>
 
-      {/* News Indicators (Dots) */}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: isMobile ? 16 : 24,
-          right: isMobile ? 16 : 24,
-          display: 'flex',
-          gap: 1,
-          zIndex: 3
-        }}
-      >
-        {mockNews.map((_, index) => (
-          <Box
-            key={index}
-            onClick={() => goToNews(index)}
+      {/* Navigation Arrows - Desktop only */}
+      {!isMobile && heroStacks.length > 1 && (
+        <>
+          <IconButton
+            onClick={prevSlide}
             sx={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              backgroundColor: index === currentNewsIndex ? categoryColor : 'rgba(255, 255, 255, 0.5)',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
+              position: 'absolute',
+              left: 24,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              bgcolor: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              backdropFilter: 'blur(10px)',
               '&:hover': {
-                backgroundColor: index === currentNewsIndex ? categoryColor : 'rgba(255, 255, 255, 0.8)',
-                transform: 'scale(1.2)'
-              }
+                bgcolor: 'rgba(255,255,255,0.3)'
+              },
+              zIndex: 3
             }}
-          />
-        ))}
-      </Box>
+          >
+            <ArrowBackIos />
+          </IconButton>
+
+          <IconButton
+            onClick={nextSlide}
+            sx={{
+              position: 'absolute',
+              right: 24,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              bgcolor: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              backdropFilter: 'blur(10px)',
+              '&:hover': {
+                bgcolor: 'rgba(255,255,255,0.3)'
+              },
+              zIndex: 3
+            }}
+          >
+            <ArrowForwardIos />
+          </IconButton>
+        </>
+      )}
+
+      {/* Slide Indicators (Dots) */}
+      {heroStacks.length > 1 && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: isMobile ? 16 : 24,
+            right: isMobile ? 16 : 24,
+            display: 'flex',
+            gap: 1,
+            zIndex: 3
+          }}
+        >
+          {heroStacks.map((_, index) => (
+            <Box
+              key={index}
+              onClick={() => goToSlide(index)}
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: index === currentSlide ? categoryColor : 'rgba(255, 255, 255, 0.5)',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: index === currentSlide ? categoryColor : 'rgba(255, 255, 255, 0.8)',
+                  transform: 'scale(1.2)'
+                }
+              }}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
