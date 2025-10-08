@@ -30,6 +30,9 @@ import {
   openBadgeModal
 } from '../store/slices/uiSlice';
 
+// API Services
+import { getAllStackImages } from '../services';
+
 // Components
 import Hero from '../components/sections/Hero';
 import NewsSection from '../components/sections/NewsSection';
@@ -238,21 +241,42 @@ const MainPage = () => {
   }
 
   // Convert stacks to NewsCard format
-  const convertStackToNewsCard = (stack) => ({
-    id: stack._id,
-    thumbnailUrl: stack.imageUrl || `https://picsum.photos/seed/${stack._id}/400/300`,
-    imageUrl: stack.imageUrl || `https://picsum.photos/seed/${stack._id}/400/300`,
-    category: stack.tags?.[0] || 'genel',
-    title: stack.title,
-    age: new Date(stack.createdAt).toLocaleDateString('tr-TR'),
-    xp: stack.xp || 0,
-    viewCount: stack.viewCount || 0,
-    newsCount: stack.news?.length || 0
-  });
+  const convertStackToNewsCard = (stack) => {
+    // Stack'in kendi resim verilerini kullan
+    let imageUrl = null;
+
+    // Önce stack'in kendi imageUrl'ini kontrol et (Redux'tan gelen)
+    if (stack.imageUrl) {
+      imageUrl = stack.imageUrl;
+    }
+    // Eğer stack'te photoUrl field'ı varsa onu kullan
+    else if (stack.photoUrl) {
+      imageUrl = stack.photoUrl;
+    }
+    // Stack'teki son haberin resmini kullan
+    else if (stack.news && stack.news.length > 0) {
+      const firstNews = stack.news[stack.news.length-1];
+      if (typeof firstNews === 'object' && firstNews.image) {
+        imageUrl = firstNews.image;
+      }
+    }
+
+    return {
+      id: stack._id,
+      thumbnailUrl: imageUrl,
+      imageUrl: imageUrl,
+      category: stack.tags?.[0] || 'genel',
+      title: stack.title,
+      age: new Date(stack.createdAt).toLocaleDateString('tr-TR'),
+      xp: stack.xp || 0,
+      viewCount: stack.viewCount || 0,
+      newsCount: stack.news?.length || 0
+    };
+  };
 
   // Convert popular stacks to NewsCard format
   const popularStacksAsNews = popularStacks.map(convertStackToNewsCard);
-
+  console.log(popularStacksAsNews);
   if (isLoading || stacksLoading) {
     return (
       <Box sx={{

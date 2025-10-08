@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { stacksAPI } from '../../services';
+import { stacksAPI, getAllStackImages } from '../../services';
 
 // Async thunk'lar - Stack API çağrıları için
 export const fetchAllStacks = createAsyncThunk(
@@ -79,7 +79,25 @@ export const fetchPopularStacks = createAsyncThunk(
   async (limit = 20, { rejectWithValue }) => {
     try {
       const response = await stacksAPI.getPopular(limit);
-      return response.data;
+      const stacks = response.data;
+
+      // Her stack için resim verilerini getir
+      const stacksWithImages = await Promise.all(
+        stacks.map(async (stack) => {
+          try {
+            const imageResponse = await getAllStackImages({ newsStackId: stack._id });
+            if (imageResponse.data && imageResponse.data.length > 0) {
+              // photoUrl field'ını kullan, photo değil
+              stack.imageUrl = imageResponse.data[0].photoUrl;
+            }
+          } catch (error) {
+            console.warn(`Stack ${stack._id} için resim alınamadı:`, error);
+          }
+          return stack;
+        })
+      );
+
+      return stacksWithImages;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -91,7 +109,25 @@ export const fetchLatestStacks = createAsyncThunk(
   async (limit = 20, { rejectWithValue }) => {
     try {
       const response = await stacksAPI.getLatest(limit);
-      return response.data;
+      const stacks = response.data;
+
+      // Her stack için resim verilerini getir
+      const stacksWithImages = await Promise.all(
+        stacks.map(async (stack) => {
+          try {
+            const imageResponse = await getAllStackImages({ newsStackId: stack._id });
+            if (imageResponse.data && imageResponse.data.length > 0) {
+              // photoUrl field'ını kullan, photo değil
+              stack.imageUrl = imageResponse.data[0].photoUrl;
+            }
+          } catch (error) {
+            console.warn(`Stack ${stack._id} için resim alınamadı:`, error);
+          }
+          return stack;
+        })
+      );
+
+      return stacksWithImages;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
