@@ -225,20 +225,20 @@ const Hero = ({ onStackClick }) => {
           maxWidth: isMobile ? '100%' : '60%'
         }}
       >
-        {/* Category */}
-        <Typography
-          variant="body2"
+        {/* Category Chip */}
+        <Chip
+          label={category.charAt(0).toUpperCase() + category.slice(1)}
           sx={{
-            color: categoryColor,
-            textTransform: 'uppercase',
-            letterSpacing: 1,
-            marginBottom: 1,
+            bgcolor: categoryColor,
+            color: 'white',
+            fontWeight: 'bold',
             fontSize: isMobile ? '0.75rem' : '0.875rem',
-            fontWeight: 'bold'
+            marginBottom: 2,
+            borderRadius: '16px',
+            textTransform: 'uppercase',
+            letterSpacing: 1
           }}
-        >
-          {category.charAt(0).toUpperCase() + category.slice(1)}
-        </Typography>
+        />
 
         {/* Title */}
         <Typography
@@ -265,43 +265,11 @@ const Hero = ({ onStackClick }) => {
             maxWidth: '500px',
             lineHeight: 1.5,
             fontSize: isMobile ? '0.875rem' : '1rem',
-            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-            marginBottom: 2
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
           }}
         >
           {currentStack?.description}
         </Typography>
-
-        {/* Stack Info */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 3,
-          flexWrap: 'wrap'
-        }}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'rgba(255,255,255,0.8)',
-              textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
-            }}
-          >
-            {currentStack?.news?.length || 0} Haber
-          </Typography>
-
-          {currentStack?.xp && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: '#FFD700',
-                fontWeight: 'bold',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.8)'
-              }}
-            >
-              {currentStack.xp} XP
-            </Typography>
-          )}
-        </Box>
       </Box>
 
       {/* Navigation Arrows - Desktop only */}
