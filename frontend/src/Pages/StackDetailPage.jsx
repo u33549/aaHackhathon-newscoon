@@ -43,6 +43,9 @@ import {
   setSelectedStack
 } from '../store/slices/stackSlice';
 
+// Components
+import ShareModal from '../components/modals/ShareModal';
+
 // Netflix benzeri tanıtım sayfası
 const StackDetailPage = () => {
   const { id } = useParams();
@@ -56,6 +59,7 @@ const StackDetailPage = () => {
   const error = useStacksError();
 
   const [playTrailer, setPlayTrailer] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Component mount olduğunda stack verilerini getir
   useEffect(() => {
@@ -183,6 +187,7 @@ const StackDetailPage = () => {
           gap: { xs: 0.5, md: 1 }
         }}>
           <IconButton
+            onClick={() => setShareModalOpen(true)}
             sx={{
               backgroundColor: 'rgba(0,0,0,0.5)',
               color: 'white',
@@ -686,6 +691,16 @@ const StackDetailPage = () => {
           </Box>
         </Fade>
       </Dialog>
+
+      {/* Share Modal */}
+      <ShareModal
+        open={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        title={stack.title}
+        description={stack.description}
+        url={window.location.href}
+        image={heroImage}
+      />
     </Box>
   );
 };
