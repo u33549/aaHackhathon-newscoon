@@ -7,6 +7,7 @@ import { newscoonTheme } from './theme/theme';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ToastNotification from './components/notifications/ToastNotification';
+import ScrollToTop from './components/common/ScrollToTop';
 
 // Pages
 import MainPage from './pages/MainPage';
@@ -20,6 +21,7 @@ function App() {
   return (
     <ThemeProvider theme={newscoonTheme}>
       <CssBaseline />
+      <ScrollToTop />
       <div className="App">
         <Header />
         <Routes>
