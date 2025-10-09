@@ -1,0 +1,454 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Button,
+  Fade,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import { 
+  ArrowDownward, 
+  ArrowForward, 
+  Close,
+  KeyboardArrowDown,
+  EmojiEvents
+} from '@mui/icons-material';
+import { useAppDispatch, useSelectedStack } from '../hooks/redux';
+import { fetchStackById } from '../store/slices/stackSlice';
+
+// Kronolojik haber parçalarını simüle eden data
+const generateChronologicalSteps = (stack) => {
+  if (!stack || !stack.news || stack.news.length === 0) return [];
+
+  const steps = [];
+  
+  // İlk step - Giriş
+  steps.push({
+    id: 'intro',
+    type: 'intro',
+    title: stack.title,
+    content: stack.description || 'Bu haber yığınında kronolojik olarak gelişen olayları inceleyeceğiz.',
+    image: stack.imageUrl || (stack.news[0]?.image),
+    timestamp: null
+  });
+
+  // Her haber için kronolojik step oluştur
+  stack.news.forEach((news, index) => {
+    const newsItem = typeof news === 'object' ? news : { title: `Haber ${index + 1}`, description: 'Haber içeriği' };
+    
+    steps.push({
+      id: `step-${index}`,
+      type: 'news',
+      title: newsItem.title || `Gelişme ${index + 1}`,
+      content: newsItem.description || newsItem.newstext || 'Bu gelişmede önemli detaylar ortaya çıktı.',
+      image: newsItem.image || stack.imageUrl,
+      timestamp: newsItem.pubDate || new Date().toISOString(),
+      stepNumber: index + 1,
+      totalSteps: stack.news.length
+    });
+  });
+
+  // Son step - Tebrik
+  steps.push({
+    id: 'completion',
+    type: 'completion',
+    title: 'Tebrikler!',
+    content: `${stack.title} haber yığınını başarıyla tamamladınız!`,
+    image: null,
+    reward: {
+      cp: stack.xp || 50,
+      badge: null
+    }
+  });
+
+  return steps;
+};
+
+const ReadingFlowPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const dispatch = useAppDispatch();
+  
+  const selectedStack = useSelectedStack();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [steps, setSteps] = useState([]);
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  // Stack verisini yükle
+  useEffect(() => {
+    if (id && (!selectedStack || selectedStack._id !== id)) {
+      dispatch(fetchStackById(id));
+    }
+  }, [id, selectedStack, dispatch]);
+
+  // Steps oluştur
+  useEffect(() => {
+    if (selectedStack) {
+      const chronologicalSteps = generateChronologicalSteps(selectedStack);
+      setSteps(chronologicalSteps);
+    }
+  }, [selectedStack]);
+
+  // Scroll hint'i otomatik gizle
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowScrollHint(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+        setIsTransitioning(false);
+      }, 300);
+    }
+  };
+
+  const handleComplete = () => {
+    // Tebrik modalı göster ve ana sayfaya dön
+    setTimeout(() => {
+      navigate('/', { state: { showCompletionToast: true, earnedCP: steps[steps.length - 1]?.reward?.cp } });
+    }, 2000);
+  };
+
+  const handleClose = () => {
+    navigate(-1);
+  };
+
+  if (!selectedStack || steps.length === 0) {
+    return (
+      <Box sx={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'background.default'
+      }}>
+        <Typography variant="h6">Haber yükleniyor...</Typography>
+      </Box>
+    );
+  }
+
+  const currentStepData = steps[currentStep];
+
+  return (
+    <Box sx={{
+      height: '100vh',
+      overflow: 'hidden',
+      position: 'relative',
+      backgroundColor: '#000'
+    }}>
+      {/* Close Button */}
+      <IconButton
+        onClick={handleClose}
+        sx={{
+          position: 'fixed',
+          top: 20,
+          right: 20,
+          zIndex: 1000,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          color: 'white',
+          backdropFilter: 'blur(10px)',
+          '&:hover': {
+            backgroundColor: 'rgba(0,0,0,0.7)'
+          }
+        }}
+      >
+        <Close />
+      </IconButton>
+
+      {/* Progress Indicator */}
+      {currentStepData.type !== 'intro' && currentStepData.type !== 'completion' && (
+        <Box sx={{
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          zIndex: 1000,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          color: 'white',
+          padding: '8px 16px',
+          borderRadius: 2,
+          backdropFilter: 'blur(10px)'
+        }}>
+          <Typography variant="caption">
+            {currentStepData.stepNumber}/{currentStepData.totalSteps}
+          </Typography>
+        </Box>
+      )}
+
+      {/* Main Content */}
+      <Fade in={!isTransitioning} timeout={500}>
+        <Box sx={{
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative'
+        }}>
+          {/* Background Image */}
+          {currentStepData.image && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(${currentStepData.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                filter: currentStepData.type === 'completion' ? 'blur(5px)' : 'none'
+              }}
+            />
+          )}
+
+          {/* Gradient Overlay */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: currentStepData.type === 'completion' 
+                ? 'linear-gradient(135deg, rgba(76,175,80,0.9) 0%, rgba(56,142,60,0.95) 100%)'
+                : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
+              zIndex: 1
+            }}
+          />
+
+          {/* Content */}
+          <Box sx={{
+            position: 'relative',
+            zIndex: 2,
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: currentStepData.type === 'intro' ? 'center' : 'flex-end',
+            alignItems: 'center',
+            padding: { xs: 3, md: 6 },
+            textAlign: 'center'
+          }}>
+            {/* Intro Page */}
+            {currentStepData.type === 'intro' && (
+              <>
+                <Typography
+                  variant={isMobile ? 'h3' : 'h1'}
+                  sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    mb: 3,
+                    textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
+                    maxWidth: '80%'
+                  }}
+                >
+                  {currentStepData.title}
+                </Typography>
+                
+                <Typography
+                  variant={isMobile ? 'h6' : 'h5'}
+                  sx={{
+                    color: 'rgba(255,255,255,0.9)',
+                    mb: 6,
+                    textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
+                    maxWidth: '60%',
+                    lineHeight: 1.5
+                  }}
+                >
+                  {currentStepData.content}
+                </Typography>
+
+                {/* Scroll Hint */}
+                <Fade in={showScrollHint}>
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    animation: showScrollHint ? 'bounce 2s infinite' : 'none'
+                  }}>
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 1 }}>
+                      Okumaya başlamak için devam edin
+                    </Typography>
+                    <KeyboardArrowDown sx={{ color: 'white', fontSize: 32 }} />
+                  </Box>
+                </Fade>
+              </>
+            )}
+
+            {/* News Step */}
+            {currentStepData.type === 'news' && (
+              <Box sx={{ maxWidth: '800px', width: '100%' }}>
+                <Typography
+                  variant={isMobile ? 'h4' : 'h2'}
+                  sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    mb: 3,
+                    textShadow: '2px 2px 8px rgba(0,0,0,0.8)'
+                  }}
+                >
+                  {currentStepData.title}
+                </Typography>
+                
+                <Typography
+                  variant={isMobile ? 'body1' : 'h6'}
+                  sx={{
+                    color: 'rgba(255,255,255,0.95)',
+                    mb: 4,
+                    textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
+                    lineHeight: 1.6
+                  }}
+                >
+                  {currentStepData.content}
+                </Typography>
+
+                {currentStepData.timestamp && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'rgba(255,255,255,0.7)',
+                      mb: 4,
+                      display: 'block'
+                    }}
+                  >
+                    {new Date(currentStepData.timestamp).toLocaleDateString('tr-TR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </Typography>
+                )}
+              </Box>
+            )}
+
+            {/* Completion Page */}
+            {currentStepData.type === 'completion' && (
+              <>
+                <EmojiEvents sx={{ fontSize: 80, color: 'white', mb: 3 }} />
+                
+                <Typography
+                  variant={isMobile ? 'h3' : 'h1'}
+                  sx={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                    mb: 3,
+                    textShadow: '2px 2px 8px rgba(0,0,0,0.8)'
+                  }}
+                >
+                  {currentStepData.title}
+                </Typography>
+                
+                <Typography
+                  variant={isMobile ? 'h6' : 'h5'}
+                  sx={{
+                    color: 'rgba(255,255,255,0.95)',
+                    mb: 4,
+                    textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
+                    maxWidth: '80%'
+                  }}
+                >
+                  {currentStepData.content}
+                </Typography>
+
+                {currentStepData.reward && (
+                  <Box sx={{
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    backdropFilter: 'blur(10px)',
+                    padding: 3,
+                    borderRadius: 3,
+                    mb: 4
+                  }}>
+                    <Typography variant="h6" sx={{ color: 'white', mb: 1 }}>
+                      Kazandığınız Ödüller
+                    </Typography>
+                    <Typography variant="h4" sx={{ color: '#FFD700', fontWeight: 'bold' }}>
+                      +{currentStepData.reward.cp} CP
+                    </Typography>
+                  </Box>
+                )}
+
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={handleComplete}
+                  sx={{
+                    backgroundColor: 'white',
+                    color: 'success.main',
+                    fontWeight: 'bold',
+                    px: 4,
+                    py: 1.5,
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.9)'
+                    }
+                  }}
+                >
+                  Ana Sayfaya Dön
+                </Button>
+              </>
+            )}
+          </Box>
+
+          {/* Next Button */}
+          {currentStepData.type !== 'completion' && (
+            <Box sx={{
+              position: 'absolute',
+              bottom: 40,
+              right: 40,
+              zIndex: 3
+            }}>
+              <Button
+                variant="contained"
+                onClick={handleNextStep}
+                endIcon={<ArrowForward />}
+                sx={{
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  fontWeight: 'bold',
+                  px: 3,
+                  py: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.3)',
+                    transform: 'translateY(-2px)'
+                  },
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {currentStepData.type === 'intro' ? 'Başla' : 'Devam Et'}
+              </Button>
+            </Box>
+          )}
+        </Box>
+      </Fade>
+
+      {/* Custom CSS for animations */}
+      <style>{`
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-10px);
+          }
+          60% {
+            transform: translateY(-5px);
+          }
+        }
+      `}</style>
+    </Box>
+  );
+};
+
+export default ReadingFlowPage;

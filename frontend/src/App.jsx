@@ -10,12 +10,13 @@ import ToastNotification from './components/notifications/ToastNotification';
 import ScrollToTop from './components/common/ScrollToTop';
 
 // Pages
-import MainPage from './pages/MainPage';
-import ArticlePage from './pages/ArticlePage';
-import AllNewsPage from './pages/AllNewsPage';
-import StackDetailPage from './pages/StackDetailPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import TestPage from './pages/TestPage';
+import MainPage from './Pages/MainPage';
+import ArticlePage from './Pages/ArticlePage';
+import AllNewsPage from './Pages/AllNewsPage';
+import StackDetailPage from './Pages/StackDetailPage';
+import ReadingFlowPage from './Pages/ReadingFlowPage';
+import AdminDashboard from './Pages/admin/AdminDashboard';
+import TestPage from './Pages/TestPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/article/:id" element={<ArticlePage />} />
           <Route path="/stack/:id" element={<StackDetailPage />} />
+          <Route path="/stack/:id/read" element={<ReadingFlowPage />} />
           <Route path="/all-news" element={<AllNewsPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/test" element={<TestPage />} />
