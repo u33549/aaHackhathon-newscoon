@@ -713,169 +713,217 @@ const ReadingFlowPage = () => {
             {/* News Step - Yeni tasarım */}
             {currentStepData.type === 'news' && (
               <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
-                {/* Pull feedback UI - Top - Gelişmiş */}
+                {/* Pull feedback UI - Top - Modern Tasarım */}
                 {pullState.isPulling && pullState.pullDirection === 'down' && (
                   <Box sx={{
                     position: 'absolute',
-                    top: -80 + (pullState.pullDistance * 0.6),
+                    top: -60 + (pullState.pullDistance * 0.4),
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 10,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    opacity: Math.min(pullState.pullDistance / 60, 1),
-                    transition: 'opacity 0.2s ease',
-                    backgroundColor: pullState.isAboveConfirmationThreshold
-                      ? 'rgba(76, 175, 80, 0.15)'
-                      : 'rgba(158, 158, 158, 0.1)',
-                    borderRadius: 3,
-                    px: 2,
-                    py: 1,
-                    backdropFilter: 'blur(10px)',
-                    border: pullState.isAboveConfirmationThreshold
-                      ? '2px solid rgba(76, 175, 80, 0.5)'
-                      : '1px solid rgba(158, 158, 158, 0.3)'
+                    gap: 1,
+                    opacity: Math.min(pullState.pullDistance / 40, 1),
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    // Modern glassmorphism design
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.08)'
+                      : 'rgba(0, 0, 0, 0.05)',
+                    borderRadius: 4,
+                    px: 3,
+                    py: 2,
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.12)' 
+                      : 'rgba(0, 0, 0, 0.08)'}`,
+                    boxShadow: theme.palette.mode === 'dark'
+                      ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                      : '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    minWidth: 180,
+                    scale: pullState.isAboveConfirmationThreshold ? 1.05 : 1,
                   }}>
-                    {/* Animasyonlu Ok */}
+
+                    {/* Subtle progress indicator */}
+                    <Box sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 2,
+                      borderRadius: '4px 4px 0 0',
+                      background: `linear-gradient(90deg, 
+                        ${theme.palette.primary.main} 0%, 
+                        ${theme.palette.secondary.main} 100%)`,
+                      opacity: pullState.pullDistance / PULL_THRESHOLD,
+                      transition: 'opacity 0.2s ease'
+                    }} />
+
+                    {/* Icon */}
                     <KeyboardArrowUp
                       sx={{
-                        color: pullState.isAboveConfirmationThreshold ? 'success.main' : 'text.secondary',
-                        fontSize: pullState.isAboveConfirmationThreshold ? 40 : 32,
-                        transform: `scale(${Math.min(pullState.pullDistance / 50, 1.2)})`,
-                        transition: 'all 0.3s ease',
-                        filter: pullState.isAboveConfirmationThreshold
-                          ? 'drop-shadow(0 0 8px rgba(76, 175, 80, 0.6))'
-                          : 'none'
+                        color: pullState.isAboveConfirmationThreshold
+                          ? theme.palette.primary.main
+                          : theme.palette.text.secondary,
+                        fontSize: 28,
+                        transform: `translateY(${pullState.isAboveConfirmationThreshold ? -2 : 0}px)`,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       }}
                     />
 
-                    {/* Aşamalı Mesajlar */}
+                    {/* Message */}
                     <Typography
-                      variant="caption"
+                      variant="body2"
                       sx={{
-                        color: pullState.isAboveConfirmationThreshold ? 'success.main' : 'text.secondary',
-                        fontWeight: pullState.isAboveConfirmationThreshold ? 'bold' : 'normal',
-                        fontSize: pullState.isAboveConfirmationThreshold ? '0.85rem' : '0.75rem',
+                        color: pullState.isAboveConfirmationThreshold
+                          ? theme.palette.primary.main
+                          : theme.palette.text.primary,
+                        fontWeight: pullState.isAboveConfirmationThreshold ? 600 : 500,
+                        fontSize: '0.85rem',
                         textAlign: 'center',
-                        textShadow: pullState.isAboveConfirmationThreshold
-                          ? '0 0 4px rgba(76, 175, 80, 0.8)'
-                          : 'none',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        letterSpacing: '0.025em'
                       }}
                     >
                       {pullState.isAboveConfirmationThreshold
-                        ? '🎯 Bırakın: Önceki Haber'
-                        : pullState.pullDistance > VISUAL_FEEDBACK_THRESHOLD
-                          ? '⬆️ Daha Fazla Çekin'
-                          : '↑ Önceki Haber İçin Çek'
+                        ? 'Önceki Habere Geç'
+                        : 'Yukarı Çek'
                       }
                     </Typography>
 
-                    {/* Progress Bar */}
+                    {/* Subtle animation dots */}
                     {pullState.pullDistance > VISUAL_FEEDBACK_THRESHOLD && (
                       <Box sx={{
-                        width: 60,
-                        height: 4,
-                        backgroundColor: 'rgba(158, 158, 158, 0.3)',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        mt: 1
+                        display: 'flex',
+                        gap: 0.5,
+                        mt: 0.5
                       }}>
-                        <Box sx={{
-                          width: `${Math.min((pullState.pullDistance / PULL_THRESHOLD) * 100, 100)}%`,
-                          height: '100%',
-                          backgroundColor: pullState.isAboveConfirmationThreshold
-                            ? 'success.main'
-                            : 'warning.main',
-                          borderRadius: 2,
-                          transition: 'all 0.2s ease'
-                        }} />
+                        {[0, 1, 2].map((index) => (
+                          <Box
+                            key={index}
+                            sx={{
+                              width: 4,
+                              height: 4,
+                              borderRadius: '50%',
+                              backgroundColor: pullState.isAboveConfirmationThreshold
+                                ? theme.palette.primary.main
+                                : theme.palette.text.disabled,
+                              opacity: pullState.pullDistance > (VISUAL_FEEDBACK_THRESHOLD + index * 10) ? 1 : 0.3,
+                              transition: 'all 0.2s ease',
+                              animationDelay: `${index * 0.1}s`
+                            }}
+                          />
+                        ))}
                       </Box>
                     )}
                   </Box>
                 )}
 
-                {/* Pull feedback UI - Bottom - Gelişmiş */}
+                {/* Pull feedback UI - Bottom - Modern Tasarım */}
                 {pullState.isPulling && pullState.pullDirection === 'up' && (
                   <Box sx={{
                     position: 'absolute',
-                    bottom: -80 + (pullState.pullDistance * 0.6),
+                    bottom: -60 + (pullState.pullDistance * 0.4),
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 10,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    opacity: Math.min(pullState.pullDistance / 60, 1),
-                    transition: 'opacity 0.2s ease',
-                    backgroundColor: pullState.isAboveConfirmationThreshold
-                      ? 'rgba(76, 175, 80, 0.15)'
-                      : 'rgba(158, 158, 158, 0.1)',
-                    borderRadius: 3,
-                    px: 2,
-                    py: 1,
-                    backdropFilter: 'blur(10px)',
-                    border: pullState.isAboveConfirmationThreshold
-                      ? '2px solid rgba(76, 175, 80, 0.5)'
-                      : '1px solid rgba(158, 158, 158, 0.3)'
+                    gap: 1,
+                    opacity: Math.min(pullState.pullDistance / 40, 1),
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    // Modern glassmorphism design
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255, 255, 255, 0.08)'
+                      : 'rgba(0, 0, 0, 0.05)',
+                    borderRadius: 4,
+                    px: 3,
+                    py: 2,
+                    backdropFilter: 'blur(20px)',
+                    border: `1px solid ${theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.12)' 
+                      : 'rgba(0, 0, 0, 0.08)'}`,
+                    boxShadow: theme.palette.mode === 'dark'
+                      ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                      : '0 8px 32px rgba(0, 0, 0, 0.1)',
+                    minWidth: 180,
+                    scale: pullState.isAboveConfirmationThreshold ? 1.05 : 1,
                   }}>
-                    {/* Progress Bar */}
+
+                    {/* Subtle animation dots */}
                     {pullState.pullDistance > VISUAL_FEEDBACK_THRESHOLD && (
                       <Box sx={{
-                        width: 60,
-                        height: 4,
-                        backgroundColor: 'rgba(158, 158, 158, 0.3)',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        mb: 1
+                        display: 'flex',
+                        gap: 0.5,
+                        mb: 0.5
                       }}>
-                        <Box sx={{
-                          width: `${Math.min((pullState.pullDistance / PULL_THRESHOLD) * 100, 100)}%`,
-                          height: '100%',
-                          backgroundColor: pullState.isAboveConfirmationThreshold
-                            ? 'success.main'
-                            : 'warning.main',
-                          borderRadius: 2,
-                          transition: 'all 0.2s ease'
-                        }} />
+                        {[0, 1, 2].map((index) => (
+                          <Box
+                            key={index}
+                            sx={{
+                              width: 4,
+                              height: 4,
+                              borderRadius: '50%',
+                              backgroundColor: pullState.isAboveConfirmationThreshold
+                                ? theme.palette.primary.main
+                                : theme.palette.text.disabled,
+                              opacity: pullState.pullDistance > (VISUAL_FEEDBACK_THRESHOLD + index * 10) ? 1 : 0.3,
+                              transition: 'all 0.2s ease',
+                              animationDelay: `${index * 0.1}s`
+                            }}
+                          />
+                        ))}
                       </Box>
                     )}
 
-                    {/* Aşamalı Mesajlar */}
+                    {/* Message */}
                     <Typography
-                      variant="caption"
+                      variant="body2"
                       sx={{
-                        color: pullState.isAboveConfirmationThreshold ? 'success.main' : 'text.secondary',
-                        fontWeight: pullState.isAboveConfirmationThreshold ? 'bold' : 'normal',
-                        fontSize: pullState.isAboveConfirmationThreshold ? '0.85rem' : '0.75rem',
+                        color: pullState.isAboveConfirmationThreshold
+                          ? theme.palette.primary.main
+                          : theme.palette.text.primary,
+                        fontWeight: pullState.isAboveConfirmationThreshold ? 600 : 500,
+                        fontSize: '0.85rem',
                         textAlign: 'center',
-                        textShadow: pullState.isAboveConfirmationThreshold
-                          ? '0 0 4px rgba(76, 175, 80, 0.8)'
-                          : 'none',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        letterSpacing: '0.025em'
                       }}
                     >
                       {pullState.isAboveConfirmationThreshold
-                        ? '🎯 Bırakın: Sonraki Haber'
-                        : pullState.pullDistance > VISUAL_FEEDBACK_THRESHOLD
-                          ? '⬇️ Daha Fazla Çekin'
-                          : '↓ Sonraki Haber İçin Çek'
+                        ? 'Sonraki Habere Geç'
+                        : 'Aşağı Çek'
                       }
                     </Typography>
 
-                    {/* Animasyonlu Ok */}
+                    {/* Icon */}
                     <KeyboardArrowDown
                       sx={{
-                        color: pullState.isAboveConfirmationThreshold ? 'success.main' : 'text.secondary',
-                        fontSize: pullState.isAboveConfirmationThreshold ? 40 : 32,
-                        transform: `scale(${Math.min(pullState.pullDistance / 50, 1.2)})`,
-                        transition: 'all 0.3s ease',
-                        filter: pullState.isAboveConfirmationThreshold
-                          ? 'drop-shadow(0 0 8px rgba(76, 175, 80, 0.6))'
-                          : 'none'
+                        color: pullState.isAboveConfirmationThreshold
+                          ? theme.palette.primary.main
+                          : theme.palette.text.secondary,
+                        fontSize: 28,
+                        transform: `translateY(${pullState.isAboveConfirmationThreshold ? 2 : 0}px)`,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                       }}
                     />
+
+                    {/* Subtle progress indicator */}
+                    <Box sx={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 2,
+                      borderRadius: '0 0 4px 4px',
+                      background: `linear-gradient(90deg, 
+                        ${theme.palette.primary.main} 0%, 
+                        ${theme.palette.secondary.main} 100%)`,
+                      opacity: pullState.pullDistance / PULL_THRESHOLD,
+                      transition: 'opacity 0.2s ease'
+                    }} />
                   </Box>
                 )}
 
@@ -890,16 +938,29 @@ const ReadingFlowPage = () => {
                     overflowX: 'hidden',
                     scrollBehavior: 'smooth',
                     transform: pullState.isPulling ? `translateY(${
-                      pullState.pullDirection === 'down' ? pullState.pullDistance * 0.3 : -pullState.pullDistance * 0.3
+                      pullState.pullDirection === 'down' ? pullState.pullDistance * 0.2 : -pullState.pullDistance * 0.2
                     }px)` : 'none',
-                    transition: pullState.isPulling ? 'none' : 'transform 0.3s ease',
-                    // Custom scrollbar
-                    '&::-webkit-scrollbar': { width: '8px' },
-                    '&::-webkit-scrollbar-track': { background: 'rgba(0,0,0,0.1)' },
+                    transition: pullState.isPulling ? 'none' : 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    // Modern scrollbar
+                    '&::-webkit-scrollbar': {
+                      width: '6px',
+                      '&:hover': { width: '8px' }
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      background: 'transparent',
+                      borderRadius: '10px'
+                    },
                     '&::-webkit-scrollbar-thumb': {
-                      background: 'rgba(0,0,0,0.3)',
-                      borderRadius: '4px',
-                      '&:hover': { background: 'rgba(0,0,0,0.5)' }
+                      background: theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(0, 0, 0, 0.2)',
+                      borderRadius: '10px',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        background: theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.3)'
+                          : 'rgba(0, 0, 0, 0.3)'
+                      }
                     }
                   }}
                 >
@@ -908,11 +969,24 @@ const ReadingFlowPage = () => {
                     <Box sx={{
                       width: '100%',
                       height: { xs: 200, sm: 250, md: 300 },
-                      borderRadius: 2,
+                      borderRadius: 3,
                       overflow: 'hidden',
                       mb: { xs: 3, md: 4 },
-                      boxShadow: 3,
-                      flexShrink: 0
+                      boxShadow: theme.palette.mode === 'dark'
+                        ? '0 4px 20px rgba(0, 0, 0, 0.3)'
+                        : '0 4px 20px rgba(0, 0, 0, 0.1)',
+                      flexShrink: 0,
+                      position: 'relative',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 100%)',
+                        pointerEvents: 'none'
+                      }
                     }}>
                       <img
                         src={currentStepData.image}
@@ -932,10 +1006,11 @@ const ReadingFlowPage = () => {
                     variant={isMobile ? 'h4' : 'h2'}
                     sx={{
                       color: 'text.primary',
-                      fontWeight: 'bold',
+                      fontWeight: 700,
                       mb: { xs: 2, md: 3 },
-                      lineHeight: 1.3,
-                      flexShrink: 0
+                      lineHeight: 1.2,
+                      flexShrink: 0,
+                      letterSpacing: '-0.025em'
                     }}
                   >
                     {currentStepData.title}
@@ -944,13 +1019,23 @@ const ReadingFlowPage = () => {
                   {/* News Date */}
                   {currentStepData.timestamp && (
                     <Typography
-                      variant="caption"
+                      variant="body2"
                       sx={{
                         color: 'text.secondary',
-                        mb: { xs: 2, md: 3 },
-                        display: 'block',
-                        fontSize: { xs: '0.8rem', md: '0.9rem' },
-                        flexShrink: 0
+                        mb: { xs: 3, md: 4 },
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        fontSize: { xs: '0.85rem', md: '0.9rem' },
+                        flexShrink: 0,
+                        '&::before': {
+                          content: '""',
+                          width: 4,
+                          height: 4,
+                          borderRadius: '50%',
+                          backgroundColor: 'primary.main',
+                          display: 'inline-block'
+                        }
                       }}
                     >
                       {new Date(currentStepData.timestamp).toLocaleDateString('tr-TR', {
@@ -968,43 +1053,66 @@ const ReadingFlowPage = () => {
                     variant={isMobile ? 'body1' : 'h6'}
                     sx={{
                       color: 'text.primary',
-                      lineHeight: 1.7,
+                      lineHeight: 1.8,
                       fontSize: { xs: '1rem', md: '1.1rem' },
                       fontWeight: 400,
                       mb: { xs: 4, md: 6 },
                       flex: 1,
-                      minHeight: 'fit-content'
+                      minHeight: 'fit-content',
+                      letterSpacing: '0.01em'
                     }}
                   >
                     {currentStepData.content}
                   </Typography>
 
-                  {/* Bottom navigation hints */}
+                  {/* Bottom navigation hints - Modern tasarım */}
                   <Box sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    py: 2,
+                    py: 3,
                     mt: 4,
-                    borderTop: '1px solid',
-                    borderColor: 'divider',
+                    borderTop: `1px solid ${theme.palette.divider}`,
                     position: 'sticky',
                     bottom: 0,
                     background: theme.palette.mode === 'dark'
-                      ? 'rgba(18,18,18,0.9)'
-                      : 'rgba(255,255,255,0.9)',
-                    backdropFilter: 'blur(10px)'
+                      ? 'rgba(18, 18, 18, 0.95)'
+                      : 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '16px 16px 0 0',
+                    mx: -3,
+                    px: 3
                   }}>
                     {currentStep > 0 && (
-                      <Typography variant="caption" color="text.secondary">
-                        ↑ Yukarı çek: Önceki haber
-                      </Typography>
+                      <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        opacity: 0.7,
+                        transition: 'opacity 0.3s ease',
+                        '&:hover': { opacity: 1 }
+                      }}>
+                        <KeyboardArrowUp sx={{ fontSize: 16 }} />
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
+                          Önceki haber
+                        </Typography>
+                      </Box>
                     )}
                     <Box sx={{ flex: 1 }} />
                     {currentStep < steps.length - 1 && (
-                      <Typography variant="caption" color="text.secondary">
-                        Aşağı çek: Sonraki haber ↓
-                      </Typography>
+                      <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        opacity: 0.7,
+                        transition: 'opacity 0.3s ease',
+                        '&:hover': { opacity: 1 }
+                      }}>
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
+                          Sonraki haber
+                        </Typography>
+                        <KeyboardArrowDown sx={{ fontSize: 16 }} />
+                      </Box>
                     )}
                   </Box>
                 </Box>
