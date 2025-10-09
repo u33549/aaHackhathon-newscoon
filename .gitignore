@@ -138,5 +138,8 @@ dist
 DbBackups/
 hüseyinAbiTasarim/
 
+<<<<<<< HEAD
 backend/.idea/
 frontend/.idea/
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619

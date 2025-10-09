@@ -6,7 +6,10 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 
 - [RSS Haber Modeli (RssNews)](#rss-haber-modeli-rssnews)
 - [Haber Yığını Modeli (NewsStacks)](#haber-yığını-modeli-newsstacks)
+<<<<<<< HEAD
   - [Kategori Sistemi](#kategori-sistemi)
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   - [Fotoğraf Güncelleme Sistemi](#fotoğraf-güncelleme-sistemi)
 - [Haber Yığını Resim Modeli (NewsStackImages)](#haber-yığını-resim-modeli-newsstackimages)
 - [İlişkiler](#ilişkiler)
@@ -24,7 +27,10 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   link: String,            // Haberin URL'i (zorunlu)
   title: String,           // Başlık (zorunlu)
   description: String,     // Açıklama (zorunlu)
+<<<<<<< HEAD
   newstext: String,        // Haber metni (opsiyonel)
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   pubDate: String,         // RFC 2822 tarih (zorunlu)
   image: String,           // Görsel URL (opsiyonel)
   category: String,        // "gundem" | "dunya" | "ekonomi" | "spor" | "analiz" | "kultur"
@@ -46,11 +52,16 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   title: String,           // Yığın başlığı (zorunlu)
   description: String,     // Açıklama (opsiyonel)
   news: [String],          // Haber GUID referansları
+<<<<<<< HEAD
   categories: [String],    // Benzersiz kategoriler ("gundem" | "dunya" | "ekonomi" | "spor" | "analiz" | "kultur")
   mainCategory: String,    // En çok temsil edilen kategori ("gundem" | "dunya" | "ekonomi" | "spor" | "analiz" | "kultur")
   status: String,          // "pending" | "approved" | "rejected" (varsayılan: "pending")
   viewCount: Number,       // Varsayılan: 0
   xp: Number,              // Otomatik hesaplanan (Haber Sayısı × 45-52 arası rastgele sayı)
+=======
+  status: String,          // "pending" | "approved" | "rejected" (varsayılan: "pending")
+  viewCount: Number,       // Varsayılan: 0
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   tags: [String],          // Opsiyonel
   isFeatured: Boolean,     // Varsayılan: false
   isPhotoUpToDate: Boolean,// Varsayılan: false
@@ -59,6 +70,7 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 }
 ```
 
+<<<<<<< HEAD
 ### Kategori Sistemi
 
 - **categories**: Yığındaki haberlerin benzersiz kategorilerini içeren dizi (Set benzeri davranış)
@@ -66,6 +78,8 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
 - **Otomatik Hesaplama**: Haber eklendiğinde/çıkarıldığında kategoriler otomatik hesaplanır
 - **CRUD Kısıtlamaları**: API'den manuel olarak categories ve mainCategory güncellenemez (otomatik hesaplanır)
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 ### Fotoğraf Güncelleme Sistemi
 
 `isPhotoUpToDate` alanı, yığının kapağının güncel olup olmadığını belirtir.
@@ -112,7 +126,10 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
   "link": "https://example.com/news/ekonomi-paketi",
   "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
   "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi...",
+<<<<<<< HEAD
   "newstext": "Bu haberin detaylı içeriği burada yer alır. Ekonomik teşvik paketi kapsamında yer alan tüm maddelerin açıklamaları, etkileri ve uygulama alanları bu bölümde detaylı olarak yer almaktadır.",
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
   "image": "https://example.com/images/ekonomi-paketi.jpg",
   "category": "ekonomi",
@@ -131,8 +148,11 @@ API'de kullanılan tüm veri modelleri ve ilişkileri.
     "aa-news-20231002-001",
     "aa-news-20231002-002"
   ],
+<<<<<<< HEAD
   "categories": ["ekonomi", "gündem"],
   "mainCategory": "ekonomi",
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   "status": "approved",
   "viewCount": 142,
   "tags": ["ekonomi", "gündem"],

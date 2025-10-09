@@ -2,12 +2,15 @@ const NewsStacks = require('../models/NewsStacks');
 const RssNews = require('../models/RssNews');
 const NewsStackImages = require('../models/NewsStackImages');
 
+<<<<<<< HEAD
 // XP hesaplama fonksiyonu
 const calculateXP = (newsCount) => {
   const randomMultiplier = Math.floor(Math.random() * (52 - 45 + 1)) + 45; // 45-52 arası
   return newsCount * randomMultiplier;
 };
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 // Tüm haber yığınlarını getir
 exports.getAllNewsStacks = async (req, res) => {
   try {
@@ -15,8 +18,11 @@ exports.getAllNewsStacks = async (req, res) => {
       status,
       isFeatured,
       tags,
+<<<<<<< HEAD
       categories,
       mainCategory,
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       limit = -1,
       sortBy = 'createdAt',
       sortOrder = 'desc'
@@ -38,6 +44,7 @@ exports.getAllNewsStacks = async (req, res) => {
       filter.tags = { $in: tagArray };
     }
 
+<<<<<<< HEAD
     if (categories) {
       const categoryArray = categories.split(',').map(cat => cat.trim());
       filter.categories = { $in: categoryArray };
@@ -47,6 +54,8 @@ exports.getAllNewsStacks = async (req, res) => {
       filter.mainCategory = mainCategory;
     }
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     // Sort objesi oluştur
     const sort = {};
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
@@ -123,6 +132,7 @@ exports.createNewsStack = async (req, res) => {
   try {
     const { title, description, news, status, tags, isFeatured } = req.body;
 
+<<<<<<< HEAD
     // En az 3 haber zorunluluğu kontrolü
     if (!news || news.length < 3) {
       return res.status(400).json({
@@ -131,6 +141,8 @@ exports.createNewsStack = async (req, res) => {
       });
     }
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     // Haber GUID'lerinin geçerli olup olmadığını kontrol et
     if (news && news.length > 0) {
       const newsExists = await RssNews.find({ guid: { $in: news } });
@@ -165,6 +177,7 @@ exports.createNewsStack = async (req, res) => {
       data: populatedNewsStack
     });
   } catch (error) {
+<<<<<<< HEAD
     // Mongoose validation hatalarını özel olarak yakala
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(err => err.message);
@@ -174,6 +187,8 @@ exports.createNewsStack = async (req, res) => {
       });
     }
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     res.status(400).json({
       success: false,
       error: error.message
@@ -193,6 +208,7 @@ exports.updateNewsStack = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     // XP ve categories alanlarını request body'den kaldır - otomatik hesaplanacak
     delete req.body.xp;
     delete req.body.categories;
@@ -208,6 +224,10 @@ exports.updateNewsStack = async (req, res) => {
         });
       }
 
+=======
+    // Eğer news array'i güncelleniyor ise
+    if (req.body.news) {
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       // Eski haberlerin isInAnyStack durumunu kontrol et
       const oldNewsGuids = newsStack.news;
       const newNewsGuids = req.body.news;
@@ -238,6 +258,7 @@ exports.updateNewsStack = async (req, res) => {
 
       // Haber listesi değiştiği için fotoğraf güncelliği durumunu false yap
       req.body.isPhotoUpToDate = false;
+<<<<<<< HEAD
 
       // XP'yi yeniden hesapla
       req.body.xp = calculateXP(req.body.news.length);
@@ -246,6 +267,8 @@ exports.updateNewsStack = async (req, res) => {
       const categoryData = await NewsStacks.calculateCategoriesFromNews(req.body.news);
       req.body.categories = categoryData.categories;
       req.body.mainCategory = categoryData.mainCategory;
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     }
 
     const updatedNewsStack = await NewsStacks.findByIdAndUpdate(
@@ -259,6 +282,7 @@ exports.updateNewsStack = async (req, res) => {
       data: updatedNewsStack
     });
   } catch (error) {
+<<<<<<< HEAD
     // Mongoose validation hatalarını özel olarak yakala
     if (error.name === 'ValidationError') {
       const validationErrors = Object.values(error.errors).map(err => err.message);
@@ -268,6 +292,8 @@ exports.updateNewsStack = async (req, res) => {
       });
     }
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     res.status(400).json({
       success: false,
       error: error.message
@@ -387,6 +413,7 @@ exports.removeNewsFromStack = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     // En az 3 haber zorunluluğu kontrolü - haber çıkarıldıktan sonra en az 3 haber kalmalı
     if (newsStack.news.length <= 3) {
       return res.status(400).json({
@@ -395,6 +422,8 @@ exports.removeNewsFromStack = async (req, res) => {
       });
     }
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     newsStack.news.pull(newsGuid);
     // Haber çıkarıldığı için fotoğraf güncelliği durumunu false yap
     newsStack.isPhotoUpToDate = false;

@@ -9,14 +9,22 @@ export const BADGE_CATEGORIES = {
 };
 
 // Video/Article structure
+<<<<<<< HEAD
 export const createVideo = (id, thumbnailUrl, duration, channelIconUrl, title, age, cp = null) => ({
+=======
+export const createVideo = (id, thumbnailUrl, duration, channelIconUrl, title, age, xp = null) => ({
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   id,
   thumbnailUrl,
   duration,
   channelIconUrl,
   title,
   age,
+<<<<<<< HEAD
   cp
+=======
+  xp
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 });
 
 // Hero slide structure
@@ -63,20 +71,35 @@ export const createFeaturedNews = (id, category, summary) => ({
 });
 
 // Leaderboard user structure
+<<<<<<< HEAD
 export const createLeaderboardUser = (id, name, cp, level, isCurrentUser = false) => ({
   id,
   name,
   cp,
+=======
+export const createLeaderboardUser = (id, name, xp, level, isCurrentUser = false) => ({
+  id,
+  name,
+  xp,
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   level,
   isCurrentUser
 });
 
 // Quiz structure
+<<<<<<< HEAD
 export const createQuiz = (question, options, correctAnswerIndex, bonusCp) => ({
   question,
   options,
   correctAnswerIndex,
   bonusCp
+=======
+export const createQuiz = (question, options, correctAnswerIndex, bonusXp) => ({
+  question,
+  options,
+  correctAnswerIndex,
+  bonusXp
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 });
 
 // Content checkpoint structure

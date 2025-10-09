@@ -14,11 +14,17 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
+<<<<<<< HEAD
     "@reduxjs/toolkit": "^2.9.0",
     "axios": "^1.12.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-redux": "^9.2.0",
+=======
+    "axios": "^1.12.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     "react-router-dom": "^7.9.3"
   },
   "devDependencies": {

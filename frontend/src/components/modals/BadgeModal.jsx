@@ -22,15 +22,26 @@ import {
 import { Close, EmojiEvents, Star } from '@mui/icons-material';
 import { allAchievements, levelThresholds } from '../../constants/index.jsx';
 
+<<<<<<< HEAD
 const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, level }) => {
+=======
+const BadgeModal = ({ isOpen, onClose, badges, totalXp, earnedAchievements, level }) => {
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
+<<<<<<< HEAD
   const currentLevelCp = levelThresholds[level - 1] ?? 0;
   const nextLevelCp = levelThresholds[level] ?? Infinity;
   const progressPercentage = nextLevelCp > 0
     ? ((totalCp - currentLevelCp) / (nextLevelCp - currentLevelCp)) * 100
+=======
+  const currentLevelXp = levelThresholds[level - 1] ?? 0;
+  const nextLevelXp = levelThresholds[level] ?? Infinity;
+  const progressPercentage = nextLevelXp > 0
+    ? ((totalXp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     : 0;
 
   return (
@@ -80,7 +91,11 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
         maxHeight: { xs: 'calc(100vh - 120px)', sm: 'none' },
         overflowY: 'auto'
       }}>
+<<<<<<< HEAD
         {/* Level and CP Section */}
+=======
+        {/* Level and XP Section */}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
         <Card sx={{
           mb: { xs: 3, md: 4 },
           bgcolor: 'primary.main',
@@ -122,12 +137,20 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
                       fontSize: { xs: '0.8rem', md: '0.875rem' }
                     }}
                   >
+<<<<<<< HEAD
                     {totalCp} CP
+=======
+                    {totalXp} XP
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
                   </Typography>
                 </Box>
               </Box>
               <Chip
+<<<<<<< HEAD
                 label={`${totalCp - currentLevelCp}/${nextLevelCp - currentLevelCp} CP`}
+=======
+                label={`${totalXp - currentLevelXp}/${nextLevelXp - currentLevelXp} XP`}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
                 sx={{
                   bgcolor: 'white',
                   color: 'primary.main',

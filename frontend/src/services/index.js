@@ -31,14 +31,22 @@ export {
   getApprovedStacks,
   getFeaturedStacks,
   getPopularStacks,
+<<<<<<< HEAD
   getStacksByTags,
   getStacksByCP,
   getLatestStacks 
+=======
+  getStacksByTags
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 } from './stackService';
 
 // Haber Yığını Resimleri (Images) servisleri
 export {
+<<<<<<< HEAD
   getAllStackImages, 
+=======
+  getAllStackImages,
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   getStackImageById,
   getStackImageByStackId,
   uploadStackImage,
@@ -52,6 +60,10 @@ export {
 } from './imageService';
 
 // Hızlı kullanım için gruplandırılmış objeler
+<<<<<<< HEAD
+=======
+// Re-export edilen fonksiyonları kullanarak objeler oluştur
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 import * as newsServices from './newsService';
 import * as stackServices from './stackService';
 import * as imageServices from './imageService';
@@ -79,9 +91,13 @@ export const stacksAPI = {
   getApproved: stackServices.getApprovedStacks,
   getFeatured: stackServices.getFeaturedStacks,
   getPopular: stackServices.getPopularStacks,
+<<<<<<< HEAD
   getByTags: stackServices.getStacksByTags,
   getByCP: stackServices.getStacksByCP,
   getLatest: stackServices.getLatestStacks 
+=======
+  getByTags: stackServices.getStacksByTags
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 };
 
 export const imagesAPI = {
@@ -95,4 +111,8 @@ export const imagesAPI = {
   deleteByStackId: imageServices.deleteStackImageByStackId,
   uploadFile: imageServices.uploadImageFile,
   updateCover: imageServices.updateStackCoverImage
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619

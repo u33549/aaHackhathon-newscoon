@@ -8,7 +8,11 @@ import {
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
+<<<<<<< HEAD
 const NewsSection = ({ title, children, action }) => {
+=======
+const NewsSection = ({ title, children }) => {
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const scrollContainerRef = useRef(null);
@@ -44,6 +48,7 @@ const NewsSection = ({ title, children, action }) => {
           {title}
         </Typography>
 
+<<<<<<< HEAD
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {/* Action Button (Tümünü Gör vb.) */}
           {action && action}
@@ -76,6 +81,35 @@ const NewsSection = ({ title, children, action }) => {
             </>
           )}
         </Box>
+=======
+        {/* Navigation Arrows - Desktop only */}
+        {!isMobile && (
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <IconButton
+              onClick={() => scroll('left')}
+              sx={{
+                backgroundColor: 'grey.100',
+                '&:hover': {
+                  backgroundColor: 'grey.200'
+                }
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              onClick={() => scroll('right')}
+              sx={{
+                backgroundColor: 'grey.100',
+                '&:hover': {
+                  backgroundColor: 'grey.200'
+                }
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          </Box>
+        )}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       </Box>
 
       {/* Slider Container */}
@@ -84,6 +118,7 @@ const NewsSection = ({ title, children, action }) => {
         sx={{
           display: 'flex',
           overflowX: 'scroll',
+<<<<<<< HEAD
           gap: 2,
           px: isMobile ? 2 : 0,
           pb: 1,
@@ -95,6 +130,34 @@ const NewsSection = ({ title, children, action }) => {
         }}
       >
         {children}
+=======
+          overflowY: 'hidden',
+          gap: 2,
+          px: isMobile ? 2 : 0,
+          pb: 1,
+          // Scrollbar'ları tamamen gizle
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+          // Firefox için scrollbar gizle
+          scrollbarWidth: 'none',
+          // IE ve Edge için
+          msOverflowStyle: 'none',
+        }}
+      >
+        {React.Children.map(children, (child, index) => (
+          <Box
+            key={index}
+            sx={{
+              flex: '0 0 auto',
+              width: isMobile ? '85vw' : '320px', // Tam genişlik mobilde, sabit genişlik desktop'ta
+              maxWidth: isMobile ? '85vw' : '320px',
+            }}
+          >
+            {child}
+          </Box>
+        ))}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       </Box>
     </Box>
   );

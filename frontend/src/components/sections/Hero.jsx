@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
   Box,
@@ -27,10 +28,27 @@ const Hero = ({ onStackClick }) => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState('left');
+=======
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Box,
+  Typography,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import { mockNews, categoryColors } from '../../constants/index.jsx';
+
+const Hero = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+  const [currentNews, setCurrentNews] = useState(mockNews[0]);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
   // Touch/Swipe için state'ler
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+<<<<<<< HEAD
 
   // Sayfa yüklendiğinde stack'leri getir
   useEffect(() => {
@@ -75,6 +93,22 @@ const Hero = ({ onStackClick }) => {
       return () => clearInterval(interval);
     }
   }, [heroStacks.length]);
+=======
+  const heroRef = useRef(null);
+
+  // Auto-rotate news every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentNewsIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % mockNews.length;
+        setCurrentNews(mockNews[nextIndex]);
+        return nextIndex;
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
   // Swipe için minimum mesafe
   const minSwipeDistance = 50;
@@ -97,6 +131,7 @@ const Hero = ({ onStackClick }) => {
 
     if (isLeftSwipe) {
       // Sol kaydırma - sonraki haber
+<<<<<<< HEAD
       nextSlide();
     }
     if (isRightSwipe) {
@@ -161,6 +196,38 @@ const Hero = ({ onStackClick }) => {
   const currentStack = heroStacks[currentSlide];
   const category = currentStack?.category || currentStack?.mainCategory || 'gundem';
   const categoryColor = categoryColors[category] || '#3B82F6';
+=======
+      nextNews();
+    }
+    if (isRightSwipe) {
+      // Sağ kaydırma - önceki haber
+      prevNews();
+    }
+  };
+
+  const nextNews = () => {
+    setCurrentNewsIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % mockNews.length;
+      setCurrentNews(mockNews[nextIndex]);
+      return nextIndex;
+    });
+  };
+
+  const prevNews = () => {
+    setCurrentNewsIndex((prevIndex) => {
+      const nextIndex = (prevIndex - 1 + mockNews.length) % mockNews.length;
+      setCurrentNews(mockNews[nextIndex]);
+      return nextIndex;
+    });
+  };
+
+  const goToNews = (index) => {
+    setCurrentNewsIndex(index);
+    setCurrentNews(mockNews[index]);
+  };
+
+  const categoryColor = categoryColors[currentNews.category?.toLowerCase()] || '#FFD700';
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
   return (
     <Box
@@ -190,7 +257,11 @@ const Hero = ({ onStackClick }) => {
           left: 0,
           width: '100%',
           height: '100%',
+<<<<<<< HEAD
           backgroundImage: `url(${currentStack?.imageUrl || currentStack?.photoUrl || `https://picsum.photos/1920/1080?random=${currentSlide}`})`,
+=======
+          backgroundImage: `url(${currentNews.image})`,
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -220,11 +291,31 @@ const Hero = ({ onStackClick }) => {
           left: 0,
           padding: isMobile ? 2 : 3,
           paddingBottom: isMobile ? 2 : 3,
+<<<<<<< HEAD
           paddingRight: isMobile ? 5 : 12, // Sağ tarafta dot'lar için yer açıyoruz
           zIndex: 3,
           maxWidth: isMobile ? '100%' : '60%' // Genişliği biraz azaltıyoruz
         }}
       >
+=======
+          zIndex: 3,
+          maxWidth: isMobile ? '100%' : '60%'
+        }}
+      >
+        {/* Category */}
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'grey.400',
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+            marginBottom: 1,
+            fontSize: isMobile ? '0.75rem' : '0.875rem'
+          }}
+        >
+          {currentNews.category}
+        </Typography>
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
         {/* Title */}
         <Typography
@@ -235,12 +326,19 @@ const Hero = ({ onStackClick }) => {
             marginBottom: 1,
             lineHeight: 1.1,
             textShadow: '2px 2px 8px rgba(0, 0, 0, 0.9)',
+<<<<<<< HEAD
             fontSize: isMobile ? '1.75rem' : '3rem',
             cursor: 'pointer'
           }}
           onClick={() => handleSlideClick(currentStack)}
         >
           {currentStack?.title}
+=======
+            fontSize: isMobile ? '1.75rem' : '3rem'
+          }}
+        >
+          {currentNews.title}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
         </Typography>
 
         {/* Description */}
@@ -248,6 +346,7 @@ const Hero = ({ onStackClick }) => {
           variant="body2"
           sx={{
             color: 'grey.300',
+<<<<<<< HEAD
             maxWidth: isMobile ? '100%' : '800px', // Mobile'da tam genişlik, desktop'ta 800px
             lineHeight: 1.5,
             fontSize: isMobile ? '0.875rem' : '1rem',
@@ -339,6 +438,48 @@ const Hero = ({ onStackClick }) => {
           ))}
         </Box>
       )}
+=======
+            maxWidth: '500px',
+            lineHeight: 1.5,
+            fontSize: isMobile ? '0.875rem' : '1rem',
+            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
+          }}
+        >
+          {currentNews.description}
+        </Typography>
+      </Box>
+
+      {/* News Indicators (Dots) */}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: isMobile ? 16 : 24,
+          right: isMobile ? 16 : 24,
+          display: 'flex',
+          gap: 1,
+          zIndex: 3
+        }}
+      >
+        {mockNews.map((_, index) => (
+          <Box
+            key={index}
+            onClick={() => goToNews(index)}
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: index === currentNewsIndex ? categoryColor : 'rgba(255, 255, 255, 0.5)',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                backgroundColor: index === currentNewsIndex ? categoryColor : 'rgba(255, 255, 255, 0.8)',
+                transform: 'scale(1.2)'
+              }
+            }}
+          />
+        ))}
+      </Box>
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     </Box>
   );
 };

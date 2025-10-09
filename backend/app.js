@@ -4,10 +4,17 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var dotenv = require('dotenv');
+<<<<<<< HEAD
 var cors = require('cors'); // CORS paketini ekledim
 
 // .env dosyasından ortam değişkenlerini yükle
 dotenv.config();
+=======
+
+// .env dosyasından ortam değişkenlerini yükle
+dotenv.config();
+
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 // MongoDB bağlantısı
 const connectDB = require('./config/db');
 connectDB();
@@ -22,9 +29,12 @@ var newsStackImagesRouter = require('./routes/newsStackImages');
 
 var app = express();
 
+<<<<<<< HEAD
 // CORS ayarlarını yapılandırma
 app.use(cors());
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 // view engine setup - frontend olmayacak, API odaklı
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'pug');
@@ -38,6 +48,7 @@ app.use(cookieParser());
 // API rotaları
 app.use('/api', indexRouter);
 
+<<<<<<< HEAD
 // Haber API'leri için API anahtarı doğrulama middleware'ini ekle (OPTIONS hariç)
 app.use('/api/news', (req, res, next) => {
   // OPTIONS request'leri için API key kontrolü yapma
@@ -62,6 +73,18 @@ app.use('/api/stacks', (req, res, next) => {
 app.use('/api/news-stack-images', (req, res, next) => {
   // GET ve OPTIONS istekleri için API key kontrolü yapma
   if (req.method === 'GET' || req.method === 'OPTIONS') {
+=======
+// Haber API'leri için API anahtarı doğrulama middleware'ini ekle
+app.use('/api/news', apiKeyAuth, rssNewsRouter);
+
+// Haber yığınları API'leri için API anahtarı doğrulama middleware'ini ekle
+app.use('/api/stacks', apiKeyAuth, newsStacksRouter);
+
+// Haber yığını resimleri API'leri - okuma işlemleri serbest, yazma işlemleri API key gerektirir
+app.use('/api/news-stack-images', (req, res, next) => {
+  // GET istekleri için API key kontrolü yapma
+  if (req.method === 'GET') {
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     return next();
   }
   // POST, PUT, DELETE için API key kontrolü yap

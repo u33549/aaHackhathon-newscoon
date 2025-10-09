@@ -28,6 +28,7 @@ export const getStackById = async (stackId) => {
 
 /**
  * Yeni haber yığını oluştur
+<<<<<<< HEAD
  * @param {Object} stackData - Yığın verisi
  * @returns {Promise} API yanıtı - oluşturulan stack CP ile birlikte döner
  * @note CP otomatik hesaplanır: Haber Sayısı × (45-52 arası rastgele sayı)
@@ -40,10 +41,23 @@ export const createStack = async (stackData) => {
     console.error('Stack oluşturma hatası:', error);
     throw error;
   }
+=======
+ * @param {Object} stackData - Haber yığını verisi
+ * @param {string} stackData.title - Yığın başlığı (zorunlu)
+ * @param {string} stackData.description - Açıklama (opsiyonel)
+ * @param {Array} stackData.news - Haber GUID'leri dizisi (opsiyonel)
+ * @param {string} stackData.status - Durum (varsayılan: "pending")
+ * @param {Array} stackData.tags - Etiketler dizisi (opsiyonel)
+ * @param {boolean} stackData.isFeatured - Öne çıkarılan mı? (varsayılan: false)
+ */
+export const createStack = async (stackData) => {
+  return await api.post('/api/stacks', stackData);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 };
 
 /**
  * Haber yığını güncelle
+<<<<<<< HEAD
  * @param {string} stackId - Yığın ID'si
  * @param {Object} updateData - Güncellenecek veriler
  * @note CP alanı otomatik hesaplanır, güncelleme verisine dahil edilmemelidir
@@ -61,6 +75,13 @@ export const updateStack = async (stackId, updateData) => {
  */
 export const updateStackById = async (stackId, updateData) => {
   return await updateStack(stackId, updateData);
+=======
+ * @param {string} stackId - Güncellenecek yığının ID'si
+ * @param {Object} updateData - Güncellenecek veriler
+ */
+export const updateStackById = async (stackId, updateData) => {
+  return await api.put(`/api/stacks/${stackId}`, updateData);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 };
 
 /**
@@ -82,7 +103,10 @@ export const addNewsToStack = async (stackId, newsGuid) => {
 
 /**
  * Haber yığınından haber çıkar
+<<<<<<< HEAD
  * ÖNEMLI: Haber çıkarıldıktan sonra yığında en az 3 haber kalmalıdır
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
  * @param {string} stackId - Haber yığınının ID'si
  * @param {string} newsGuid - Çıkarılacak haberin GUID'i
  */
@@ -132,6 +156,7 @@ export const getStacksByTags = async (tags, limit = 10) => {
   });
 };
 
+<<<<<<< HEAD
 /**
  * CP'ye göre sıralı haber yığınlarını getir (en yüksekten en düşüğe)
  * @param {number} limit - Maksimum sonuç sayısı
@@ -156,3 +181,24 @@ export const getLatestStacks = async (limit = 20) => {
     limit
   });
 };
+=======
+
+
+// stackService.js dosyasının en sonuna ekleyin:
+
+export const stackService = {
+  getAllStacks,
+  getStackById,
+  createStack,
+  updateStackById,
+  deleteStackById,
+  addNewsToStack,
+  removeNewsFromStack,
+  getApprovedStacks,
+  getFeaturedStacks,
+  getPopularStacks,
+  getStacksByTags
+};
+
+export default stackService;
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619

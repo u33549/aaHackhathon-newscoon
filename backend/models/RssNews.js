@@ -27,10 +27,13 @@ const rssNewsSchema = new mongoose.Schema({
     required: [true, 'Açıklama alanı zorunludur'],
     trim: true
   },
+<<<<<<< HEAD
   newstext: {
     type: String,
     trim: true
   },
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   pubDate: {
     type: String,
     required: [true, 'Yayın tarihi alanı zorunludur']

@@ -53,7 +53,10 @@ export const exampleCreateNews = async () => {
       guid: `news-${Date.now()}`,
       title: 'Örnek Haber Başlığı',
       description: 'Bu bir örnek haber açıklamasıdır.',
+<<<<<<< HEAD
       newstext: 'Bu haberin detaylı içeriği burada yer alır. Haberin tam metni, ayrıntıları ve ek bilgiler bu alanda saklanır.',
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       link: 'https://example.com/news/example',
       pubDate: new Date().toUTCString(),
       category: 'gundem',
@@ -74,6 +77,7 @@ export const exampleCreateNews = async () => {
 // ====================================
 
 /**
+<<<<<<< HEAD
  * CP'ye göre sıralanmış yığınları getir - örnek kullanım
  */
 export const exampleGetStacksByCP = async () => {
@@ -88,6 +92,8 @@ export const exampleGetStacksByCP = async () => {
 };
 
 /**
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
  * Öne çıkan yığınları getir - örnek kullanım
  */
 export const exampleGetFeaturedStacks = async () => {
@@ -103,6 +109,7 @@ export const exampleGetFeaturedStacks = async () => {
 
 /**
  * Yeni haber yığını oluştur - örnek kullanım
+<<<<<<< HEAD
  * ÖNEMLI: En az 3 haber GUID'i gereklidir
  */
 export const exampleCreateStack = async () => {
@@ -119,6 +126,15 @@ export const exampleCreateStack = async () => {
       title: 'Örnek Haber Yığını',
       description: 'Bu bir örnek haber yığını açıklamasıdır.',
       news: newsGuids, // En az 3 haber GUID'i
+=======
+ */
+export const exampleCreateStack = async () => {
+  try {
+    const stackData = {
+      title: 'Örnek Haber Yığını',
+      description: 'Bu bir örnek haber yığını açıklamasıdır.',
+      news: [], // Boş başlat, sonra haber ekle
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       tags: ['örnek', 'test'],
       status: 'pending',
       isFeatured: false
@@ -147,6 +163,7 @@ export const exampleAddNewsToStack = async (stackId, newsGuid) => {
   }
 };
 
+<<<<<<< HEAD
 /**
  * Yığından haber çıkar - örnek kullanım
  * ÖNEMLI: Çıkarıldıktan sonra en az 3 haber kalmalıdır
@@ -170,6 +187,8 @@ export const exampleRemoveNewsFromStack = async (stackId, newsGuid) => {
   }
 };
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 // ======================================
 // RESİM YÖNETİMİ KULLANIM ÖRNEKLERİ
 // ======================================
@@ -223,13 +242,19 @@ export const exampleUpdateStackCover = async (stackId, fileInput) => {
 
 /**
  * Tam haber yığını workflow'u - örnek senaryo
+<<<<<<< HEAD
  * 1. En az 3 haber GUID'i kontrol et
  * 2. Yığın oluştur
+=======
+ * 1. Yığın oluştur
+ * 2. Haber ekle
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
  * 3. Kapak resmi yükle
  * 4. Yığını onayla
  */
 export const exampleCompleteStackWorkflow = async (newsGuids, coverImageFile) => {
   try {
+<<<<<<< HEAD
     // 1. En az 3 haber GUID'i kontrolü
     if (!newsGuids || newsGuids.length < 3) {
       throw new Error('En az 3 haber GUID\'i gereklidir. Şu anda: ' + (newsGuids?.length || 0));
@@ -240,6 +265,13 @@ export const exampleCompleteStackWorkflow = async (newsGuids, coverImageFile) =>
       title: 'Gündem: Önemli Gelişmeler',
       description: 'Bugünkü önemli haberler',
       news: newsGuids, // En az 3 haber GUID'i
+=======
+    // 1. Yığın oluştur
+    const stackData = {
+      title: 'Gündem: Önemli Gelişmeler',
+      description: 'Bugünkü önemli haberler',
+      news: newsGuids,
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       tags: ['gündem', 'önemli'],
       status: 'pending'
     };
@@ -249,13 +281,21 @@ export const exampleCompleteStackWorkflow = async (newsGuids, coverImageFile) =>
 
     console.log('✅ Yığın oluşturuldu:', stackId);
 
+<<<<<<< HEAD
     // 3. Kapak resmi yükle (eğer varsa)
+=======
+    // 2. Kapak resmi yükle (eğer varsa)
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     if (coverImageFile) {
       const imageResponse = await imagesAPI.uploadFile(stackId, coverImageFile);
       console.log('✅ Kapak resmi yüklendi:', imageResponse.data.photoUrl);
     }
 
+<<<<<<< HEAD
     // 4. Yığını onayla
+=======
+    // 3. Yığını onayla
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     const updateResponse = await stacksAPI.update(stackId, {
       status: 'approved',
       isFeatured: true

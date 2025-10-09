@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+<<<<<<< HEAD
 import { Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,11 +29,19 @@ import {
   addToast,
   openBadgeModal
 } from '../store/slices/uiSlice';
+=======
+import { Box } from '@mui/material';
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
 // Components
 import Hero from '../components/sections/Hero';
 import NewsSection from '../components/sections/NewsSection';
+<<<<<<< HEAD
 import NewsCard from '../components/cards/NewsCard';
+=======
+import VideoCard from '../components/cards/VideoCard';
+import FeaturedNewsCard from '../components/cards/FeaturedNewsCard';
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
 import BadgeModal from '../components/modals/BadgeModal';
@@ -41,12 +50,18 @@ import BadgeToast from '../components/notifications/BadgeToast';
 
 // Data and utilities
 import {
+<<<<<<< HEAD
+=======
+  heroSlides,
+  featuredNews,
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   allBadges,
   levelThresholds,
   allAchievements
 } from '../constants/index.jsx';
 
 const MainPage = () => {
+<<<<<<< HEAD
   // Redux state
   const dispatch = useAppDispatch();
   const { news, selectedNews } = useNews();
@@ -64,11 +79,27 @@ const MainPage = () => {
   const [notificationToast, setNotificationToast] = useState(null);
   const [streakData, setStreakData] = useState({ current: 0, lastDate: null });
   const [earnedAchievements, setEarnedAchievements] = useState(new Set());
+=======
+  // State management
+  const [news] = useState(heroSlides);
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [totalXp, setTotalXp] = useState(0);
+  const [readArticles, setReadArticles] = useState([]);
+  const [earnedBadges, setEarnedBadges] = useState([]);
+  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
+  const [newBadgeToast, setNewBadgeToast] = useState(null);
+  const [notificationToast, setNotificationToast] = useState(null);
+  const [streakData, setStreakData] = useState({ current: 0, lastDate: null });
+  const [earnedAchievements, setEarnedAchievements] = useState(new Set());
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
   // Refs for timers
   const toastTimerRef = useRef(null);
   const notificationTimerRef = useRef(null);
 
+<<<<<<< HEAD
   const navigate = useNavigate();
 
   // Load data on component mount
@@ -107,6 +138,13 @@ const MainPage = () => {
     let level = 1;
     for (let i = 1; i < levelThresholds.length; i++) {
       if (cp >= levelThresholds[i]) {
+=======
+  // Utility functions
+  const calculateLevel = (xp) => {
+    let level = 1;
+    for (let i = 1; i < levelThresholds.length; i++) {
+      if (xp >= levelThresholds[i]) {
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
         level = i + 1;
       } else {
         break;
@@ -115,6 +153,7 @@ const MainPage = () => {
     return level;
   };
 
+<<<<<<< HEAD
   const currentLevel = calculateLevel(totalCp);
   const currentLevelCp = levelThresholds[currentLevel - 1] ?? 0;
   const nextLevelCp = levelThresholds[currentLevel] ?? Infinity;
@@ -128,10 +167,22 @@ const MainPage = () => {
       dispatch(setSelectedNews(articleToOpen));
       // Navigate to article page
       navigate(`/article/${articleToOpen.guid || articleToOpen.id}`);
+=======
+  const currentLevel = calculateLevel(totalXp);
+  const currentLevelXp = levelThresholds[currentLevel - 1] ?? 0;
+  const nextLevelXp = levelThresholds[currentLevel] ?? Infinity;
+
+  // Event handlers
+  const handleVideoCardClick = (articleId) => {
+    const articleToOpen = news.find(slide => slide.id === articleId);
+    if (articleToOpen) {
+      setSelectedArticle(articleToOpen);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     }
   };
 
   const handleSearchChange = (query) => {
+<<<<<<< HEAD
     dispatch(setSearchQuery(query));
   };
 
@@ -212,12 +263,49 @@ const MainPage = () => {
     thumbnailUrl: slide.imageUrl || slide.image,
     imageUrl: slide.imageUrl || slide.image,
     category: slide.category,
+=======
+    setSearchQuery(query);
+  };
+
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
+
+  // Filter news by category and search
+  let filteredNews = selectedCategory === 'all' ? news : news.filter(article => article.category === selectedCategory);
+
+  if (searchQuery) {
+    filteredNews = filteredNews.filter(article =>
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.content?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
+  const filteredFeaturedNews = selectedCategory === 'all'
+    ? featuredNews
+    : featuredNews.filter(item => item.category.toLowerCase() === selectedCategory);
+
+  // Generate recommendations
+  const readArticleIds = new Set(readArticles.map(a => a.id));
+  const readCategories = new Set(
+    news
+      .filter(slide => readArticleIds.has(slide.id))
+      .map(slide => slide.category)
+  );
+
+  const allArticlesAsVideos = filteredNews.map(slide => ({
+    id: slide.id,
+    thumbnailUrl: slide.imageUrl,
+    duration: slide.category.charAt(0).toUpperCase() + slide.category.slice(1),
+    channelIconUrl: `https://picsum.photos/seed/source${slide.id}/40/40`,
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     title: slide.title,
     age: 'Öneri',
   }));
 
   let recommendedNews;
   if (readCategories.size > 0) {
+<<<<<<< HEAD
     const recommendations = allArticlesAsNews.filter(newsItem => {
       const slide = filteredNews.find(s => (s.id || s.guid) === newsItem.id);
       return !readArticleIds.has(newsItem.id) && readCategories.has(slide?.category);
@@ -316,6 +404,17 @@ const MainPage = () => {
         {isLoading ? 'Haberler' : 'Haber yığınları'} yükleniyor...
       </Box>
     );
+=======
+    const recommendations = allArticlesAsVideos.filter(video => {
+      const slide = news.find(s => s.id === video.id);
+      return !readArticleIds.has(video.id) && readCategories.has(slide.category);
+    });
+    recommendedNews = recommendations.length > 0
+      ? recommendations.slice(0, 8)
+      : allArticlesAsVideos.filter(video => !readArticleIds.has(video.id)).slice(0, 8);
+  } else {
+    recommendedNews = allArticlesAsVideos.filter(video => !readArticleIds.has(video.id)).slice(0, 8);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   }
 
   return (
@@ -325,20 +424,39 @@ const MainPage = () => {
       color: 'text.primary'
     }}>
       {/* Toast Notifications */}
+<<<<<<< HEAD
       <BadgeToast />
+=======
+      <BadgeToast data={newBadgeToast} />
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
       <AchievementToast data={notificationToast} />
 
       {/* Badge Modal */}
       <BadgeModal
+<<<<<<< HEAD
         badges={earnedBadges}
         totalCp={totalCp}
+=======
+        isOpen={isBadgeModalOpen}
+        onClose={() => setIsBadgeModalOpen(false)}
+        badges={earnedBadges}
+        totalXp={totalXp}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
         earnedAchievements={earnedAchievements}
         level={currentLevel}
       />
 
       <Box component="main">
+<<<<<<< HEAD
         {/* Hero Section - Her kategoriden 2 stack gösterir */}
         <Hero onStackClick={handleStackClick} />
+=======
+        {/* Hero Section */}
+        <Hero
+          slides={filteredNews}
+          onArticleSelect={setSelectedArticle}
+        />
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
         {/* Search and Category Section */}
         <Box sx={{ backgroundColor: 'background.default', pt: 3 }}>
@@ -349,13 +467,18 @@ const MainPage = () => {
           />
 
           <CategoryPills
+<<<<<<< HEAD
             selectedCategory={selectedCategory || 'all'}
+=======
+            selectedCategory={selectedCategory}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
             onCategoryChange={handleCategoryChange}
           />
         </Box>
 
         {/* News Sections */}
         <Box sx={{ py: 2 }}>
+<<<<<<< HEAD
           <NewsSection title="En Popüler Haberler">
             <NewsCard
               articles={popularStacksAsNews}
@@ -382,15 +505,45 @@ const MainPage = () => {
               variant="horizontal"
               onClick={(stackId) => handleStackClick(stackId)}
             />
+=======
+          <NewsSection title="Sana Özel Haberler">
+            {recommendedNews.map(video => (
+              <VideoCard
+                key={video.id}
+                video={video}
+                onClick={() => handleVideoCardClick(video.id)}
+              />
+            ))}
+          </NewsSection>
+
+          <NewsSection title="Öne Çıkan Haberler">
+            {filteredFeaturedNews.map(newsItem => (
+              <FeaturedNewsCard
+                key={newsItem.id}
+                news={newsItem}
+              />
+            ))}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
           </NewsSection>
 
           <NewsSection title="Son okunan haberler">
             {readArticles.length > 0 ? (
+<<<<<<< HEAD
               <NewsCard
                 articles={readArticles}
                 variant="horizontal"
                 onClick={(newsId) => handleNewsCardClick(newsId)}
               />
+=======
+              readArticles.map(video => (
+                <VideoCard
+                  key={video.id}
+                  video={video}
+                  variant="portrait"
+                  onClick={() => handleVideoCardClick(video.id)}
+                />
+              ))
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
             ) : (
               <Box sx={{ px: 2, color: 'text.secondary' }}>
                 Henüz hiç haber okumadınız. Okumaya başlamak için manşetlerden birini seçin!

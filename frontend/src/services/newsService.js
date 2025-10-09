@@ -32,7 +32,10 @@ export const getNewsByGuid = async (guid) => {
  * @param {string} newsData.link - Haber URL'i (zorunlu)
  * @param {string} newsData.title - Haber başlığı (zorunlu)
  * @param {string} newsData.description - Haber açıklaması (zorunlu)
+<<<<<<< HEAD
  * @param {string} newsData.newstext - Haber metni (opsiyonel)
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
  * @param {string} newsData.pubDate - Yayın tarihi RFC formatında (zorunlu)
  * @param {string} newsData.image - Haber görsel URL'i (opsiyonel)
  * @param {string} newsData.category - Haber kategorisi (opsiyonel)
@@ -92,3 +95,20 @@ export const getLatestNews = async (limit = 20) => {
 export const getUsableNews = async (limit = 50) => {
   return await getAllNews({ isUsable: true, limit });
 };
+<<<<<<< HEAD
+=======
+
+export const newsService = {
+  getAllNews,
+  getNewsByGuid,
+  createNews,
+  createBulkNews,
+  updateNewsByGuid,
+  deleteNewsByGuid,
+  getNewsByCategory,
+  getLatestNews,
+  getUsableNews
+};
+
+export default newsService;
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619

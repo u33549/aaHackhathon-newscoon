@@ -123,3 +123,27 @@ export const updateStackCoverImage = async (newsStackId, imageFile, originalName
     originalName: originalName || imageFile.name
   });
 };
+<<<<<<< HEAD
+=======
+
+
+// imageService.js dosyasının en sonuna ekleyin:
+
+export const imageService = {
+  getAllStackImages,
+  getStackImageById,
+  getStackImageByStackId,
+  uploadStackImage,
+  updateStackImageById,
+  updateStackImageByStackId,
+  deleteStackImageById,
+  deleteStackImageByStackId,
+  fileToBase64,
+  uploadImageFile,
+  updateStackCoverImage,
+  // AdminDashboard için alias
+  getAllImages: getAllStackImages
+};
+
+export default imageService;
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619

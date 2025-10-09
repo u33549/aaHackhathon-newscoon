@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 import {
   Box,
   Container,
@@ -9,12 +13,22 @@ import {
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
 
+<<<<<<< HEAD
 const SearchBar = ({ searchQuery, onSearchChange, placeholder = "Haberlerde ara..." }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSearchChange = (event) => {
     onSearchChange(event.target.value);
+=======
+const SearchBar = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   };
 
   return (
@@ -25,8 +39,13 @@ const SearchBar = ({ searchQuery, onSearchChange, placeholder = "Haberlerde ara.
       <Container maxWidth="lg">
         <TextField
           fullWidth
+<<<<<<< HEAD
           placeholder={placeholder}
           value={searchQuery}
+=======
+          placeholder="Haberlerde ara..."
+          value={searchTerm}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
           onChange={handleSearchChange}
           size={isMobile ? "medium" : "medium"}
           InputProps={{

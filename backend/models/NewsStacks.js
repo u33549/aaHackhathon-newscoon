@@ -15,6 +15,7 @@ const newsStacksSchema = new mongoose.Schema({
     type: String,
     ref: 'RssNews'
   }],
+<<<<<<< HEAD
   categories: [{
     type: String,
     enum: ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'],
@@ -25,6 +26,8 @@ const newsStacksSchema = new mongoose.Schema({
     enum: ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'],
     trim: true
   },
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
@@ -35,11 +38,14 @@ const newsStacksSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+<<<<<<< HEAD
   xp: {
     type: Number,
     default: 0,
     min: 0
   },
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
   tags: [{
     type: String,
     trim: true
@@ -56,6 +62,7 @@ const newsStacksSchema = new mongoose.Schema({
   timestamps: true
 });
 
+<<<<<<< HEAD
 // XP hesaplama fonksiyonu
 function calculateXP(newsCount) {
   const randomMultiplier = Math.floor(Math.random() * (52 - 45 + 1)) + 45; // 45-52 arası
@@ -164,13 +171,19 @@ newsStacksSchema.path('news').validate(function(value) {
   return value && value.length >= 3;
 }, 'Bir haber yığını oluşturmak için en az 3 haber seçilmelidir');
 
+=======
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 // İndeksler
 newsStacksSchema.index({ status: 1 });
 newsStacksSchema.index({ isFeatured: 1 });
 newsStacksSchema.index({ viewCount: -1 });
+<<<<<<< HEAD
 newsStacksSchema.index({ xp: -1 });
 newsStacksSchema.index({ tags: 1 });
 newsStacksSchema.index({ categories: 1 });
 newsStacksSchema.index({ mainCategory: 1 });
+=======
+newsStacksSchema.index({ tags: 1 });
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
 
 module.exports = mongoose.model('NewsStacks', newsStacksSchema);

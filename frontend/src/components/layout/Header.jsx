@@ -16,12 +16,21 @@ import {
 import { EmojiEvents, Star } from '@mui/icons-material';
 import LogoNewscoon from '../../assets/Logo_Newscoon.png';
 
+<<<<<<< HEAD
 const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const progressPercentage = cpForNextLevel.max > 0
     ? (cpForNextLevel.current / cpForNextLevel.max) * 100
+=======
+const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const progressPercentage = xpForNextLevel.max > 0
+    ? (xpForNextLevel.current / xpForNextLevel.max) * 100
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
     : 0;
 
   return (
@@ -68,7 +77,11 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
             </Typography>
           </Box>
 
+<<<<<<< HEAD
           {/* CP and Level Display - Sadece Desktop */}
+=======
+          {/* XP and Level Display - Sadece Desktop */}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
           {!isMobile && (
             <Box sx={{
               display: 'flex',
@@ -91,10 +104,17 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
                 />
               </Box>
 
+<<<<<<< HEAD
               {/* CP Progress */}
               <Box sx={{ minWidth: 150 }}>
                 <Typography variant="caption" color="text.secondary">
                   CP: {cpForNextLevel.current}/{cpForNextLevel.max}
+=======
+              {/* XP Progress */}
+              <Box sx={{ minWidth: 150 }}>
+                <Typography variant="caption" color="text.secondary">
+                  XP: {xpForNextLevel.current}/{xpForNextLevel.max}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
                 </Typography>
                 <LinearProgress
                   variant="determinate"
@@ -127,7 +147,11 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
             </Box>
           )}
 
+<<<<<<< HEAD
           {/* Mobile Layout - Logo, Level, CP ve Rozetler */}
+=======
+          {/* Mobile Layout - Logo, Level, XP ve Rozetler */}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
           {isMobile && (
             <Stack direction="row" alignItems="center" spacing={1.5}>
               {/* Level Display */}
@@ -142,7 +166,11 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
                 }}
               />
 
+<<<<<<< HEAD
               {/* CP Display */}
+=======
+              {/* XP Display */}
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
               <Typography
                 variant="body2"
                 color="primary.main"
@@ -151,7 +179,11 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
                   fontSize: '0.8rem'
                 }}
               >
+<<<<<<< HEAD
                 {totalCp} CP
+=======
+                {totalXp} XP
+>>>>>>> e343038552ef02089151de6b0936c8a29bd83619
               </Typography>
 
               {/* Badges Icon Button - Kupa ikonu sarı */}
