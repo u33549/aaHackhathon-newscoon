@@ -327,32 +327,52 @@ const StackDetailPage = () => {
 
                 {/* Tags - Like butonunun yerine */}
                 {stack.tags && stack.tags.length > 0 && (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, ml: 2 }}>
+                  <Box sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 1,
+                    mt: 2,
+                    alignItems: 'center'
+                  }}>
                     {stack.tags.slice(0, 3).map((tag, index) => (
                       <Chip
                         key={index}
                         label={tag}
                         size="small"
                         sx={{
-                          backgroundColor: 'rgba(255,255,255,0.2)',
+                          backgroundColor: 'rgba(255,255,255,0.15)',
                           color: 'white',
-                          border: '1px solid rgba(255,255,255,0.3)',
-                          fontSize: '0.75rem',
+                          border: '1px solid rgba(255,255,255,0.4)',
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                          height: 28,
+                          backdropFilter: 'blur(10px)',
                           '&:hover': {
-                            backgroundColor: 'rgba(255,255,255,0.3)'
-                          }
+                            backgroundColor: 'rgba(255,255,255,0.25)',
+                            borderColor: 'rgba(255,255,255,0.6)',
+                            transform: 'translateY(-1px)'
+                          },
+                          transition: 'all 0.2s ease'
                         }}
                       />
                     ))}
                     {stack.tags.length > 3 && (
                       <Chip
-                        label={`+${stack.tags.length - 3}`}
+                        label={`+${stack.tags.length - 3} daha`}
                         size="small"
                         sx={{
-                          backgroundColor: 'rgba(255,255,255,0.2)',
-                          color: 'white',
+                          backgroundColor: 'rgba(255,255,255,0.1)',
+                          color: 'rgba(255,255,255,0.8)',
                           border: '1px solid rgba(255,255,255,0.3)',
-                          fontSize: '0.75rem'
+                          fontSize: '0.75rem',
+                          fontWeight: 400,
+                          height: 28,
+                          backdropFilter: 'blur(10px)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.2)',
+                            color: 'white'
+                          },
+                          transition: 'all 0.2s ease'
                         }}
                       />
                     )}
@@ -366,9 +386,9 @@ const StackDetailPage = () => {
 
       {/* Content Section */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Grid container spacing={4}>
-          {/* Main Content */}
-          <Grid item xs={12} md={8}>
+        {/* Main Content - Full Width */}
+        <Grid container>
+          <Grid item xs={12}>
             {/* News List */}
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
               Bu Yığındaki Haberler
@@ -427,108 +447,6 @@ const StackDetailPage = () => {
                 Bu yığında henüz haber bulunmuyor.
               </Typography>
             )}
-
-            {/* Tags */}
-            {stack.tags && stack.tags.length > 0 && (
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  Etiketler
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {stack.tags.map((tag, index) => (
-                    <Chip
-                      key={index}
-                      label={tag}
-                      variant="outlined"
-                      size="small"
-                    />
-                  ))}
-                </Box>
-              </Box>
-            )}
-          </Grid>
-
-          {/* Sidebar */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ position: 'sticky', top: 100 }}>
-              {/* Stack Info */}
-              <Card sx={{ mb: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Yığın Bilgileri
-                  </Typography>
-
-                  <List dense>
-                    <ListItem disablePadding>
-                      <ListItemText
-                        primary="Kategori"
-                        secondary={stack.mainCategory || 'Genel'}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem disablePadding>
-                      <ListItemText
-                        primary="Oluşturulma Tarihi"
-                        secondary={formatDate(stack.createdAt)}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem disablePadding>
-                      <ListItemText
-                        primary="Son Güncelleme"
-                        secondary={formatDate(stack.updatedAt)}
-                      />
-                    </ListItem>
-                    <Divider />
-                    <ListItem disablePadding>
-                      <ListItemText
-                        primary="Durum"
-                        secondary={
-                          <Chip
-                            label={stack.status === 'approved' ? 'Onaylandı' : 'Beklemede'}
-                            size="small"
-                            color={stack.status === 'approved' ? 'success' : 'warning'}
-                          />
-                        }
-                      />
-                    </ListItem>
-                  </List>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Hızlı İşlemler
-                  </Typography>
-
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      startIcon={<BookmarkBorder />}
-                      fullWidth
-                    >
-                      Favorilere Ekle
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<Share />}
-                      fullWidth
-                    >
-                      Paylaş
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<TrendingUp />}
-                      fullWidth
-                    >
-                      Benzer Yığınlar
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
           </Grid>
         </Grid>
       </Container>
