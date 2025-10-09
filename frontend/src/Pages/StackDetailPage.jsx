@@ -16,10 +16,6 @@ import {
   Backdrop,
   useTheme,
   useMediaQuery,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
   Avatar,
   LinearProgress
 } from '@mui/material';
@@ -27,13 +23,10 @@ import {
   ArrowBack,
   PlayArrow,
   Add,
-  ThumbUp,
   Share,
-  BookmarkBorder,
   AccessTime,
   Visibility,
   Star,
-  TrendingUp,
   Category,
   Close
 } from '@mui/icons-material';
@@ -62,7 +55,6 @@ const StackDetailPage = () => {
   const loading = useStacksLoading();
   const error = useStacksError();
 
-  const [showFullDescription, setShowFullDescription] = useState(false);
   const [playTrailer, setPlayTrailer] = useState(false);
 
   // Component mount olduğunda stack verilerini getir
@@ -159,7 +151,7 @@ const StackDetailPage = () => {
       <Box
         sx={{
           position: 'relative',
-          height: { xs: '70vh', md: '80vh' },
+          height: { xs: '60vh', sm: '70vh', md: '80vh' },
           backgroundImage: `url(${heroImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -184,22 +176,24 @@ const StackDetailPage = () => {
         {/* Close and Share buttons */}
         <Box sx={{
           position: 'absolute',
-          top: 20,
-          right: 20,
+          top: { xs: 16, md: 20 },
+          right: { xs: 16, md: 20 },
           zIndex: 3,
           display: 'flex',
-          gap: 1
+          gap: { xs: 0.5, md: 1 }
         }}>
           <IconButton
             sx={{
               backgroundColor: 'rgba(0,0,0,0.5)',
               color: 'white',
+              width: { xs: 40, md: 48 },
+              height: { xs: 40, md: 48 },
               '&:hover': {
                 backgroundColor: 'rgba(0,0,0,0.8)'
               }
             }}
           >
-            <Share />
+            <Share fontSize={isMobile ? 'small' : 'medium'} />
           </IconButton>
 
           <IconButton
@@ -207,24 +201,31 @@ const StackDetailPage = () => {
             sx={{
               backgroundColor: 'rgba(0,0,0,0.5)',
               color: 'white',
+              width: { xs: 40, md: 48 },
+              height: { xs: 40, md: 48 },
               '&:hover': {
                 backgroundColor: 'rgba(0,0,0,0.8)'
               }
             }}
           >
-            <Close />
+            <Close fontSize={isMobile ? 'small' : 'medium'} />
           </IconButton>
         </Box>
 
         {/* Hero Content */}
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, pb: 8 }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, pb: { xs: 4, md: 8 } }}>
           <Grid container spacing={4} alignItems="flex-end">
             <Grid item xs={12} md={8}>
               {/* Category */}
               <Chip
                 label={stack.mainCategory?.charAt(0).toUpperCase() + stack.mainCategory?.slice(1) || 'Genel'}
                 color="primary"
-                sx={{ mb: 2, fontWeight: 'bold' }}
+                size={isMobile ? 'small' : 'medium'}
+                sx={{
+                  mb: { xs: 1.5, md: 2 },
+                  fontWeight: 'bold',
+                  fontSize: { xs: '0.75rem', md: '0.875rem' }
+                }}
               />
 
               {/* Title */}
@@ -233,39 +234,70 @@ const StackDetailPage = () => {
                 sx={{
                   color: 'white',
                   fontWeight: 'bold',
-                  mb: 2,
-                  fontSize: { xs: '2rem', md: '3.5rem' },
+                  mb: { xs: 1.5, md: 2 },
+                  fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3.5rem' },
                   textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                  lineHeight: 1.1
+                  lineHeight: { xs: 1.2, md: 1.1 }
                 }}
               >
                 {stack.title}
               </Typography>
 
               {/* Stats */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3, flexWrap: 'wrap' }}>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: { xs: 2, md: 3 },
+                mb: { xs: 2, md: 3 },
+                flexWrap: 'wrap'
+              }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Star sx={{ color: '#ffd700', fontSize: 20 }} />
-                  <Typography variant="body1" sx={{ color: 'white', fontWeight: 'bold' }}>
+                  <Star sx={{ color: '#ffd700', fontSize: { xs: 18, md: 20 } }} />
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                      fontSize: { xs: '0.875rem', md: '1rem' }
+                    }}
+                  >
                     {stack.xp || 0} CP
                   </Typography>
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Visibility sx={{ color: 'rgba(255,255,255,0.8)', fontSize: 20 }} />
-                  <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <Visibility sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: 18, md: 20 } }} />
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: 'rgba(255,255,255,0.8)',
+                      fontSize: { xs: '0.875rem', md: '1rem' }
+                    }}
+                  >
                     {stack.viewCount || 0} görüntülenme
                   </Typography>
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Category sx={{ color: 'rgba(255,255,255,0.8)', fontSize: 20 }} />
-                  <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                  <Category sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: 18, md: 20 } }} />
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: 'rgba(255,255,255,0.8)',
+                      fontSize: { xs: '0.875rem', md: '1rem' }
+                    }}
+                  >
                     {stack.news?.length || 0} haber
                   </Typography>
                 </Box>
 
-                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'rgba(255,255,255,0.8)',
+                    fontSize: { xs: '0.875rem', md: '1rem' }
+                  }}
+                >
                   {formatDate(stack.createdAt)}
                 </Typography>
               </Box>
@@ -275,29 +307,41 @@ const StackDetailPage = () => {
                 variant="body1"
                 sx={{
                   color: 'rgba(255,255,255,0.9)',
-                  mb: 4,
-                  maxWidth: '600px',
-                  fontSize: '1.1rem',
-                  lineHeight: 1.6,
-                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                  mb: { xs: 3, md: 4 },
+                  maxWidth: { xs: '100%', md: '600px' },
+                  fontSize: { xs: '0.95rem', md: '1.1rem' },
+                  lineHeight: { xs: 1.5, md: 1.6 },
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                  display: { xs: '-webkit-box', md: 'block' },
+                  WebkitLineClamp: { xs: 3, md: 'none' },
+                  WebkitBoxOrient: { xs: 'vertical', md: 'unset' },
+                  overflow: { xs: 'hidden', md: 'visible' }
                 }}
               >
                 {stack.description || 'Bu haber yığını için açıklama bulunmuyor.'}
               </Typography>
 
               {/* Action Buttons */}
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
+              <Box sx={{
+                display: 'flex',
+                gap: { xs: 1.5, md: 2 },
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}>
                 <Button
                   variant="contained"
-                  size="large"
+                  size={isMobile ? 'medium' : 'large'}
                   startIcon={<PlayArrow />}
                   onClick={() => setPlayTrailer(true)}
+                  fullWidth={isMobile}
                   sx={{
                     backgroundColor: 'white',
                     color: 'black',
                     fontWeight: 'bold',
-                    px: 4,
-                    py: 1.5,
+                    px: { xs: 3, md: 4 },
+                    py: { xs: 1.2, md: 1.5 },
+                    fontSize: { xs: '0.875rem', md: '1rem' },
                     '&:hover': {
                       backgroundColor: 'rgba(255,255,255,0.8)'
                     }
@@ -308,14 +352,16 @@ const StackDetailPage = () => {
 
                 <Button
                   variant="outlined"
-                  size="large"
+                  size={isMobile ? 'medium' : 'large'}
                   startIcon={<Add />}
+                  fullWidth={isMobile}
                   sx={{
                     borderColor: 'rgba(255,255,255,0.5)',
                     color: 'white',
                     fontWeight: 'bold',
-                    px: 3,
-                    py: 1.5,
+                    px: { xs: 3, md: 3 },
+                    py: { xs: 1.2, md: 1.5 },
+                    fontSize: { xs: '0.875rem', md: '1rem' },
                     '&:hover': {
                       borderColor: 'white',
                       backgroundColor: 'rgba(255,255,255,0.1)'
@@ -330,11 +376,13 @@ const StackDetailPage = () => {
                   <Box sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: 1,
-                    mt: 2,
-                    alignItems: 'center'
+                    gap: { xs: 0.75, md: 1 },
+                    mt: { xs: 1, md: 2 },
+                    alignItems: 'center',
+                    width: { xs: '100%', sm: 'auto' },
+                    justifyContent: { xs: 'center', sm: 'flex-start' }
                   }}>
-                    {stack.tags.slice(0, 3).map((tag, index) => (
+                    {stack.tags.slice(0, isMobile ? 2 : 3).map((tag, index) => (
                       <Chip
                         key={index}
                         label={tag}
@@ -343,9 +391,9 @@ const StackDetailPage = () => {
                           backgroundColor: 'rgba(255,255,255,0.15)',
                           color: 'white',
                           border: '1px solid rgba(255,255,255,0.4)',
-                          fontSize: '0.8rem',
+                          fontSize: { xs: '0.7rem', md: '0.8rem' },
                           fontWeight: 500,
-                          height: 28,
+                          height: { xs: 24, md: 28 },
                           backdropFilter: 'blur(10px)',
                           '&:hover': {
                             backgroundColor: 'rgba(255,255,255,0.25)',
@@ -356,17 +404,17 @@ const StackDetailPage = () => {
                         }}
                       />
                     ))}
-                    {stack.tags.length > 3 && (
+                    {stack.tags.length > (isMobile ? 2 : 3) && (
                       <Chip
-                        label={`+${stack.tags.length - 3} daha`}
+                        label={`+${stack.tags.length - (isMobile ? 2 : 3)} daha`}
                         size="small"
                         sx={{
                           backgroundColor: 'rgba(255,255,255,0.1)',
                           color: 'rgba(255,255,255,0.8)',
                           border: '1px solid rgba(255,255,255,0.3)',
-                          fontSize: '0.75rem',
+                          fontSize: { xs: '0.65rem', md: '0.75rem' },
                           fontWeight: 400,
-                          height: 28,
+                          height: { xs: 24, md: 28 },
                           backdropFilter: 'blur(10px)',
                           '&:hover': {
                             backgroundColor: 'rgba(255,255,255,0.2)',
@@ -385,22 +433,31 @@ const StackDetailPage = () => {
       </Box>
 
       {/* Content Section */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
         {/* Main Content - Full Width */}
         <Grid container>
           <Grid item xs={12}>
             {/* News List */}
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontWeight: 'bold',
+                mb: { xs: 2, md: 3 },
+                fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' },
+                px: { xs: 2, sm: 0 }
+              }}
+            >
               Bu Yığındaki Haberler
             </Typography>
 
             {stack.news && stack.news.length > 0 ? (
-              <Box sx={{ mb: 4 }}>
+              <Box sx={{ mb: 4, px: { xs: 2, sm: 0 } }}>
                 {stack.news.map((news, index) => (
                   <Card
                     key={index}
                     sx={{
-                      mb: 2,
+                      mb: { xs: 1.5, md: 2 },
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       '&:hover': {
@@ -414,24 +471,60 @@ const StackDetailPage = () => {
                       }
                     }}
                   >
-                    <CardContent>
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: 'primary.main', mt: 0.5 }}>
+                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                      <Box sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: { xs: 1.5, md: 2 },
+                        flexDirection: { xs: 'column', sm: 'row' }
+                      }}>
+                        <Avatar sx={{
+                          bgcolor: 'primary.main',
+                          mt: { xs: 0, sm: 0.5 },
+                          width: { xs: 32, md: 40 },
+                          height: { xs: 32, md: 40 },
+                          fontSize: { xs: '0.875rem', md: '1rem' },
+                          alignSelf: { xs: 'flex-start', sm: 'flex-start' }
+                        }}>
                           {index + 1}
                         </Avatar>
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="h6" gutterBottom>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{
+                              fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
+                              lineHeight: { xs: 1.3, md: 1.4 },
+                              mb: { xs: 1, md: 1.5 }
+                            }}
+                          >
                             {typeof news === 'object' ? news.title : `Haber ${index + 1}`}
                           </Typography>
                           {typeof news === 'object' && news.description && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                mb: { xs: 1, md: 1 },
+                                fontSize: { xs: '0.875rem', md: '0.875rem' },
+                                lineHeight: 1.5,
+                                display: { xs: '-webkit-box', md: 'block' },
+                                WebkitLineClamp: { xs: 2, md: 'none' },
+                                WebkitBoxOrient: { xs: 'vertical', md: 'unset' },
+                                overflow: { xs: 'hidden', md: 'visible' }
+                              }}
+                            >
                               {news.description}
                             </Typography>
                           )}
                           {typeof news === 'object' && news.pubDate && (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <AccessTime sx={{ fontSize: 16, color: 'text.secondary' }} />
-                              <Typography variant="caption" color="text.secondary">
+                              <AccessTime sx={{ fontSize: { xs: 14, md: 16 }, color: 'text.secondary' }} />
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ fontSize: { xs: '0.75rem', md: '0.75rem' } }}
+                              >
                                 {formatDate(news.pubDate)}
                               </Typography>
                             </Box>
@@ -443,7 +536,16 @@ const StackDetailPage = () => {
                 ))}
               </Box>
             ) : (
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{
+                  mb: 4,
+                  px: { xs: 2, sm: 0 },
+                  textAlign: { xs: 'center', sm: 'left' },
+                  fontSize: { xs: '0.875rem', md: '1rem' }
+                }}
+              >
                 Bu yığında henüz haber bulunmuyor.
               </Typography>
             )}
@@ -457,6 +559,7 @@ const StackDetailPage = () => {
         onClose={() => setPlayTrailer(false)}
         maxWidth="lg"
         fullWidth
+        fullScreen={isMobile}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
         slotProps={{
@@ -467,35 +570,57 @@ const StackDetailPage = () => {
         }}
       >
         <Fade in={playTrailer}>
-          <Box sx={{ position: 'relative', backgroundColor: 'background.paper' }}>
+          <Box sx={{
+            position: 'relative',
+            backgroundColor: 'background.paper',
+            height: { xs: '100vh', md: 'auto' },
+            overflow: { xs: 'auto', md: 'visible' }
+          }}>
             <IconButton
               onClick={() => setPlayTrailer(false)}
               sx={{
                 position: 'absolute',
-                top: 8,
-                right: 8,
+                top: { xs: 16, md: 8 },
+                right: { xs: 16, md: 8 },
                 zIndex: 1,
                 backgroundColor: 'rgba(0,0,0,0.5)',
-                color: 'white'
+                color: 'white',
+                width: { xs: 40, md: 48 },
+                height: { xs: 40, md: 48 }
               }}
             >
-              <Close />
+              <Close fontSize={isMobile ? 'small' : 'medium'} />
             </IconButton>
 
-            <Box sx={{ p: 4 }}>
-              <Typography variant="h4" gutterBottom>
+            <Box sx={{
+              p: { xs: 3, sm: 4, md: 4 },
+              pt: { xs: 5, md: 4 },
+              minHeight: { xs: '100vh', md: 'auto' }
+            }}>
+              <Typography
+                variant="h4"
+                gutterBottom
+                sx={{
+                  fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' },
+                  mb: { xs: 2, md: 3 },
+                  pr: { xs: 6, md: 0 }
+                }}
+              >
                 {stack.title} - Haberler
               </Typography>
 
               {stack.news && stack.news.length > 0 ? (
-                <Grid container spacing={2}>
+                <Grid container spacing={{ xs: 1.5, sm: 2 }}>
                   {stack.news.slice(0, 6).map((news, index) => (
                     <Grid item xs={12} sm={6} md={4} key={index}>
                       <Card
                         sx={{
                           cursor: 'pointer',
                           transition: 'transform 0.2s',
-                          '&:hover': { transform: 'scale(1.02)' }
+                          '&:hover': { transform: 'scale(1.02)' },
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column'
                         }}
                         onClick={() => {
                           if (typeof news === 'object' && news.guid) {
@@ -507,17 +632,45 @@ const StackDetailPage = () => {
                         {typeof news === 'object' && news.image && (
                           <CardMedia
                             component="img"
-                            height="120"
+                            height={isMobile ? "160" : "120"}
                             image={news.image}
                             alt={news.title}
+                            sx={{ objectFit: 'cover' }}
                           />
                         )}
-                        <CardContent>
-                          <Typography variant="subtitle1" noWrap>
+                        <CardContent sx={{
+                          flex: 1,
+                          p: { xs: 1.5, md: 2 },
+                          '&:last-child': { pb: { xs: 1.5, md: 2 } }
+                        }}>
+                          <Typography
+                            variant="subtitle1"
+                            sx={{
+                              fontSize: { xs: '0.9rem', md: '1rem' },
+                              fontWeight: 600,
+                              lineHeight: 1.3,
+                              mb: 1,
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden'
+                            }}
+                          >
                             {typeof news === 'object' ? news.title : `Haber ${index + 1}`}
                           </Typography>
                           {typeof news === 'object' && news.description && (
-                            <Typography variant="body2" color="text.secondary" noWrap>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{
+                                fontSize: { xs: '0.8rem', md: '0.875rem' },
+                                lineHeight: 1.4,
+                                display: '-webkit-box',
+                                WebkitLineClamp: { xs: 2, md: 1 },
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden'
+                              }}
+                            >
                               {news.description}
                             </Typography>
                           )}
