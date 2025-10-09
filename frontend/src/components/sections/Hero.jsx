@@ -168,7 +168,7 @@ const Hero = ({ onStackClick }) => {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      onClick={() => handleSlideClick(currentStack)} // Hero alanına tıklama işlevi eklendi
+      onClick={() => handleSlideClick(currentStack)}
       sx={{
         position: 'relative',
         width: '100%',
@@ -176,7 +176,9 @@ const Hero = ({ onStackClick }) => {
         overflow: 'hidden',
         backgroundColor: '#000',
         cursor: 'pointer',
-        touchAction: 'pan-y', // Sadece dikey kaydırmaya izin ver
+        touchAction: 'pan-y',
+        display: 'flex',
+        flexDirection: 'column',
         '&:hover .hero-image': {
           transform: 'scale(1.03)',
         }
@@ -213,63 +215,12 @@ const Hero = ({ onStackClick }) => {
         }}
       />
 
-      {/* Content */}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          padding: isMobile ? 2 : 3,
-          paddingBottom: isMobile ? 6 : 8, // Noktalı bar için daha fazla alt boşluk
-          paddingRight: isMobile ? 5 : 12,
-          zIndex: 3,
-          maxWidth: isMobile ? '100%' : '60%'
-        }}
-      >
-
-        {/* Title */}
-        <Typography
-          variant={isMobile ? 'h3' : 'h1'}
-          sx={{
-            color: 'white',
-            fontWeight: 'bold',
-            marginBottom: 1,
-            lineHeight: 1.1,
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.9)',
-            fontSize: isMobile ? '1.75rem' : '3rem',
-            cursor: 'pointer'
-          }}
-          onClick={() => handleSlideClick(currentStack)}
-        >
-          {currentStack?.title}
-        </Typography>
-
-        {/* Description */}
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'grey.300',
-            maxWidth: isMobile ? '100%' : '800px', // Mobile'da tam genişlik, desktop'ta 800px
-            lineHeight: 1.5,
-            fontSize: isMobile ? '0.875rem' : '1rem',
-            textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {currentStack?.description}
-        </Typography>
-      </Box>
-
       {/* Navigation Arrows - Desktop only */}
       {!isMobile && heroStacks.length > 1 && (
         <>
           <IconButton
             onClick={(e) => {
-              e.stopPropagation(); // Ana hero alanının onClick'ini engelle
+              e.stopPropagation();
               prevSlide();
             }}
             sx={{
@@ -283,7 +234,7 @@ const Hero = ({ onStackClick }) => {
               '&:hover': {
                 bgcolor: 'rgba(255,255,255,0.3)'
               },
-              zIndex: 3
+              zIndex: 4
             }}
           >
             <ArrowBackIos />
@@ -291,7 +242,7 @@ const Hero = ({ onStackClick }) => {
 
           <IconButton
             onClick={(e) => {
-              e.stopPropagation(); // Ana hero alanının onClick'ini engelle
+              e.stopPropagation();
               nextSlide();
             }}
             sx={{
@@ -305,7 +256,7 @@ const Hero = ({ onStackClick }) => {
               '&:hover': {
                 bgcolor: 'rgba(255,255,255,0.3)'
               },
-              zIndex: 3
+              zIndex: 4
             }}
           >
             <ArrowForwardIos />
@@ -313,43 +264,95 @@ const Hero = ({ onStackClick }) => {
         </>
       )}
 
-      {/* Slide Indicators (Dots) */}
-      {heroStacks.length > 1 && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: isMobile ? 20 : 30,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'row', // Yatay sıralama
-            gap: 1,
-            zIndex: 4 // Content'ten daha üstte
-          }}
-        >
-          {heroStacks.map((_, index) => (
-            <Box
-              key={index}
-              onClick={(e) => {
-                e.stopPropagation(); // Ana hero alanının onClick'ini engelle
-                goToSlide(index);
-              }}
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                backgroundColor: index === currentSlide ? categoryColor : 'rgba(255, 255, 255, 0.5)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: index === currentSlide ? categoryColor : 'rgba(255, 255, 255, 0.8)',
-                  transform: 'scale(1.2)'
-                }
-              }}
-            />
-          ))}
+      {/* Main Content Container - Flexbox Layout */}
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        position: 'relative',
+        zIndex: 3
+      }}>
+
+        {/* Spacer - takes up available space */}
+        <Box sx={{ flex: 1 }} />
+
+        {/* Content Section */}
+        <Box sx={{
+          p: { xs: 2, md: 3 },
+          maxWidth: { xs: '100%', md: '60%' }
+        }}>
+          {/* Title */}
+          <Typography
+            variant={isMobile ? 'h3' : 'h1'}
+            sx={{
+              color: 'white',
+              fontWeight: 'bold',
+              marginBottom: 1,
+              lineHeight: 1.1,
+              textShadow: '2px 2px 8px rgba(0, 0, 0, 0.9)',
+              fontSize: isMobile ? '1.75rem' : '3rem',
+              cursor: 'pointer'
+            }}
+            onClick={() => handleSlideClick(currentStack)}
+          >
+            {currentStack?.title}
+          </Typography>
+
+          {/* Description */}
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'grey.300',
+              lineHeight: 1.5,
+              fontSize: isMobile ? '0.875rem' : '1rem',
+              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              mb: { xs: 2, md: 3 }
+            }}
+          >
+            {currentStack?.description}
+          </Typography>
         </Box>
-      )}
+
+        {/* Dots Navigation - Flexbox positioned at bottom */}
+        {heroStacks.length > 1 && (
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            pb: { xs: 2, md: 3 },
+            px: 2,
+            gap: 1
+          }}>
+            {heroStacks.map((_, index) => (
+              <Box
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToSlide(index);
+                }}
+                sx={{
+                  width: { xs: 8, md: 10 },
+                  height: { xs: 8, md: 10 },
+                  borderRadius: '50%',
+                  backgroundColor: index === currentSlide ? categoryColor : 'rgba(255, 255, 255, 0.5)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  flexShrink: 0,
+                  '&:hover': {
+                    backgroundColor: index === currentSlide ? categoryColor : 'rgba(255, 255, 255, 0.8)',
+                    transform: 'scale(1.2)'
+                  }
+                }}
+              />
+            ))}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
