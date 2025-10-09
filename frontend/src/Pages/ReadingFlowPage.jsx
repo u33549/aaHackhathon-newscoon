@@ -81,7 +81,7 @@ const generateChronologicalSteps = (stack) => {
       id: `step-${index}`,
       type: 'news',
       title: newsItem.title || `Gelişme ${index + 1}`,
-      content: newsItem.description || newsItem.newstext || 'Bu gelişmede önemli detaylar ortaya çıktı.',
+      content:  newsItem.newstext || newsItem.description ||'Bu gelişmede önemli detaylar ortaya çıktı.',
       image: newsItem.image || getStackImage(stack),
       timestamp: newsItem.pubDate || new Date().toISOString(),
       stepNumber: index + 1,
@@ -304,10 +304,11 @@ const ReadingFlowPage = () => {
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
-          position: 'relative'
+          position: 'relative',
+          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000'
         }}>
-          {/* Background Image */}
-          {currentStepData.image && (
+          {/* Background Image - Sadece intro ve completion için */}
+          {currentStepData.image && currentStepData.type !== 'news' && (
             <Box
               sx={{
                 position: 'absolute',
@@ -324,20 +325,22 @@ const ReadingFlowPage = () => {
             />
           )}
 
-          {/* Gradient Overlay */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: currentStepData.type === 'completion' 
-                ? 'linear-gradient(135deg, rgba(76,175,80,0.9) 0%, rgba(56,142,60,0.95) 100%)'
-                : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
-              zIndex: 1
-            }}
-          />
+          {/* Gradient Overlay - Sadece intro ve completion için */}
+          {currentStepData.type !== 'news' && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: currentStepData.type === 'completion'
+                  ? 'linear-gradient(135deg, rgba(76,175,80,0.9) 0%, rgba(56,142,60,0.95) 100%)'
+                  : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
+                zIndex: 1
+              }}
+            />
+          )}
 
           {/* Content */}
           <Box sx={{
@@ -346,11 +349,13 @@ const ReadingFlowPage = () => {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-end',
+            justifyContent: currentStepData.type === 'news' ? 'flex-start' : 'flex-end',
             alignItems: 'flex-start',
             padding: { xs: 3, md: 6 },
             paddingBottom: { xs: 12, md: 15 }, // Scroll butonu için alt boşluk
-            textAlign: 'left'
+            paddingTop: currentStepData.type === 'news' ? { xs: 8, md: 10 } : { xs: 3, md: 6 },
+            textAlign: 'left',
+            overflowY: currentStepData.type === 'news' ? 'auto' : 'hidden'
           }}>
             {/* Intro Page */}
             {currentStepData.type === 'intro' && (
@@ -466,43 +471,62 @@ const ReadingFlowPage = () => {
               </>
             )}
 
-            {/* News Step */}
+            {/* News Step - Yeni tasarım */}
             {currentStepData.type === 'news' && (
               <Box sx={{
-                maxWidth: { xs: '100%', md: '900px' }, // News step için de daha geniş
-                width: '100%'
+                maxWidth: '100%',
+                width: '100%',
+                maxHeight: '100%',
+                display: 'flex',
+                flexDirection: 'column'
               }}>
+                {/* Haber Fotoğrafı - Üstte dikdörtgen */}
+                {currentStepData.image && (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: { xs: 200, sm: 250, md: 300 },
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      mb: { xs: 3, md: 4 },
+                      boxShadow: 3
+                    }}
+                  >
+                    <img
+                      src={currentStepData.image}
+                      alt={currentStepData.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center'
+                      }}
+                    />
+                  </Box>
+                )}
+
+                {/* Haber Başlığı */}
                 <Typography
                   variant={isMobile ? 'h4' : 'h2'}
                   sx={{
-                    color: 'white',
+                    color: 'text.primary',
                     fontWeight: 'bold',
-                    mb: 3,
-                    textShadow: '2px 2px 8px rgba(0,0,0,0.8)'
+                    mb: { xs: 2, md: 3 },
+                    lineHeight: 1.3
                   }}
                 >
                   {currentStepData.title}
                 </Typography>
 
-                <Typography
-                  variant={isMobile ? 'body1' : 'h6'}
-                  sx={{
-                    color: 'rgba(255,255,255,0.95)',
-                    mb: 4,
-                    textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
-                    lineHeight: 1.6
-                  }}
-                >
-                  {currentStepData.content}
-                </Typography>
-
+                {/* Tarih Bilgisi */}
                 {currentStepData.timestamp && (
                   <Typography
                     variant="caption"
                     sx={{
-                      color: 'rgba(255,255,255,0.7)',
-                      mb: 4,
-                      display: 'block'
+                      color: 'text.secondary',
+                      mb: { xs: 2, md: 3 },
+                      display: 'block',
+                      fontSize: { xs: '0.8rem', md: '0.9rem' }
                     }}
                   >
                     {new Date(currentStepData.timestamp).toLocaleDateString('tr-TR', {
@@ -514,6 +538,23 @@ const ReadingFlowPage = () => {
                     })}
                   </Typography>
                 )}
+
+                {/* Haber İçeriği */}
+                <Typography
+                  variant={isMobile ? 'body1' : 'h6'}
+                  sx={{
+                    color: 'text.primary',
+                    lineHeight: 1.7,
+                    fontSize: { xs: '1rem', md: '1.1rem' },
+                    fontWeight: 400,
+                    mb: { xs: 4, md: 6 }
+                  }}
+                >
+                  {currentStepData.content}
+                </Typography>
+
+                {/* Alt boşluk - scroll için */}
+                <Box sx={{ height: { xs: 100, md: 120 } }} />
               </Box>
             )}
 
