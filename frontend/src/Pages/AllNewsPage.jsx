@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -9,22 +9,21 @@ import {
   CardContent,
   CardMedia,
   Grid,
-  Chip,
-  IconButton
+  Chip
 } from '@mui/material';
-import { ArrowBack, AccessTime } from '@mui/icons-material';
+import { ArrowBack, AccessTime, Visibility } from '@mui/icons-material';
 
 // Redux hooks
 import { useAppDispatch } from '../hooks/redux';
 import {
-  useNews,
-  useNewsLoading,
+  useStacks,
+  useStacksLoading,
   useSearchQuery,
   useActiveCategory
 } from '../hooks/redux';
 import {
-  fetchAllNews
-} from '../store/slices/newsSlice';
+  fetchAllStacks
+} from '../store/slices/stackSlice';
 import {
   setSearchQuery,
   setActiveCategory
@@ -38,49 +37,39 @@ const AllNewsPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  // Redux state kullan
-  const { news } = useNews();
-  const isLoading = useNewsLoading();
+  // Redux state kullan - stacks için
+  const { stacks } = useStacks();
+  const isLoading = useStacksLoading();
   const searchQuery = useSearchQuery();
   const selectedCategory = useActiveCategory();
 
-  // Component mount olduğunda haberleri getir
+  // Component mount olduğunda haber yığınlarını getir
   useEffect(() => {
-    if (news.length === 0) {
-      dispatch(fetchAllNews());
+    if (stacks.length === 0) {
+      dispatch(fetchAllStacks());
     }
-  }, [dispatch, news.length]);
+  }, [dispatch, stacks.length]);
 
-  // Timeline'a göre sıralanan tüm haberler (Redux'tan gelen gerçek veriler)
-  const allNews = [...news].sort((a, b) =>
-    new Date(b.pubDate || b.createdAt || Date.now()) - new Date(a.pubDate || a.createdAt || Date.now())
+  // Timeline'a göre sıralanan tüm haber yığınları (Redux'tan gelen gerçek veriler)
+  const allStacks = [...stacks].sort((a, b) =>
+    new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now())
   );
 
-  // Filter news by category and search
-  let filteredNews = selectedCategory === 'all' || !selectedCategory
-    ? allNews
-    : allNews.filter(article => article.category === selectedCategory);
+  // Filter stacks by category and search
+  let filteredStacks = selectedCategory === 'all' || !selectedCategory
+    ? allStacks
+    : allStacks.filter(stack => stack.mainCategory === selectedCategory);
 
   if (searchQuery) {
-    filteredNews = filteredNews.filter(article => {
-      const title = article.title?.toLowerCase() || '';
-      const summary = article.summary?.toLowerCase() || article.description?.toLowerCase() || '';
+    filteredStacks = filteredStacks.filter(stack => {
+      const title = stack.title?.toLowerCase() || '';
+      const description = stack.description?.toLowerCase() || '';
+      const tags = stack.tags?.join(' ').toLowerCase() || '';
 
-      // content array'ini string'e çevir
-      let contentText = '';
-      if (Array.isArray(article.content)) {
-        contentText = article.content
-          .map(item => `${item.title || ''} ${item.paragraph || ''}`)
-          .join(' ')
-          .toLowerCase();
-      } else if (typeof article.content === 'string') {
-        contentText = article.content.toLowerCase();
-      }
-      
       const searchTerm = searchQuery.toLowerCase();
       return title.includes(searchTerm) || 
-             summary.includes(searchTerm) || 
-             contentText.includes(searchTerm);
+             description.includes(searchTerm) ||
+             tags.includes(searchTerm);
     });
   }
 
@@ -92,8 +81,8 @@ const AllNewsPage = () => {
     dispatch(setActiveCategory(categoryId));
   };
 
-  const handleNewsClick = (newsId) => {
-    navigate(`/article/${newsId}`);
+  const handleStackClick = (stackId) => {
+    navigate(`/stack/${stackId}`);
   };
 
   const formatDate = (dateString) => {
@@ -108,12 +97,30 @@ const AllNewsPage = () => {
     });
   };
 
-  if (isLoading && news.length === 0) {
+  const getStackImage = (stack) => {
+    // Stack'in kendi resim verilerini kullan
+    if (stack.imageUrl) {
+      return stack.imageUrl;
+    }
+    if (stack.photoUrl) {
+      return stack.photoUrl;
+    }
+    // Stack'teki son haberin resmini kullan
+    if (stack.news && stack.news.length > 0) {
+      const firstNews = stack.news[stack.news.length-1];
+      if (typeof firstNews === 'object' && firstNews.image) {
+        return firstNews.image;
+      }
+    }
+    return 'https://via.placeholder.com/250x150';
+  };
+
+  if (isLoading && stacks.length === 0) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
           <Typography variant="h6" color="text.secondary">
-            Haberler yükleniyor...
+            Haber yığınları yükleniyor...
           </Typography>
         </Box>
       </Container>
@@ -133,11 +140,11 @@ const AllNewsPage = () => {
         </Button>
         
         <Typography variant="h4" component="h1" gutterBottom>
-          Tüm Haberler
+          Tüm Haber Yığınları
         </Typography>
         
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {filteredNews.length} haber bulundu
+          {filteredStacks.length} haber yığını bulundu
         </Typography>
       </Box>
 
@@ -146,7 +153,7 @@ const AllNewsPage = () => {
         <SearchBar
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
-          placeholder="Haberlerde ara..."
+          placeholder="Haber yığınlarında ara..."
         />
         
         <CategoryPills
@@ -155,11 +162,11 @@ const AllNewsPage = () => {
         />
       </Box>
 
-      {/* News Grid */}
+      {/* Stacks Grid */}
       <Grid container spacing={3}>
-        {filteredNews.length > 0 ? (
-          filteredNews.map((news) => (
-            <Grid item xs={12} key={news.id || news.guid}>
+        {filteredStacks.length > 0 ? (
+          filteredStacks.map((stack) => (
+            <Grid item xs={12} key={stack._id}>
               <Card
                 sx={{ 
                   display: 'flex',
@@ -171,9 +178,9 @@ const AllNewsPage = () => {
                     boxShadow: 3
                   }
                 }}
-                onClick={() => handleNewsClick(news.id || news.guid)}
+                onClick={() => handleStackClick(stack._id)}
               >
-                {/* News Image */}
+                {/* Stack Image */}
                 <CardMedia
                   component="img"
                   sx={{
@@ -181,19 +188,31 @@ const AllNewsPage = () => {
                     height: { xs: 200, sm: 150 },
                     objectFit: 'cover'
                   }}
-                  image={news.imageUrl || news.image || 'https://via.placeholder.com/250x150'}
-                  alt={news.title}
+                  image={getStackImage(stack)}
+                  alt={stack.title}
                 />
                 
-                {/* News Content */}
+                {/* Stack Content */}
                 <CardContent sx={{ flex: 1, p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap', gap: 1 }}>
                     <Chip
-                      label={news.category?.charAt(0).toUpperCase() + news.category?.slice(1) || 'Genel'}
+                      label={stack.mainCategory?.charAt(0).toUpperCase() + stack.mainCategory?.slice(1) || 'Genel'}
                       size="small"
                       color="primary"
-                      sx={{ mr: 1 }}
                     />
+                    <Chip
+                      label={`${stack.news?.length || 0} Haber`}
+                      size="small"
+                      variant="outlined"
+                    />
+                    {stack.xp && (
+                      <Chip
+                        label={`${stack.xp} XP`}
+                        size="small"
+                        color="success"
+                        variant="outlined"
+                      />
+                    )}
                   </Box>
                   
                   <Typography
@@ -209,7 +228,7 @@ const AllNewsPage = () => {
                       overflow: 'hidden'
                     }}
                   >
-                    {news.title}
+                    {stack.title}
                   </Typography>
                   
                   <Typography
@@ -223,14 +242,40 @@ const AllNewsPage = () => {
                       overflow: 'hidden'
                     }}
                   >
-                    {news.description || news.summary || 'Açıklama bulunmuyor'}
+                    {stack.description || 'Açıklama bulunmuyor'}
                   </Typography>
-                  
-                  <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                    <AccessTime sx={{ fontSize: 16, mr: 0.5 }} />
-                    <Typography variant="caption">
-                      {formatDate(news.pubDate || news.createdAt)}
-                    </Typography>
+
+                  {/* Tags */}
+                  {stack.tags && stack.tags.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      {stack.tags.slice(0, 3).map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                          sx={{ mr: 0.5, mb: 0.5, fontSize: '0.7rem' }}
+                        />
+                      ))}
+                    </Box>
+                  )}
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                      <AccessTime sx={{ fontSize: 16, mr: 0.5 }} />
+                      <Typography variant="caption">
+                        {formatDate(stack.createdAt)}
+                      </Typography>
+                    </Box>
+
+                    {stack.viewCount && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                        <Visibility sx={{ fontSize: 16, mr: 0.5 }} />
+                        <Typography variant="caption">
+                          {stack.viewCount} görüntülenme
+                        </Typography>
+                      </Box>
+                    )}
                   </Box>
                 </CardContent>
               </Card>
@@ -246,7 +291,7 @@ const AllNewsPage = () => {
               }}
             >
               <Typography variant="h6" gutterBottom>
-                Arama kriterlerinize uygun haber bulunamadı
+                Arama kriterlerinize uygun haber yığını bulunamadı
               </Typography>
               <Typography variant="body2">
                 Farklı anahtar kelimeler deneyin veya kategori filtresini değiştirin
