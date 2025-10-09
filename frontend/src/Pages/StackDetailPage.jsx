@@ -509,11 +509,7 @@ const StackDetailPage = () => {
                               sx={{
                                 mb: { xs: 1, md: 1 },
                                 fontSize: { xs: '0.875rem', md: '0.875rem' },
-                                lineHeight: 1.5,
-                                display: { xs: '-webkit-box', md: 'block' },
-                                WebkitLineClamp: { xs: 2, md: 'none' },
-                                WebkitBoxOrient: { xs: 'vertical', md: 'unset' },
-                                overflow: { xs: 'hidden', md: 'visible' }
+                                lineHeight: 1.5
                               }}
                             >
                               {news.description}
