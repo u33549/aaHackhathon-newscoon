@@ -80,6 +80,11 @@ const ReadingFlowPage = () => {
   const [steps, setSteps] = useState([]);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
+  // Touch/Scroll event handling için state'ler
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+
   // Stack verisini yükle
   useEffect(() => {
     if (id && (!selectedStack || selectedStack._id !== id)) {
@@ -103,12 +108,92 @@ const ReadingFlowPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Wheel event listener (Mouse scroll)
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (isTransitioning || isScrolling) return;
+
+      // Scroll direction check
+      if (e.deltaY > 0) {
+        // Scroll down - next step
+        handleNextStep();
+      } else if (e.deltaY < 0) {
+        // Scroll up - previous step (if needed)
+        handlePrevStep();
+      }
+    };
+
+    // Keyboard navigation
+    const handleKeyDown = (e) => {
+      if (isTransitioning) return;
+
+      if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        handleNextStep();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        handlePrevStep();
+      } else if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isTransitioning, isScrolling, currentStep, steps.length]);
+
+  // Touch handlers for mobile
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isDownSwipe = distance > 50; // Minimum 50px swipe
+    const isUpSwipe = distance < -50;
+
+    if (isDownSwipe) {
+      handleNextStep();
+    }
+    if (isUpSwipe) {
+      handlePrevStep();
+    }
+  };
+
   const handleNextStep = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < steps.length - 1 && !isTransitioning) {
       setIsTransitioning(true);
+      setIsScrolling(true);
+
       setTimeout(() => {
         setCurrentStep(prev => prev + 1);
         setIsTransitioning(false);
+        setTimeout(() => setIsScrolling(false), 500);
+      }, 300);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 0 && !isTransitioning) {
+      setIsTransitioning(true);
+      setIsScrolling(true);
+
+      setTimeout(() => {
+        setCurrentStep(prev => prev - 1);
+        setIsTransitioning(false);
+        setTimeout(() => setIsScrolling(false), 500);
       }, 300);
     }
   };
@@ -141,12 +226,18 @@ const ReadingFlowPage = () => {
   const currentStepData = steps[currentStep];
 
   return (
-    <Box sx={{
-      height: '100vh',
-      overflow: 'hidden',
-      position: 'relative',
-      backgroundColor: '#000'
-    }}>
+    <Box
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      sx={{
+        height: '100vh',
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: '#000',
+        touchAction: 'pan-y' // Vertical scrolling için
+      }}
+    >
       {/* Close Button */}
       <IconButton
         onClick={handleClose}
