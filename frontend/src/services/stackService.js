@@ -28,33 +28,39 @@ export const getStackById = async (stackId) => {
 
 /**
  * Yeni haber yığını oluştur
- * ÖNEMLI: En az 3 haber gereklidir
- * @param {Object} stackData - Haber yığını verisi
- * @param {string} stackData.title - Yığın başlığı (zorunlu)
- * @param {string} stackData.description - Açıklama (zorunlu)
- * @param {Array} stackData.news - Haber GUID'leri dizisi (en az 3 adet gerekli)
- * @param {string} stackData.status - Durum (varsayılan: "pending")
- * @param {Array} stackData.tags - Etiketler dizisi (opsiyonel)
- * @param {boolean} stackData.isFeatured - Öne çıkarılan mı? (varsayılan: false)
- * @returns {Promise} API yanıtı - oluşturulan stack XP ile birlikte döner
- * @note XP otomatik hesaplanır: Haber Sayısı × (45-52 arası rastgele sayı)
+ * @param {Object} stackData - Yığın verisi
+ * @returns {Promise} API yanıtı - oluşturulan stack CP ile birlikte döner
+ * @note CP otomatik hesaplanır: Haber Sayısı × (45-52 arası rastgele sayı)
  */
 export const createStack = async (stackData) => {
-  return await api.post('/api/stacks', stackData);
+  try {
+    const response = await api.post('/news-stacks', stackData);
+    return response;
+  } catch (error) {
+    console.error('Stack oluşturma hatası:', error);
+    throw error;
+  }
 };
 
 /**
  * Haber yığını güncelle
- * ÖNEMLI: news dizisi güncelleniyorsa en az 3 haber gereklidir
- * @param {string} stackId - Güncellenecek yığının ID'si
+ * @param {string} stackId - Yığın ID'si
  * @param {Object} updateData - Güncellenecek veriler
- * @param {Array} updateData.news - Haber GUID'leri (güncelleniyorsa en az 3 adet)
- * @note XP alanı otomatik hesaplanır, güncelleme verisine dahil edilmemelidir
+ * @note CP alanı otomatik hesaplanır, güncelleme verisine dahil edilmemelidir
  */
-export const updateStackById = async (stackId, updateData) => {
-  // XP alanını güncelleme verisinden kaldır - otomatik hesaplanır
+export const updateStack = async (stackId, updateData) => {
+  // CP alanını güncelleme verisinden kaldır - otomatik hesaplanır
   const { xp, ...cleanUpdateData } = updateData;
   return await api.put(`/api/stacks/${stackId}`, cleanUpdateData);
+};
+
+/**
+ * Haber yığını güncelle (alias for updateStack)
+ * @param {string} stackId - Yığın ID'si
+ * @param {Object} updateData - Güncellenecek veriler
+ */
+export const updateStackById = async (stackId, updateData) => {
+  return await updateStack(stackId, updateData);
 };
 
 /**
@@ -127,10 +133,10 @@ export const getStacksByTags = async (tags, limit = 10) => {
 };
 
 /**
- * XP'ye göre sıralı haber yığınlarını getir (en yüksekten en düşüğe)
+ * CP'ye göre sıralı haber yığınlarını getir (en yüksekten en düşüğe)
  * @param {number} limit - Maksimum sonuç sayısı
  */
-export const getStacksByXP = async (limit = 10) => {
+export const getStacksByCP = async (limit = 10) => {
   return await getAllStacks({
     sortBy: 'xp',
     sortOrder: 'desc',

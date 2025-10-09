@@ -45,7 +45,7 @@ const BadgeToast = ({ data }) => {
               Yeni Rozet Kazandın! 🎉
             </Typography>
             <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              {data.badge?.name} - +{data.xp} XP
+              {data.badge?.name} - +{data.cp} CP
             </Typography>
           </Box>
         </Box>

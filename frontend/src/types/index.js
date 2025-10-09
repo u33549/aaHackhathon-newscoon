@@ -9,14 +9,14 @@ export const BADGE_CATEGORIES = {
 };
 
 // Video/Article structure
-export const createVideo = (id, thumbnailUrl, duration, channelIconUrl, title, age, xp = null) => ({
+export const createVideo = (id, thumbnailUrl, duration, channelIconUrl, title, age, cp = null) => ({
   id,
   thumbnailUrl,
   duration,
   channelIconUrl,
   title,
   age,
-  xp
+  cp
 });
 
 // Hero slide structure
@@ -63,20 +63,20 @@ export const createFeaturedNews = (id, category, summary) => ({
 });
 
 // Leaderboard user structure
-export const createLeaderboardUser = (id, name, xp, level, isCurrentUser = false) => ({
+export const createLeaderboardUser = (id, name, cp, level, isCurrentUser = false) => ({
   id,
   name,
-  xp,
+  cp,
   level,
   isCurrentUser
 });
 
 // Quiz structure
-export const createQuiz = (question, options, correctAnswerIndex, bonusXp) => ({
+export const createQuiz = (question, options, correctAnswerIndex, bonusCp) => ({
   question,
   options,
   correctAnswerIndex,
-  bonusXp
+  bonusCp
 });
 
 // Content checkpoint structure

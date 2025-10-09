@@ -339,7 +339,7 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
 
                       {newsItem.xp && (
                         <Chip
-                          label={`${newsItem.xp} XP`}
+                          label={`${newsItem.xp} CP`}
                           size="small"
                           sx={{
                             backgroundColor: 'rgba(255,255,255,0.2)',

@@ -32,7 +32,7 @@ export {
   getFeaturedStacks,
   getPopularStacks,
   getStacksByTags,
-  getStacksByXP
+  getStacksByCP
 } from './stackService';
 
 // Haber Yığını Resimleri (Images) servisleri
@@ -79,7 +79,7 @@ export const stacksAPI = {
   getFeatured: stackServices.getFeaturedStacks,
   getPopular: stackServices.getPopularStacks,
   getByTags: stackServices.getStacksByTags,
-  getByXP: stackServices.getStacksByXP,
+  getByCP: stackServices.getStacksByCP,
   getLatest: stackServices.getLatestStacks
 };
 

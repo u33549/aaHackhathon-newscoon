@@ -74,15 +74,15 @@ export const exampleCreateNews = async () => {
 // ====================================
 
 /**
- * XP'ye göre sıralanmış yığınları getir - örnek kullanım
+ * CP'ye göre sıralanmış yığınları getir - örnek kullanım
  */
-export const exampleGetStacksByXP = async () => {
+export const exampleGetStacksByCP = async () => {
   try {
-    const response = await stacksAPI.getByXP(10);
-    console.log('En yüksek XP\'li yığınlar:', response.data);
-    return response;
+    const response = await stacksAPI.getByCP(10);
+    console.log('En yüksek CP\'li yığınlar:', response.data);
+    return response.data;
   } catch (error) {
-    console.error('XP sıralaması hatası:', error.message);
+    console.error('CP sıralaması hatası:', error.message);
     throw error;
   }
 };

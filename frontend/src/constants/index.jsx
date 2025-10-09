@@ -113,22 +113,22 @@ export const allAchievements = [
         isCompleted: ({ streak }) => streak >= 3
     },
     {
-        id: 'xp_hoarder',
+        id: 'cp_hoarder',
         name: 'Puan Avcısı',
-        description: 'Toplamda 1000 XP kazan.',
+        description: 'Toplamda 1000 CP kazan.',
         icon: React.createElement(EkonomiBadgeIcon),
-        isCompleted: ({ totalXp }) => totalXp >= 1000
+        isCompleted: ({ totalCp }) => totalCp >= 1000
     },
 ];
 
 export const leaderboardData = [
-    { id: 1, name: 'Kripto Kaşifi', xp: 7850, level: 12 },
-    { id: 2, name: 'Veri Vandalı', xp: 7600, level: 12 },
-    { id: 3, name: 'Siber Sultan', xp: 7120, level: 11 },
-    { id: 4, name: 'Sen', xp: 0, level: 1, isCurrentUser: true },
-    { id: 5, name: 'Algoritma Avcısı', xp: 6540, level: 10 },
-    { id: 6, name: 'Piksel Profesörü', xp: 6110, level: 10 },
-    { id: 7, name: 'Kod Kaptanı', xp: 5890, level: 9 },
+    { id: 1, name: 'Kripto Kaşifi', cp: 7850, level: 12 },
+    { id: 2, name: 'Veri Vandalı', cp: 7600, level: 12 },
+    { id: 3, name: 'Siber Sultan', cp: 7120, level: 11 },
+    { id: 4, name: 'Sen', cp: 0, level: 1, isCurrentUser: true },
+    { id: 5, name: 'Algoritma Avcısı', cp: 6540, level: 10 },
+    { id: 6, name: 'Piksel Profesörü', cp: 6110, level: 10 },
+    { id: 7, name: 'Kod Kaptanı', cp: 5890, level: 9 },
 ];
 
 export const categoryColors = {

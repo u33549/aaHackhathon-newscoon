@@ -58,7 +58,7 @@ const MainPage = () => {
   const selectedCategory = useActiveCategory();
 
   // Local state (will gradually move to Redux)
-  const [totalXp, setTotalXp] = useState(0);
+  const [totalCp, setTotalCp] = useState(0);
   const [readArticles, setReadArticles] = useState([]);
   const [earnedBadges, setEarnedBadges] = useState([]);
   const [notificationToast, setNotificationToast] = useState(null);
@@ -103,10 +103,10 @@ const MainPage = () => {
   }, [dispatch, news.length, popularStacks.length, latestStacks.length]);
 
   // Utility functions
-  const calculateLevel = (xp) => {
+  const calculateLevel = (cp) => {
     let level = 1;
     for (let i = 1; i < levelThresholds.length; i++) {
-      if (xp >= levelThresholds[i]) {
+      if (cp >= levelThresholds[i]) {
         level = i + 1;
       } else {
         break;
@@ -115,9 +115,9 @@ const MainPage = () => {
     return level;
   };
 
-  const currentLevel = calculateLevel(totalXp);
-  const currentLevelXp = levelThresholds[currentLevel - 1] ?? 0;
-  const nextLevelXp = levelThresholds[currentLevel] ?? Infinity;
+  const currentLevel = calculateLevel(totalCp);
+  const currentLevelCp = levelThresholds[currentLevel - 1] ?? 0;
+  const nextLevelCp = levelThresholds[currentLevel] ?? Infinity;
 
   // Event handlers
   const handleNewsCardClick = (articleId) => {
@@ -331,7 +331,7 @@ const MainPage = () => {
       {/* Badge Modal */}
       <BadgeModal
         badges={earnedBadges}
-        totalXp={totalXp}
+        totalCp={totalCp}
         earnedAchievements={earnedAchievements}
         level={currentLevel}
       />

@@ -22,15 +22,15 @@ import {
 import { Close, EmojiEvents, Star } from '@mui/icons-material';
 import { allAchievements, levelThresholds } from '../../constants/index.jsx';
 
-const BadgeModal = ({ isOpen, onClose, badges, totalXp, earnedAchievements, level }) => {
+const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, level }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const currentLevelXp = levelThresholds[level - 1] ?? 0;
-  const nextLevelXp = levelThresholds[level] ?? Infinity;
-  const progressPercentage = nextLevelXp > 0
-    ? ((totalXp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100
+  const currentLevelCp = levelThresholds[level - 1] ?? 0;
+  const nextLevelCp = levelThresholds[level] ?? Infinity;
+  const progressPercentage = nextLevelCp > 0
+    ? ((totalCp - currentLevelCp) / (nextLevelCp - currentLevelCp)) * 100
     : 0;
 
   return (
@@ -80,7 +80,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalXp, earnedAchievements, leve
         maxHeight: { xs: 'calc(100vh - 120px)', sm: 'none' },
         overflowY: 'auto'
       }}>
-        {/* Level and XP Section */}
+        {/* Level and CP Section */}
         <Card sx={{
           mb: { xs: 3, md: 4 },
           bgcolor: 'primary.main',
@@ -122,12 +122,12 @@ const BadgeModal = ({ isOpen, onClose, badges, totalXp, earnedAchievements, leve
                       fontSize: { xs: '0.8rem', md: '0.875rem' }
                     }}
                   >
-                    {totalXp} XP
+                    {totalCp} CP
                   </Typography>
                 </Box>
               </Box>
               <Chip
-                label={`${totalXp - currentLevelXp}/${nextLevelXp - currentLevelXp} XP`}
+                label={`${totalCp - currentLevelCp}/${nextLevelCp - currentLevelCp} CP`}
                 sx={{
                   bgcolor: 'white',
                   color: 'primary.main',

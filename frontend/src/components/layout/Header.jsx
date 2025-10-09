@@ -16,12 +16,12 @@ import {
 import { EmojiEvents, Star } from '@mui/icons-material';
 import LogoNewscoon from '../../assets/Logo_Newscoon.png';
 
-const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
+const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const progressPercentage = xpForNextLevel.max > 0
-    ? (xpForNextLevel.current / xpForNextLevel.max) * 100
+  const progressPercentage = cpForNextLevel.max > 0
+    ? (cpForNextLevel.current / cpForNextLevel.max) * 100
     : 0;
 
   return (
@@ -68,7 +68,7 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
             </Typography>
           </Box>
 
-          {/* XP and Level Display - Sadece Desktop */}
+          {/* CP and Level Display - Sadece Desktop */}
           {!isMobile && (
             <Box sx={{
               display: 'flex',
@@ -91,10 +91,10 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
                 />
               </Box>
 
-              {/* XP Progress */}
+              {/* CP Progress */}
               <Box sx={{ minWidth: 150 }}>
                 <Typography variant="caption" color="text.secondary">
-                  XP: {xpForNextLevel.current}/{xpForNextLevel.max}
+                  CP: {cpForNextLevel.current}/{cpForNextLevel.max}
                 </Typography>
                 <LinearProgress
                   variant="determinate"
@@ -127,7 +127,7 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
             </Box>
           )}
 
-          {/* Mobile Layout - Logo, Level, XP ve Rozetler */}
+          {/* Mobile Layout - Logo, Level, CP ve Rozetler */}
           {isMobile && (
             <Stack direction="row" alignItems="center" spacing={1.5}>
               {/* Level Display */}
@@ -142,7 +142,7 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
                 }}
               />
 
-              {/* XP Display */}
+              {/* CP Display */}
               <Typography
                 variant="body2"
                 color="primary.main"
@@ -151,7 +151,7 @@ const Header = ({ totalXp = 0, level = 1, xpForNextLevel = { current: 0, max: 10
                   fontSize: '0.8rem'
                 }}
               >
-                {totalXp} XP
+                {totalCp} CP
               </Typography>
 
               {/* Badges Icon Button - Kupa ikonu sarı */}

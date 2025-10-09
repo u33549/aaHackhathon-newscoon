@@ -207,7 +207,7 @@ const AllNewsPage = () => {
                     />
                     {stack.xp && (
                       <Chip
-                        label={`${stack.xp} XP`}
+                        label={`${stack.xp} CP`}
                         size="small"
                         color="success"
                         variant="outlined"
