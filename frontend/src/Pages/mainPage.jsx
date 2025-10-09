@@ -150,7 +150,7 @@ const MainPage = () => {
   };
 
   const handleStackClick = (stackId) => {
-    // Stack'e tıklandığında stack detay sayfasına yönlendir
+    // Stack'e tıklandığında Netflix benzeri tanıtım sayfasına yönlendir
     const allStacks = [...popularStacks, ...latestStacks];
     const stackToOpen = allStacks.find(stack => stack._id === stackId);
     if (stackToOpen) {
