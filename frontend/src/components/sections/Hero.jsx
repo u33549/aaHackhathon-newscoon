@@ -220,10 +220,10 @@ const Hero = ({ onStackClick }) => {
           bottom: 0,
           left: 0,
           padding: isMobile ? 2 : 3,
-          paddingBottom: isMobile ? 2 : 3,
-          paddingRight: isMobile ? 5 : 12, // Sağ tarafta dot'lar için yer açıyoruz
+          paddingBottom: isMobile ? 6 : 8, // Noktalı bar için daha fazla alt boşluk
+          paddingRight: isMobile ? 5 : 12,
           zIndex: 3,
-          maxWidth: isMobile ? '100%' : '60%' // Genişliği biraz azaltıyoruz
+          maxWidth: isMobile ? '100%' : '60%'
         }}
       >
 
@@ -319,9 +319,10 @@ const Hero = ({ onStackClick }) => {
           sx={{
             position: 'absolute',
             bottom: isMobile ? 20 : 30,
-            right: isMobile ? 20 : 30,
+            left: '50%',
+            transform: 'translateX(-50%)',
             display: 'flex',
-            flexDirection: 'column', // Dikey sıralama
+            flexDirection: 'row', // Yatay sıralama
             gap: 1,
             zIndex: 4 // Content'ten daha üstte
           }}
