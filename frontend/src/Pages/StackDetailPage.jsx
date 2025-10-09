@@ -327,14 +327,13 @@ const StackDetailPage = () => {
                 gap: { xs: 1.5, md: 2 },
                 flexWrap: 'wrap',
                 alignItems: 'center',
-                flexDirection: { xs: 'column', sm: 'row' }
+                flexDirection: 'row' // Her zaman yatay
               }}>
                 <Button
                   variant="contained"
                   size={isMobile ? 'medium' : 'large'}
                   startIcon={<PlayArrow />}
                   onClick={() => setPlayTrailer(true)}
-                  fullWidth={isMobile}
                   sx={{
                     backgroundColor: 'white',
                     color: 'black',
@@ -342,6 +341,8 @@ const StackDetailPage = () => {
                     px: { xs: 3, md: 4 },
                     py: { xs: 1.2, md: 1.5 },
                     fontSize: { xs: '0.875rem', md: '1rem' },
+                    flex: { xs: '1 1 auto', sm: '0 0 auto' }, // Mobilde esnek genişlik
+                    minWidth: { xs: 'auto', sm: 'auto' },
                     '&:hover': {
                       backgroundColor: 'rgba(255,255,255,0.8)'
                     }
@@ -354,7 +355,6 @@ const StackDetailPage = () => {
                   variant="outlined"
                   size={isMobile ? 'medium' : 'large'}
                   startIcon={<Add />}
-                  fullWidth={isMobile}
                   sx={{
                     borderColor: 'rgba(255,255,255,0.5)',
                     color: 'white',
@@ -362,6 +362,8 @@ const StackDetailPage = () => {
                     px: { xs: 3, md: 3 },
                     py: { xs: 1.2, md: 1.5 },
                     fontSize: { xs: '0.875rem', md: '1rem' },
+                    flex: { xs: '1 1 auto', sm: '0 0 auto' }, // Mobilde esnek genişlik
+                    minWidth: { xs: 'auto', sm: 'auto' },
                     '&:hover': {
                       borderColor: 'white',
                       backgroundColor: 'rgba(255,255,255,0.1)'
@@ -377,7 +379,7 @@ const StackDetailPage = () => {
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: { xs: 0.75, md: 1 },
-                    mt: { xs: 1, md: 2 },
+                    mt: { xs: 1, md: 0 }, // Mobilde üstten margin
                     alignItems: 'center',
                     width: { xs: '100%', sm: 'auto' },
                     justifyContent: { xs: 'center', sm: 'flex-start' }
