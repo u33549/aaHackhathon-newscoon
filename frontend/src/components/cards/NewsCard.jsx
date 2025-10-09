@@ -7,54 +7,57 @@ import {
   useMediaQuery,
   Chip
 } from '@mui/material';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { ChevronLeft, ChevronRight, AccessTime, Visibility } from '@mui/icons-material';
 import { categoryColors } from '../../constants/index.jsx';
 
 const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const scrollContainerRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   // Backward compatibility için article prop'u varsa articles array'ine çevir
   const articleList = articles.length > 0 ? articles : (article ? [article] : []);
 
-  // Touch/Swipe için state'ler
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
-
-  // Swipe için minimum mesafe
-  const minSwipeDistance = 50;
-
-  const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe) {
-      scrollNext();
-    }
-    if (isRightSwipe) {
-      scrollPrev();
+  // Scroll durumunu kontrol et
+  const checkScrollButtons = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+      );
     }
   };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      checkScrollButtons();
+      container.addEventListener('scroll', checkScrollButtons);
+
+      // Resize event listener ekle
+      const handleResize = () => {
+        setTimeout(checkScrollButtons, 100);
+      };
+      window.addEventListener('resize', handleResize);
+
+      return () => {
+        container.removeEventListener('scroll', checkScrollButtons);
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [articleList.length]);
 
   const scrollNext = () => {
     const container = scrollContainerRef.current;
-    if (container) {
-      const cardWidth = container.children[0]?.offsetWidth || 300;
+    if (container && canScrollRight) {
+      const containerWidth = container.clientWidth;
+      const scrollAmount = containerWidth * 0.8;
+
       container.scrollBy({
-        left: cardWidth + 16, // 16px gap
+        left: scrollAmount,
         behavior: 'smooth'
       });
     }
@@ -62,10 +65,12 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
 
   const scrollPrev = () => {
     const container = scrollContainerRef.current;
-    if (container) {
-      const cardWidth = container.children[0]?.offsetWidth || 300;
+    if (container && canScrollLeft) {
+      const containerWidth = container.clientWidth;
+      const scrollAmount = containerWidth * 0.8;
+
       container.scrollBy({
-        left: -(cardWidth + 16), // 16px gap
+        left: -scrollAmount,
         behavior: 'smooth'
       });
     }
@@ -111,11 +116,12 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
         }}
       >
         {/* Navigation Arrows - Desktop */}
-        {!isMobile && articleList.length > 3 && (
+        {!isMobile && articleList.length > 1 && (
           <>
             <IconButton
               className="nav-buttons"
               onClick={scrollPrev}
+              disabled={!canScrollLeft}
               sx={{
                 position: 'absolute',
                 left: -20,
@@ -130,6 +136,11 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
                 '&:hover': {
                   backgroundColor: 'primary.main',
                   color: 'primary.contrastText'
+                },
+                '&:disabled': {
+                  backgroundColor: 'action.disabledBackground',
+                  color: 'action.disabled',
+                  opacity: 0.3
                 }
               }}
             >
@@ -139,6 +150,7 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
             <IconButton
               className="nav-buttons"
               onClick={scrollNext}
+              disabled={!canScrollRight}
               sx={{
                 position: 'absolute',
                 right: -20,
@@ -153,6 +165,11 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
                 '&:hover': {
                   backgroundColor: 'primary.main',
                   color: 'primary.contrastText'
+                },
+                '&:disabled': {
+                  backgroundColor: 'action.disabledBackground',
+                  color: 'action.disabled',
+                  opacity: 0.3
                 }
               }}
             >
@@ -164,9 +181,6 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
         {/* Horizontal Scrollable Container */}
         <Box
           ref={scrollContainerRef}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
           sx={{
             display: 'flex',
             overflowX: 'auto',
@@ -178,7 +192,7 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
             '&::-webkit-scrollbar': {
               display: 'none'
             },
-            touchAction: 'pan-x'
+            scrollBehavior: 'smooth'
           }}
         >
           {articleList.map((newsItem, index) => {
@@ -200,39 +214,54 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
                   flexShrink: 0,
                   '&:hover': {
                     transform: 'translateY(-4px)',
-                    boxShadow: 4,
-                    '& .news-image': {
-                      transform: 'scale(1.05)'
+                    boxShadow: 6,
+                    '& .news-overlay': {
+                      background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0.9) 100%)'
                     }
                   }
                 }}
               >
                 {/* Background Image */}
                 <Box
-                  className="news-image"
                   sx={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    width: '100%',
-                    height: '100%',
+                    right: 0,
+                    bottom: 0,
                     backgroundImage: `url(${newsItem.thumbnailUrl || newsItem.imageUrl || 'https://via.placeholder.com/350x240'})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    transition: 'transform 0.3s ease',
-                    zIndex: 1
+                    backgroundRepeat: 'no-repeat'
                   }}
                 />
 
-                {/* Gradient Overlay */}
+                {/* Overlay */}
                 <Box
+                  className="news-overlay"
                   sx={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.0) 60%)',
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.8) 100%)',
+                    transition: 'all 0.3s ease'
+                  }}
+                />
+
+                {/* Category Chip */}
+                <Chip
+                  label={newsItem.category?.charAt(0).toUpperCase() + newsItem.category?.slice(1) || 'Genel'}
+                  size="small"
+                  sx={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 12,
+                    backgroundColor: categoryColor,
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
                     zIndex: 2
                   }}
                 />
@@ -245,57 +274,64 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
                     left: 0,
                     right: 0,
                     p: 2,
-                    zIndex: 3
+                    zIndex: 2
                   }}
                 >
-                  {/* Category Chip */}
-                  {newsItem.category && (
-                    <Chip
-                      label={newsItem.category.charAt(0).toUpperCase() + newsItem.category.slice(1)}
-                      size="small"
-                      sx={{
-                        backgroundColor: categoryColor,
-                        color: 'white',
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        mb: 1,
-                        height: 20
-                      }}
-                    />
-                  )}
-
-                  {/* Title */}
                   <Typography
-                    variant="subtitle1"
+                    variant="h6"
                     sx={{
                       color: 'white',
                       fontWeight: 'bold',
+                      mb: 1,
                       lineHeight: 1.3,
-                      textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      fontSize: { xs: '0.9rem', sm: '1rem' }
+                      fontSize: { xs: '1rem', sm: '1.1rem' }
                     }}
                   >
                     {newsItem.title}
                   </Typography>
 
-                  {/* Age/Type */}
-                  {newsItem.age && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)',
-                        display: 'block',
-                        mt: 0.5
-                      }}
-                    >
-                      {newsItem.age}
-                    </Typography>
-                  )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    {newsItem.age && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <AccessTime sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }} />
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}
+                        >
+                          {newsItem.age}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {newsItem.viewCount && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Visibility sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }} />
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}
+                        >
+                          {newsItem.viewCount}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {newsItem.xp && (
+                      <Chip
+                        label={`${newsItem.xp} XP`}
+                        size="small"
+                        sx={{
+                          backgroundColor: 'rgba(255,255,255,0.2)',
+                          color: 'white',
+                          fontSize: '0.7rem',
+                          height: 20
+                        }}
+                      />
+                    )}
+                  </Box>
                 </Box>
               </Box>
             );
