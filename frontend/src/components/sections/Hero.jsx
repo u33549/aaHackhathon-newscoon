@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { usePopularStacks, useLatestStacks, useStacksLoading } from '../../hooks/redux';
 import { fetchPopularStacks, fetchLatestStacks } from '../../store/slices/stackSlice';
 import { categoryColors } from '../../constants';
+import LogoNewscoon from '../../assets/Logo_Newscoon.png';
 
 const Hero = ({ onStackClick }) => {
   const theme = useTheme();
@@ -142,8 +143,8 @@ const Hero = ({ onStackClick }) => {
         return lastNews.image;
       }
     }
-    // Fallback olarak placeholder kullan
-    return "https://cdnassets.aa.com.tr/assets/newVersion/images/logo.png";
+    // Fallback olarak Newscoon logosu kullan
+    return LogoNewscoon;
   };
 
   if (loading && heroStacks.length === 0) {
