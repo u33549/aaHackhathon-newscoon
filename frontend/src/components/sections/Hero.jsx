@@ -126,6 +126,26 @@ const Hero = ({ onStackClick }) => {
     }
   };
 
+  // Get stack image helper function
+  const getStackImage = (stack) => {
+    // Önce stack'in kendi resim verilerini kontrol et
+    if (stack?.imageUrl) {
+      return stack.imageUrl;
+    }
+    if (stack?.photoUrl) {
+      return stack.photoUrl;
+    }
+    // Stack'teki son haberin resmini kullan
+    if (stack?.news && stack.news.length > 0) {
+      const lastNews = stack.news[stack.news.length - 1];
+      if (typeof lastNews === 'object' && lastNews.image) {
+        return lastNews.image;
+      }
+    }
+    // Fallback olarak placeholder kullan
+    return "https://cdnassets.aa.com.tr/assets/newVersion/images/logo.png";
+  };
+
   if (loading && heroStacks.length === 0) {
     return (
       <Box sx={{
@@ -193,7 +213,7 @@ const Hero = ({ onStackClick }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: `url(${currentStack?.imageUrl || currentStack?.photoUrl || `https://picsum.photos/1920/1080?random=${currentSlide}`})`,
+          backgroundImage: `url(${getStackImage(currentStack)})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

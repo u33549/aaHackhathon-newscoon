@@ -21,7 +21,6 @@ function App() {
   return (
     <ThemeProvider theme={newscoonTheme}>
       <CssBaseline />
-      <ScrollToTop />
       <div className="App">
         <Header />
         <Routes>
