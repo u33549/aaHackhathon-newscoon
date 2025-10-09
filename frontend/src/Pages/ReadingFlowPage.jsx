@@ -4,17 +4,18 @@ import {
   Box,
   Typography,
   IconButton,
-  Button,
   Fade,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Chip
 } from '@mui/material';
 import { 
-  ArrowDownward, 
-  ArrowForward, 
   Close,
   KeyboardArrowDown,
-  EmojiEvents
+  EmojiEvents,
+  Visibility,
+  Star,
+  Category
 } from '@mui/icons-material';
 import { useAppDispatch, useSelectedStack } from '../hooks/redux';
 import { fetchStackById } from '../store/slices/stackSlice';
@@ -25,14 +26,38 @@ const generateChronologicalSteps = (stack) => {
 
   const steps = [];
   
-  // İlk step - Giriş
+  // Stack'in resim verilerini al - önce stack'in kendi resmi, sonra ilk haberin resmi
+  const getStackImage = (stack) => {
+    // Önce stack'in kendi resim verilerini kontrol et
+    if (stack?.imageUrl) return stack.imageUrl;
+    if (stack?.photoUrl) return stack.photoUrl;
+    // Stack'teki son haberin resmini kullan
+    if (stack?.news && stack.news.length > 0) {
+      const lastNews = stack.news[stack.news.length - 1];
+      if (typeof lastNews === 'object' && lastNews.image) {
+        return lastNews.image;
+      }
+    }
+    return 'https://via.placeholder.com/1920x1080';
+  };
+
+  // İlk step - Giriş (Stack'in kendi bilgileriyle)
   steps.push({
     id: 'intro',
     type: 'intro',
     title: stack.title,
-    content: stack.description || 'Bu haber yığınında kronolojik olarak gelişen olayları inceleyeceğiz.',
-    image: stack.imageUrl || (stack.news[0]?.image),
-    timestamp: null
+    content: stack.description || 'Bu haber yığınında kronolojik olarak gelişen olayları inceleceğiz.',
+    image: getStackImage(stack), // Stack'in kendi resmi
+    timestamp: null,
+    // Stack verileri
+    stackData: {
+      newsCount: stack.news?.length || 0,
+      viewCount: stack.viewCount || 0,
+      cp: stack.xp || 0,
+      category: stack.mainCategory || 'genel',
+      createdAt: stack.createdAt,
+      tags: stack.tags || []
+    }
   });
 
   // Her haber için kronolojik step oluştur
@@ -44,7 +69,7 @@ const generateChronologicalSteps = (stack) => {
       type: 'news',
       title: newsItem.title || `Gelişme ${index + 1}`,
       content: newsItem.description || newsItem.newstext || 'Bu gelişmede önemli detaylar ortaya çıktı.',
-      image: newsItem.image || stack.imageUrl,
+      image: newsItem.image || getStackImage(stack),
       timestamp: newsItem.pubDate || new Date().toISOString(),
       stepNumber: index + 1,
       totalSteps: stack.news.length
@@ -78,7 +103,6 @@ const ReadingFlowPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [steps, setSteps] = useState([]);
-  const [showScrollHint, setShowScrollHint] = useState(true);
 
   // Touch/Scroll event handling için state'ler
   const [touchStart, setTouchStart] = useState(null);
@@ -100,13 +124,35 @@ const ReadingFlowPage = () => {
     }
   }, [selectedStack]);
 
-  // Scroll hint'i otomatik gizle
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowScrollHint(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1 && !isTransitioning) {
+      setIsTransitioning(true);
+      setIsScrolling(true);
+
+      setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+        setIsTransitioning(false);
+        setTimeout(() => setIsScrolling(false), 500);
+      }, 300);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 0 && !isTransitioning) {
+      setIsTransitioning(true);
+      setIsScrolling(true);
+
+      setTimeout(() => {
+        setCurrentStep(prev => prev - 1);
+        setIsTransitioning(false);
+        setTimeout(() => setIsScrolling(false), 500);
+      }, 300);
+    }
+  };
+
+  const handleClose = () => {
+    navigate(-1);
+  };
 
   // Wheel event listener (Mouse scroll)
   useEffect(() => {
@@ -145,7 +191,7 @@ const ReadingFlowPage = () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isTransitioning, isScrolling, currentStep, steps.length]);
+  }, [isTransitioning, isScrolling, currentStep, steps.length, handleNextStep, handlePrevStep, handleClose]);
 
   // Touch handlers for mobile
   const handleTouchStart = (e) => {
@@ -170,43 +216,6 @@ const ReadingFlowPage = () => {
     if (isUpSwipe) {
       handlePrevStep();
     }
-  };
-
-  const handleNextStep = () => {
-    if (currentStep < steps.length - 1 && !isTransitioning) {
-      setIsTransitioning(true);
-      setIsScrolling(true);
-
-      setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
-        setIsTransitioning(false);
-        setTimeout(() => setIsScrolling(false), 500);
-      }, 300);
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (currentStep > 0 && !isTransitioning) {
-      setIsTransitioning(true);
-      setIsScrolling(true);
-
-      setTimeout(() => {
-        setCurrentStep(prev => prev - 1);
-        setIsTransitioning(false);
-        setTimeout(() => setIsScrolling(false), 500);
-      }, 300);
-    }
-  };
-
-  const handleComplete = () => {
-    // Tebrik modalı göster ve ana sayfaya dön
-    setTimeout(() => {
-      navigate('/', { state: { showCompletionToast: true, earnedCP: steps[steps.length - 1]?.reward?.cp } });
-    }, 2000);
-  };
-
-  const handleClose = () => {
-    navigate(-1);
   };
 
   if (!selectedStack || steps.length === 0) {
@@ -324,35 +333,119 @@ const ReadingFlowPage = () => {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: currentStepData.type === 'intro' ? 'center' : 'flex-end',
-            alignItems: 'center',
+            justifyContent: 'flex-end',
+            alignItems: 'flex-start',
             padding: { xs: 3, md: 6 },
-            textAlign: 'center'
+            paddingBottom: { xs: 12, md: 15 }, // Scroll butonu için alt boşluk
+            textAlign: 'left'
           }}>
             {/* Intro Page */}
             {currentStepData.type === 'intro' && (
               <>
+                {/* Kategori Chip - Sol üstte */}
+                {currentStepData.stackData && (
+                  <Chip
+                    label={currentStepData.stackData.category?.charAt(0).toUpperCase() + currentStepData.stackData.category?.slice(1) || 'Genel'}
+                    sx={{
+                      backgroundColor: '#FFD700',
+                      color: '#000',
+                      fontWeight: 'bold',
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      height: { xs: 32, md: 36 },
+                      borderRadius: 2,
+                      mb: { xs: 2, md: 3 },
+                      px: { xs: 2, md: 3 }
+                    }}
+                  />
+                )}
+
+                {/* Ana Başlık - Daha geniş alan */}
                 <Typography
                   variant={isMobile ? 'h3' : 'h1'}
                   sx={{
                     color: 'white',
                     fontWeight: 'bold',
-                    mb: 3,
+                    mb: { xs: 2, md: 3 },
                     textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
-                    maxWidth: '80%'
+                    maxWidth: { xs: '100%', md: '95%' }, // Mobilde %100, desktop'ta %95
+                    lineHeight: 1.2,
+                    fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' },
+                    textAlign: 'left'
                   }}
                 >
                   {currentStepData.title}
                 </Typography>
-                
+
+                {/* Metrikler - Tam genişlik kullanım */}
+                {currentStepData.stackData && (
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: { xs: 2, md: 3 },
+                    mb: { xs: 2, md: 3 },
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-start',
+                    width: '100%' // Tam genişlik
+                  }}>
+                    {/* CP */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Star sx={{ color: '#FFD700', fontSize: { xs: 20, md: 24 } }} />
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: { xs: '0.9rem', md: '1.1rem' }
+                        }}
+                      >
+                        {currentStepData.stackData.cp} CP
+                      </Typography>
+                    </Box>
+
+                    {/* Görüntülenme */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Visibility sx={{ color: 'white', fontSize: { xs: 20, md: 24 } }} />
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: { xs: '0.9rem', md: '1.1rem' }
+                        }}
+                      >
+                        {currentStepData.stackData.viewCount} görüntülenme
+                      </Typography>
+                    </Box>
+
+                    {/* Haber Sayısı */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Category sx={{ color: 'white', fontSize: { xs: 20, md: 24 } }} />
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: { xs: '0.9rem', md: '1.1rem' }
+                        }}
+                      >
+                        {currentStepData.stackData.newsCount} haber
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Açıklama Metni - Çok daha geniş alan */}
                 <Typography
-                  variant={isMobile ? 'h6' : 'h5'}
+                  variant={isMobile ? 'body1' : 'h6'}
                   sx={{
                     color: 'rgba(255,255,255,0.9)',
-                    mb: 6,
+                    mb: { xs: 3, md: 4 },
                     textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
-                    maxWidth: '60%',
-                    lineHeight: 1.5
+                    maxWidth: { xs: '100%', sm: '95%', md: '90%' }, // Responsive genişlik
+                    lineHeight: 1.6,
+                    fontSize: { xs: '1rem', md: '1.2rem' },
+                    textAlign: 'left',
+                    width: '100%' // Container'ın tam genişliğini kullan
                   }}
                 >
                   {currentStepData.content}
@@ -362,7 +455,10 @@ const ReadingFlowPage = () => {
 
             {/* News Step */}
             {currentStepData.type === 'news' && (
-              <Box sx={{ maxWidth: '800px', width: '100%' }}>
+              <Box sx={{
+                maxWidth: { xs: '100%', md: '900px' }, // News step için de daha geniş
+                width: '100%'
+              }}>
                 <Typography
                   variant={isMobile ? 'h4' : 'h2'}
                   sx={{
@@ -431,7 +527,7 @@ const ReadingFlowPage = () => {
                     color: 'rgba(255,255,255,0.95)',
                     mb: 4,
                     textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
-                    maxWidth: '80%'
+                    maxWidth: { xs: '100%', md: '90%' } // Completion için de daha geniş
                   }}
                 >
                   {currentStepData.content}
