@@ -181,23 +181,40 @@ const StackDetailPage = () => {
           }}
         />
 
-        {/* Close button */}
-        <IconButton
-          onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            top: 20,
-            right: 20,
-            zIndex: 3,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'rgba(0,0,0,0.8)'
-            }
-          }}
-        >
-          <Close />
-        </IconButton>
+        {/* Close and Share buttons */}
+        <Box sx={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          zIndex: 3,
+          display: 'flex',
+          gap: 1
+        }}>
+          <IconButton
+            sx={{
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.8)'
+              }
+            }}
+          >
+            <Share />
+          </IconButton>
+
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.8)'
+              }
+            }}
+          >
+            <Close />
+          </IconButton>
+        </Box>
 
         {/* Hero Content */}
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, pb: 8 }}>
@@ -269,7 +286,7 @@ const StackDetailPage = () => {
               </Typography>
 
               {/* Action Buttons */}
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
                 <Button
                   variant="contained"
                   size="large"
@@ -305,34 +322,42 @@ const StackDetailPage = () => {
                     }
                   }}
                 >
-                  Listeme Ekle
+                  Takip Et
                 </Button>
 
-                <IconButton
-                  sx={{
-                    border: '2px solid rgba(255,255,255,0.5)',
-                    color: 'white',
-                    '&:hover': {
-                      borderColor: 'white',
-                      backgroundColor: 'rgba(255,255,255,0.1)'
-                    }
-                  }}
-                >
-                  <ThumbUp />
-                </IconButton>
-
-                <IconButton
-                  sx={{
-                    border: '2px solid rgba(255,255,255,0.5)',
-                    color: 'white',
-                    '&:hover': {
-                      borderColor: 'white',
-                      backgroundColor: 'rgba(255,255,255,0.1)'
-                    }
-                  }}
-                >
-                  <Share />
-                </IconButton>
+                {/* Tags - Like butonunun yerine */}
+                {stack.tags && stack.tags.length > 0 && (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, ml: 2 }}>
+                    {stack.tags.slice(0, 3).map((tag, index) => (
+                      <Chip
+                        key={index}
+                        label={tag}
+                        size="small"
+                        sx={{
+                          backgroundColor: 'rgba(255,255,255,0.2)',
+                          color: 'white',
+                          border: '1px solid rgba(255,255,255,0.3)',
+                          fontSize: '0.75rem',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.3)'
+                          }
+                        }}
+                      />
+                    ))}
+                    {stack.tags.length > 3 && (
+                      <Chip
+                        label={`+${stack.tags.length - 3}`}
+                        size="small"
+                        sx={{
+                          backgroundColor: 'rgba(255,255,255,0.2)',
+                          color: 'white',
+                          border: '1px solid rgba(255,255,255,0.3)',
+                          fontSize: '0.75rem'
+                        }}
+                      />
+                    )}
+                  </Box>
+                )}
               </Box>
             </Grid>
           </Grid>
