@@ -23,17 +23,54 @@ function App() {
     <ThemeProvider theme={newscoonTheme}>
       <CssBaseline />
       <div className="App">
-        <Header />
         <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/article/:id" element={<ArticlePage />} />
-          <Route path="/stack/:id" element={<StackDetailPage />} />
+          {/* Ana sayfa ve diğer sayfalar - Header ve Footer ile */}
+          <Route path="/" element={
+            <>
+              <Header />
+              <MainPage />
+              <Footer />
+            </>
+          } />
+          <Route path="/article/:id" element={
+            <>
+              <Header />
+              <ArticlePage />
+              <Footer />
+            </>
+          } />
+          <Route path="/stack/:id" element={
+            <>
+              <Header />
+              <StackDetailPage />
+              <Footer />
+            </>
+          } />
+          <Route path="/all-news" element={
+            <>
+              <Header />
+              <AllNewsPage />
+              <Footer />
+            </>
+          } />
+          <Route path="/admin" element={
+            <>
+              <Header />
+              <AdminDashboard />
+              <Footer />
+            </>
+          } />
+          <Route path="/test" element={
+            <>
+              <Header />
+              <TestPage />
+              <Footer />
+            </>
+          } />
+
+          {/* ReadingFlowPage - Header ve Footer olmadan */}
           <Route path="/stack/:id/read" element={<ReadingFlowPage />} />
-          <Route path="/all-news" element={<AllNewsPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/test" element={<TestPage />} />
         </Routes>
-        <Footer />
 
         {/* Global Toast Notifications */}
         <ToastNotification />
