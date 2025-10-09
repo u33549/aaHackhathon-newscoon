@@ -29,7 +29,7 @@ Bu doküman Haber Yığınları (NewsStacks) API'sinin tüm fonksiyonlarını a�
 GET /api/stacks
 ```
 
-Açıklama: Haber yığınlarını filtreli şekilde getirir; her yığın için kapak görseli varsa `photoUrl` alanı eklenir. `news` alanı minimal haber bilgileriyle doldurulur (populate).
+Açıklama: Haber yığınlarını filtreli şekilde getirir; her yığın için kapak görseli varsa `photoUrl` alanı eklenir. `news` alanı tüm haber bilgileriyle doldurulur (guid, title, description, newstext, link, pubDate, image, category, isInAnyStack, isUsable).
 
 İstek Şablonu:
 - Yöntem: GET
@@ -70,10 +70,14 @@ GET /api/stacks?limit=2&sortBy=viewCount&sortOrder=desc
           "_id": "aa-news-20231002-001",
           "guid": "aa-news-20231002-001",
           "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
+          "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi kapsamında...",
+          "newstext": "Bu haberin detaylı içeriği burada yer alır. Ekonomik teşvik paketi kapsamında yer alan tüm maddelerin açıklamaları...",
           "link": "https://example.com/news/ekonomi-paketi",
           "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
           "image": "https://example.com/images/ekonomi-paketi.jpg",
-          "category": "ekonomi"
+          "category": "ekonomi",
+          "isInAnyStack": true,
+          "isUsable": true
         }
       ],
       "status": "approved",
@@ -139,10 +143,14 @@ GET /api/stacks/609e1e24a12a452a3c4c5e25
         "_id": "aa-news-20231002-001",
         "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
+        "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi kapsamında...",
+        "newstext": "Bu haberin detaylı içeriği burada yer alır. Ekonomik teşvik paketi kapsamında yer alan tüm maddelerin açıklamaları...",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
         "image": "https://example.com/images/ekonomi-paketi.jpg",
         "category": "ekonomi",
+        "isInAnyStack": true,
+        "isUsable": true,
         "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi..."
       }
     ],
@@ -226,6 +234,8 @@ Olası Hatalar:
         "_id": "aa-news-20231002-001",
         "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
+        "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi kapsamında...",
+        "newstext": "Bu haberin detaylı içeriği burada yer alır. Ekonomik teşvik paketi kapsamında yer alan tüm maddelerin açıklamaları...",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
         "image": "https://example.com/images/ekonomi-paketi.jpg",
@@ -365,6 +375,8 @@ curl -X POST "http://localhost:3000/api/stacks/609e1e24a12a452a3c4c5e25/addNews"
         "_id": "aa-news-20231002-001",
         "guid": "aa-news-20231002-001",
         "title": "Yeni Ekonomik Teşvik Paketi Açıklandı",
+        "description": "Hükümet tarafından açıklanan yeni ekonomik teşvik paketi kapsamında...",
+        "newstext": "Bu haberin detaylı içeriği burada yer alır. Ekonomik teşvik paketi kapsamında yer alan tüm maddelerin açıklamaları...",
         "link": "https://example.com/news/ekonomi-paketi",
         "pubDate": "Mon, 02 Oct 2023 15:30:00 GMT",
         "image": "https://example.com/images/ekonomi-paketi.jpg",

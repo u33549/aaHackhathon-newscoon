@@ -51,9 +51,7 @@ exports.getAllNewsStacks = async (req, res) => {
     const sort = {};
     sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    let query = NewsStacks.find(filter)
-      .populate('news', 'title link pubDate image category')
-      .sort(sort);
+    let query = NewsStacks.find(filter).sort(sort);
 
     if (limit > 0) {
       query = query.limit(parseInt(limit));
@@ -61,20 +59,33 @@ exports.getAllNewsStacks = async (req, res) => {
 
     const newsStacks = await query;
 
-    // Her stack için resim bilgisini ekle
-    const newsStacksWithImages = await Promise.all(
+    // Her stack için haberleri manuel olarak populate et ve resim bilgisini ekle
+    const newsStacksWithFullData = await Promise.all(
       newsStacks.map(async (stack) => {
         const stackObj = stack.toObject();
+
+        // Haberleri manuel populate et
+        if (stackObj.news && stackObj.news.length > 0) {
+          const newsItems = await RssNews.find({
+            guid: { $in: stackObj.news }
+          }).select('guid title description newstext link pubDate image category isInAnyStack isUsable');
+          stackObj.news = newsItems;
+        } else {
+          stackObj.news = [];
+        }
+
+        // Resim bilgisini ekle
         const image = await NewsStackImages.findOne({ newsStackId: stack._id });
         stackObj.photoUrl = image ? image.photoUrl : null;
+
         return stackObj;
       })
     );
 
     res.status(200).json({
       success: true,
-      count: newsStacksWithImages.length,
-      data: newsStacksWithImages
+      count: newsStacksWithFullData.length,
+      data: newsStacksWithFullData
     });
   } catch (error) {
     res.status(500).json({
@@ -87,8 +98,7 @@ exports.getAllNewsStacks = async (req, res) => {
 // ID'ye göre haber yığını getir
 exports.getNewsStackById = async (req, res) => {
   try {
-    const newsStack = await NewsStacks.findById(req.params.id)
-      .populate('news', 'title link pubDate image category description guid');
+    const newsStack = await NewsStacks.findById(req.params.id);
 
     if (!newsStack) {
       return res.status(404).json({
@@ -101,8 +111,20 @@ exports.getNewsStackById = async (req, res) => {
     newsStack.viewCount += 1;
     await newsStack.save();
 
-    // Resim bilgisini ekle
+    // Stack objesine dönüştür
     const stackObj = newsStack.toObject();
+
+    // Haberleri manuel populate et
+    if (stackObj.news && stackObj.news.length > 0) {
+      const newsItems = await RssNews.find({
+        guid: { $in: stackObj.news }
+      }).select('guid title description newstext link pubDate image category isInAnyStack isUsable');
+      stackObj.news = newsItems;
+    } else {
+      stackObj.news = [];
+    }
+
+    // Resim bilgisini ekle
     const image = await NewsStackImages.findOne({ newsStackId: newsStack._id });
     stackObj.photoUrl = image ? image.photoUrl : null;
 
@@ -157,12 +179,20 @@ exports.createNewsStack = async (req, res) => {
       isFeatured: isFeatured || false
     });
 
-    const populatedNewsStack = await NewsStacks.findById(newsStack._id)
-      .populate('news', 'title link pubDate image category');
+    // Manuel populate ile sonucu hazırla
+    const stackObj = newsStack.toObject();
+    if (stackObj.news && stackObj.news.length > 0) {
+      const newsItems = await RssNews.find({
+        guid: { $in: stackObj.news }
+      }).select('guid title description newstext link pubDate image category isInAnyStack isUsable');
+      stackObj.news = newsItems;
+    } else {
+      stackObj.news = [];
+    }
 
     res.status(201).json({
       success: true,
-      data: populatedNewsStack
+      data: stackObj
     });
   } catch (error) {
     // Mongoose validation hatalarını özel olarak yakala
@@ -252,11 +282,22 @@ exports.updateNewsStack = async (req, res) => {
       req.params.id,
       req.body,
       { new: true, runValidators: true }
-    ).populate('news', 'title link pubDate image category');
+    );
+
+    // Manuel populate ile sonucu hazırla
+    const stackObj = updatedNewsStack.toObject();
+    if (stackObj.news && stackObj.news.length > 0) {
+      const newsItems = await RssNews.find({
+        guid: { $in: stackObj.news }
+      }).select('guid title description newstext link pubDate image category isInAnyStack isUsable');
+      stackObj.news = newsItems;
+    } else {
+      stackObj.news = [];
+    }
 
     res.status(200).json({
       success: true,
-      data: updatedNewsStack
+      data: stackObj
     });
   } catch (error) {
     // Mongoose validation hatalarını özel olarak yakala
@@ -351,12 +392,20 @@ exports.addNewsToStack = async (req, res) => {
     // Haberin isInAnyStack durumunu güncelle
     await RssNews.findOneAndUpdate({ guid: newsGuid }, { isInAnyStack: true });
 
-    const updatedNewsStack = await NewsStacks.findById(req.params.id)
-      .populate('news', 'title link pubDate image category');
+    // Manuel populate ile sonucu hazırla
+    const stackObj = newsStack.toObject();
+    if (stackObj.news && stackObj.news.length > 0) {
+      const newsItems = await RssNews.find({
+        guid: { $in: stackObj.news }
+      }).select('guid title description newstext link pubDate image category isInAnyStack isUsable');
+      stackObj.news = newsItems;
+    } else {
+      stackObj.news = [];
+    }
 
     res.status(200).json({
       success: true,
-      data: updatedNewsStack
+      data: stackObj
     });
   } catch (error) {
     res.status(400).json({
@@ -410,12 +459,20 @@ exports.removeNewsFromStack = async (req, res) => {
       await RssNews.findOneAndUpdate({ guid: newsGuid }, { isInAnyStack: false });
     }
 
-    const updatedNewsStack = await NewsStacks.findById(req.params.id)
-      .populate('news', 'title link pubDate image category');
+    // Manuel populate ile sonucu hazırla
+    const stackObj = newsStack.toObject();
+    if (stackObj.news && stackObj.news.length > 0) {
+      const newsItems = await RssNews.find({
+        guid: { $in: stackObj.news }
+      }).select('guid title description newstext link pubDate image category isInAnyStack isUsable');
+      stackObj.news = newsItems;
+    } else {
+      stackObj.news = [];
+    }
 
     res.status(200).json({
       success: true,
-      data: updatedNewsStack
+      data: stackObj
     });
   } catch (error) {
     res.status(400).json({

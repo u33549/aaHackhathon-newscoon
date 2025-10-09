@@ -36,7 +36,7 @@ Not: Hızlı referans tablosu sadece endpoint kapsamını gösterir; parametrele
 
 | Endpoint | Metod | Açıklama | Parametreler |
 |----------|-------|----------|-------------|
-| `/api/stacks` | GET | Tüm haber yığınlarını listele | `status`, `isFeatured`, `tags`, `categories`, `mainCategory`, `limit`, `sortBy`, `sortOrder` |
+| `/api/stacks` | GET | Tüm haber yığınlarını listele (tam haber bilgileriyle) | `status`, `isFeatured`, `tags`, `categories`, `mainCategory`, `limit`, `sortBy`, `sortOrder` |
 | `/api/stacks` | POST | Yeni haber yığını ekle | - |
 | `/api/stacks/:id` | GET | ID'ye (stackId) göre haber yığını getir | - |
 | `/api/stacks/:id` | PUT | ID'ye (stackId) göre haber yığını güncelle | - |

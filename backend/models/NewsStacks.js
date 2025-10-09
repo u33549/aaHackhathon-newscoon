@@ -12,8 +12,7 @@ const newsStacksSchema = new mongoose.Schema({
     trim: true
   },
   news: [{
-    type: String,
-    ref: 'RssNews'
+    type: String
   }],
   categories: [{
     type: String,
