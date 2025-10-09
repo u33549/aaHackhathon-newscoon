@@ -20,6 +20,19 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
   // Backward compatibility için article prop'u varsa articles array'ine çevir
   const articleList = articles.length > 0 ? articles : (article ? [article] : []);
 
+  // Görüntülenme sayısını kısaltılmış formatta göstermek için yardımcı fonksiyon
+  const formatViewCount = (count) => {
+    if (!count || count === 0) return '0';
+
+    const num = parseInt(count);
+    if (num >= 1000000) {
+      return `${Math.floor(num / 1000000)}M+`;
+    } else if (num >= 1000) {
+      return `${Math.floor(num / 1000)}k+`;
+    }
+    return num.toString();
+  };
+
   // Scroll durumunu kontrol et
   const checkScrollButtons = () => {
     const container = scrollContainerRef.current;
@@ -294,43 +307,49 @@ const NewsCard = ({ articles = [], article, variant = 'horizontal', onClick }) =
                     {newsItem.title}
                   </Typography>
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    {newsItem.age && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <AccessTime sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }} />
-                        <Typography
-                          variant="caption"
-                          sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}
-                        >
-                          {newsItem.age}
-                        </Typography>
-                      </Box>
-                    )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {/* Sol taraf - Zaman */}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {newsItem.age && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <AccessTime sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }} />
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}
+                          >
+                            {newsItem.age}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
 
-                    {newsItem.viewCount && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Visibility sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }} />
-                        <Typography
-                          variant="caption"
-                          sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}
-                        >
-                          {newsItem.viewCount}
-                        </Typography>
-                      </Box>
-                    )}
+                    {/* Sağ taraf - Görüntülenme ve XP */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {newsItem.viewCount && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Visibility sx={{ fontSize: 14, color: 'rgba(255,255,255,0.8)' }} />
+                          <Typography
+                            variant="caption"
+                            sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.75rem' }}
+                          >
+                            {formatViewCount(newsItem.viewCount)}
+                          </Typography>
+                        </Box>
+                      )}
 
-                    {newsItem.xp && (
-                      <Chip
-                        label={`${newsItem.xp} XP`}
-                        size="small"
-                        sx={{
-                          backgroundColor: 'rgba(255,255,255,0.2)',
-                          color: 'white',
-                          fontSize: '0.7rem',
-                          height: 20
-                        }}
-                      />
-                    )}
+                      {newsItem.xp && (
+                        <Chip
+                          label={`${newsItem.xp} XP`}
+                          size="small"
+                          sx={{
+                            backgroundColor: 'rgba(255,255,255,0.2)',
+                            color: 'white',
+                            fontSize: '0.7rem',
+                            height: 20
+                          }}
+                        />
+                      )}
+                    </Box>
                   </Box>
                 </Box>
               </Box>
