@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
   Button,
   Box,
   Typography,
   IconButton,
   TextField,
-  Chip,
   useTheme,
-  useMediaQuery,
   Snackbar,
-  Alert
+  Alert,
+  Backdrop,
+  useMediaQuery
 } from '@mui/material';
 import {
   Close,
@@ -29,13 +27,14 @@ import {
 
 const ShareModal = ({ open, onClose, url, title, description }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopySuccess(true);
+      setTimeout(() => onClose(), 1500); // 1.5 saniye sonra kapat
     } catch (err) {
       // Fallback for older browsers
       const textField = document.createElement('textarea');
@@ -45,6 +44,7 @@ const ShareModal = ({ open, onClose, url, title, description }) => {
       document.execCommand('copy');
       textField.remove();
       setCopySuccess(true);
+      setTimeout(() => onClose(), 1500);
     }
   };
 
@@ -54,17 +54,16 @@ const ShareModal = ({ open, onClose, url, title, description }) => {
     const encodedDescription = encodeURIComponent(description);
 
     const shareUrls = {
-      whatsapp: `https://wa.me/?text=${encodedTitle}%0A${encodedDescription}%0A${encodedUrl}`,
+      whatsapp: `https://wa.me/?text=${encodedTitle}%0A${encodedUrl}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
       telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
       email: `mailto:?subject=${encodedTitle}&body=${encodedDescription}%0A%0A${encodedUrl}`,
-      instagram: `https://www.instagram.com/` // Instagram doesn't support direct URL sharing
+      instagram: `https://www.instagram.com/`
     };
 
     if (platform === 'instagram') {
-      // Instagram için link kopyalama ve kullanıcıyı yönlendirme
       handleCopyLink();
       window.open('https://www.instagram.com/', '_blank');
       return;
@@ -73,58 +72,45 @@ const ShareModal = ({ open, onClose, url, title, description }) => {
     const shareUrl = shareUrls[platform];
     if (shareUrl) {
       window.open(shareUrl, '_blank', 'width=600,height=400');
+      onClose(); // Paylaştıktan sonra modalı kapat
     }
   };
 
   const shareOptions = [
     {
       id: 'whatsapp',
-      name: 'WhatsApp',
-      icon: <WhatsApp />,
-      color: '#25D366',
-      description: 'WhatsApp\'ta paylaş'
+      icon: <WhatsApp sx={{ fontSize: 32 }} />,
+      color: '#25D366'
     },
     {
       id: 'facebook',
-      name: 'Facebook',
-      icon: <Facebook />,
-      color: '#1877F2',
-      description: 'Facebook\'ta paylaş'
+      icon: <Facebook sx={{ fontSize: 32 }} />,
+      color: '#1877F2'
     },
     {
       id: 'twitter',
-      name: 'Twitter',
-      icon: <Twitter />,
-      color: '#1DA1F2',
-      description: 'Twitter\'da paylaş'
+      icon: <Twitter sx={{ fontSize: 32 }} />,
+      color: '#1DA1F2'
     },
     {
       id: 'linkedin',
-      name: 'LinkedIn',
-      icon: <LinkedIn />,
-      color: '#0A66C2',
-      description: 'LinkedIn\'de paylaş'
+      icon: <LinkedIn sx={{ fontSize: 32 }} />,
+      color: '#0A66C2'
     },
     {
       id: 'telegram',
-      name: 'Telegram',
-      icon: <Telegram />,
-      color: '#0088CC',
-      description: 'Telegram\'da paylaş'
+      icon: <Telegram sx={{ fontSize: 32 }} />,
+      color: '#0088CC'
     },
     {
       id: 'email',
-      name: 'E-posta',
-      icon: <Email />,
-      color: '#EA4335',
-      description: 'E-posta ile gönder'
+      icon: <Email sx={{ fontSize: 32 }} />,
+      color: '#EA4335'
     },
     {
       id: 'instagram',
-      name: 'Instagram',
-      icon: <Instagram />,
-      color: '#E4405F',
-      description: 'Instagram\'da paylaş'
+      icon: <Instagram sx={{ fontSize: 32 }} />,
+      color: '#E4405F'
     }
   ];
 
@@ -135,134 +121,181 @@ const ShareModal = ({ open, onClose, url, title, description }) => {
         onClose={onClose}
         maxWidth="sm"
         fullWidth
-        fullScreen={isMobile}
         PaperProps={{
           sx: {
-            borderRadius: { xs: 0, sm: 3 },
-            minHeight: { xs: '100vh', sm: 'auto' },
-            m: { xs: 0, sm: 2 }
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            backdropFilter: 'blur(20px)',
+            color: 'white',
+            borderRadius: 3,
+            m: { xs: 2, sm: 3 },
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }
+        }}
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)'
           }
         }}
       >
-        <DialogTitle sx={{
+        {/* Close Button */}
+        <IconButton
+          onClick={onClose}
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            color: 'white',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 10,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.2)'
+            }
+          }}
+        >
+          <Close sx={{ fontSize: 24 }} />
+        </IconButton>
+
+        <DialogContent sx={{
           display: 'flex',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
           alignItems: 'center',
-          pb: 2,
-          px: { xs: 2, md: 3 },
-          pt: { xs: 2, md: 3 }
+          justifyContent: 'center',
+          p: { xs: 3, sm: 4 },
+          pt: { xs: 4, sm: 5 },
+          textAlign: 'center'
         }}>
-          <Typography variant="h6" fontWeight={600}>
-            Haber Yığını Paylaş
+          {/* Title */}
+          <Typography
+            variant={isMobile ? "h4" : "h3"}
+            sx={{
+              mb: { xs: 4, sm: 6 },
+              fontWeight: 300,
+              color: 'white',
+              fontSize: { xs: '1.75rem', sm: '2.5rem' }
+            }}
+          >
+            Paylaş
           </Typography>
-          <IconButton onClick={onClose} sx={{ p: 1 }}>
-            <Close />
-          </IconButton>
-        </DialogTitle>
 
-        <DialogContent sx={{ p: { xs: 2, md: 3 } }}>
-          {/* Link kopyalama alanı */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-              Link Kopyala
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <TextField
-                fullWidth
-                value={url}
-                size="small"
-                InputProps={{
-                  readOnly: true,
-                  sx: { backgroundColor: 'grey.50' }
-                }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleCopyLink}
-                startIcon={<ContentCopy />}
-                sx={{ flexShrink: 0 }}
-              >
-                Kopyala
-              </Button>
-            </Box>
-          </Box>
-
-          {/* Sosyal medya paylaşım seçenekleri */}
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              Sosyal Medyada Paylaş
-            </Typography>
-            <Box sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)' },
-              gap: 2
-            }}>
-              {shareOptions.map((option) => (
-                <Button
-                  key={option.id}
-                  onClick={() => handleShare(option.id)}
-                  variant="outlined"
-                  startIcon={option.icon}
-                  sx={{
-                    p: { xs: 1.5, sm: 2 },
-                    flexDirection: 'column',
-                    gap: 0.5,
-                    height: { xs: 70, sm: 80 },
-                    borderColor: option.color,
-                    color: option.color,
-                    '&:hover': {
-                      backgroundColor: `${option.color}15`,
-                      borderColor: option.color
-                    }
-                  }}
-                >
-                  <Typography variant="caption" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
-                    {option.name}
-                  </Typography>
-                </Button>
-              ))}
-            </Box>
-          </Box>
-
-          {/* Paylaşım bilgisi */}
+          {/* Share Options Grid */}
           <Box sx={{
-            mt: 3,
-            p: 2,
-            backgroundColor: 'grey.50',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'grey.200'
+            display: 'flex',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: { xs: 2, sm: 3 },
+            mb: { xs: 4, sm: 6 },
+            width: '100%',
+            maxWidth: '500px'
           }}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-              {title}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {description}
-            </Typography>
-            <Chip
-              label="Newscoon"
-              size="small"
-              color="primary"
-              sx={{ fontSize: '0.7rem' }}
+            {shareOptions.map((option) => (
+              <Box
+                key={option.id}
+                onClick={() => handleShare(option.id)}
+                sx={{
+                  width: { xs: 55, sm: 60 },
+                  height: { xs: 55, sm: 60 },
+                  borderRadius: '50%',
+                  backgroundColor: option.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 6px 24px rgba(0, 0, 0, 0.3)',
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    boxShadow: `0 8px 32px ${option.color}40`,
+                    filter: 'brightness(1.1)'
+                  },
+                  '&:active': {
+                    transform: 'scale(0.95)'
+                  }
+                }}
+              >
+                {React.cloneElement(option.icon, {
+                  sx: {
+                    color: 'white',
+                    fontSize: { xs: 22, sm: 24 }
+                  }
+                })}
+              </Box>
+            ))}
+          </Box>
+
+          {/* Link Copy Section */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            width: '100%'
+          }}>
+            <TextField
+              fullWidth
+              value={url}
+              size="medium"
+              InputProps={{
+                readOnly: true,
+                sx: {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white',
+                  borderRadius: 2,
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.5)'
+                  }
+                }
+              }}
+              sx={{
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                  fontSize: '0.9rem'
+                }
+              }}
             />
+            <IconButton
+              onClick={handleCopyLink}
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                color: 'white',
+                width: { xs: 48, sm: 56 },
+                height: { xs: 48, sm: 56 },
+                borderRadius: 2,
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                }
+              }}
+            >
+              <ContentCopy />
+            </IconButton>
           </Box>
         </DialogContent>
-
-        <DialogActions sx={{ p: { xs: 2, md: 3 }, pt: 0 }}>
-          <Button onClick={onClose} fullWidth variant="outlined">
-            Kapat
-          </Button>
-        </DialogActions>
       </Dialog>
 
-      {/* Kopyalama başarı mesajı */}
+      {/* Success Message */}
       <Snackbar
         open={copySuccess}
         autoHideDuration={3000}
         onClose={() => setCopySuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={() => setCopySuccess(false)} severity="success" variant="filled">
+        <Alert
+          onClose={() => setCopySuccess(false)}
+          severity="success"
+          variant="filled"
+          sx={{
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            fontSize: '1rem',
+            fontWeight: 500
+          }}
+        >
           Link kopyalandı!
         </Alert>
       </Snackbar>
