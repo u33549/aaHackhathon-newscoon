@@ -20,6 +20,19 @@ import {
 import { useAppDispatch, useSelectedStack } from '../hooks/redux';
 import { fetchStackById } from '../store/slices/stackSlice';
 
+// Görüntülenme sayısını kısaltılmış formatta göstermek için yardımcı fonksiyon
+const formatViewCount = (count) => {
+  if (!count || count === 0) return '0';
+
+  const num = parseInt(count);
+  if (num >= 1000000) {
+    return `${Math.floor(num / 1000000)}M+`;
+  } else if (num >= 1000) {
+    return `${Math.floor(num / 1000)}k+`;
+  }
+  return num.toString();
+};
+
 // Kronolojik haber parçalarını simüle eden data
 const generateChronologicalSteps = (stack) => {
   if (!stack || !stack.news || stack.news.length === 0) return [];
@@ -413,7 +426,7 @@ const ReadingFlowPage = () => {
                           fontSize: { xs: '0.9rem', md: '1.1rem' }
                         }}
                       >
-                        {currentStepData.stackData.viewCount} görüntülenme
+                        {formatViewCount(currentStepData.stackData.viewCount)} görüntülenme
                       </Typography>
                     </Box>
 
