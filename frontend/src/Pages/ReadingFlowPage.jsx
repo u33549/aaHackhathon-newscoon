@@ -357,21 +357,6 @@ const ReadingFlowPage = () => {
                 >
                   {currentStepData.content}
                 </Typography>
-
-                {/* Scroll Hint */}
-                <Fade in={showScrollHint}>
-                  <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    animation: showScrollHint ? 'bounce 2s infinite' : 'none'
-                  }}>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)', mb: 1 }}>
-                      Okumaya başlamak için devam edin
-                    </Typography>
-                    <KeyboardArrowDown sx={{ color: 'white', fontSize: 32 }} />
-                  </Box>
-                </Fade>
               </>
             )}
 
@@ -389,7 +374,7 @@ const ReadingFlowPage = () => {
                 >
                   {currentStepData.title}
                 </Typography>
-                
+
                 <Typography
                   variant={isMobile ? 'body1' : 'h6'}
                   sx={{
@@ -468,57 +453,52 @@ const ReadingFlowPage = () => {
                     </Typography>
                   </Box>
                 )}
-
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={handleComplete}
-                  sx={{
-                    backgroundColor: 'white',
-                    color: 'success.main',
-                    fontWeight: 'bold',
-                    px: 4,
-                    py: 1.5,
-                    '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.9)'
-                    }
-                  }}
-                >
-                  Ana Sayfaya Dön
-                </Button>
               </>
             )}
           </Box>
 
-          {/* Next Button */}
+          {/* Permanent Scroll Animation - Always at bottom */}
           {currentStepData.type !== 'completion' && (
             <Box sx={{
               position: 'absolute',
-              bottom: 40,
-              right: 40,
+              bottom: 30,
+              left: '50%',
+              transform: 'translateX(-50%)',
               zIndex: 3
             }}>
-              <Button
-                variant="contained"
+              <Box
                 onClick={handleNextStep}
-                endIcon={<ArrowForward />}
                 sx={{
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  backdropFilter: 'blur(10px)',
-                  color: 'white',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  fontWeight: 'bold',
-                  px: 3,
-                  py: 1.5,
+                  width: 60,
+                  height: 60,
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(15px)',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  animation: 'bounce 2s infinite',
+                  transition: 'all 0.3s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.3)',
-                    transform: 'translateY(-2px)'
+                    backgroundColor: 'rgba(255,255,255,0.25)',
+                    transform: 'scale(1.1)',
+                    borderColor: 'rgba(255,255,255,0.5)'
                   },
-                  transition: 'all 0.3s ease'
+                  '&:active': {
+                    transform: 'scale(0.95)'
+                  }
                 }}
               >
-                {currentStepData.type === 'intro' ? 'Başla' : 'Devam Et'}
-              </Button>
+                <KeyboardArrowDown
+                  sx={{
+                    color: 'white',
+                    fontSize: 32,
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                  }}
+                />
+              </Box>
             </Box>
           )}
         </Box>
