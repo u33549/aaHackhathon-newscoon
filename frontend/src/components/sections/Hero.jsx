@@ -168,6 +168,7 @@ const Hero = ({ onStackClick }) => {
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      onClick={() => handleSlideClick(currentStack)} // Hero alanına tıklama işlevi eklendi
       sx={{
         position: 'relative',
         width: '100%',
@@ -267,7 +268,10 @@ const Hero = ({ onStackClick }) => {
       {!isMobile && heroStacks.length > 1 && (
         <>
           <IconButton
-            onClick={prevSlide}
+            onClick={(e) => {
+              e.stopPropagation(); // Ana hero alanının onClick'ini engelle
+              prevSlide();
+            }}
             sx={{
               position: 'absolute',
               left: 24,
@@ -286,7 +290,10 @@ const Hero = ({ onStackClick }) => {
           </IconButton>
 
           <IconButton
-            onClick={nextSlide}
+            onClick={(e) => {
+              e.stopPropagation(); // Ana hero alanının onClick'ini engelle
+              nextSlide();
+            }}
             sx={{
               position: 'absolute',
               right: 24,
@@ -322,7 +329,10 @@ const Hero = ({ onStackClick }) => {
           {heroStacks.map((_, index) => (
             <Box
               key={index}
-              onClick={() => goToSlide(index)}
+              onClick={(e) => {
+                e.stopPropagation(); // Ana hero alanının onClick'ini engelle
+                goToSlide(index);
+              }}
               sx={{
                 width: 8,
                 height: 8,
