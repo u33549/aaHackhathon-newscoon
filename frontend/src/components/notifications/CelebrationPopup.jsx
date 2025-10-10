@@ -54,44 +54,50 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
         return {
           icon: <Star sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Seviye Atladın! 🎉',
-          bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          iconBgColor: '#FFD700',
+          bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+          iconBgColor: 'rgba(255, 215, 0, 0.2)',
           message: `Seviye ${currentCelebration.newLevel}`,
-          subtitle: currentCelebration.xpBonus ? `+${currentCelebration.xpBonus} XP Bonus` : null
+          subtitle: currentCelebration.xpBonus ? `+${currentCelebration.xpBonus} XP Bonus` : null,
+          accentColor: '#FFD700'
         };
 
       case 'badge':
         return {
           icon: currentCelebration.badge?.icon
             ? getIconComponent(currentCelebration.badge.icon)
-            : <EmojiEvents sx={{ fontSize: 48, color: 'white' }} />,
+            : <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Yeni Rozet! 🏆',
-          bgColor: `linear-gradient(135deg, ${currentCelebration.badge?.color || '#4CAF50'} 0%, ${currentCelebration.badge?.color || '#388E3C'} 100%)`,
-          iconBgColor: currentCelebration.badge?.color || '#4CAF50',
+          bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+          iconBgColor: currentCelebration.badge?.color
+            ? `${currentCelebration.badge.color}33`
+            : 'rgba(255, 215, 0, 0.2)',
           message: currentCelebration.badge?.name || 'Rozet Kazanıldı',
-          subtitle: currentCelebration.badge?.description || null
+          subtitle: currentCelebration.badge?.description || null,
+          accentColor: '#FFD700'
         };
 
       case 'achievement':
         return {
           icon: currentCelebration.achievement?.icon
             ? getIconComponent(currentCelebration.achievement.icon)
-            : <TrendingUp sx={{ fontSize: 48, color: 'white' }} />,
+            : <TrendingUp sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Başarım Açıldı! ⭐',
-          bgColor: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          iconBgColor: '#f5576c',
+          bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+          iconBgColor: 'rgba(255, 215, 0, 0.2)',
           message: currentCelebration.achievement?.name || 'Başarım Tamamlandı',
-          subtitle: currentCelebration.achievement?.description || null
+          subtitle: currentCelebration.achievement?.description || null,
+          accentColor: '#FFD700'
         };
 
       default:
         return {
-          icon: <EmojiEvents sx={{ fontSize: 48, color: 'white' }} />,
+          icon: <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Tebrikler! 🎉',
-          bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          iconBgColor: '#667eea',
+          bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
+          iconBgColor: 'rgba(255, 215, 0, 0.2)',
           message: 'Yeni Bir Başarı',
-          subtitle: null
+          subtitle: null,
+          accentColor: '#FFD700'
         };
     }
   };
@@ -121,9 +127,9 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               padding: { xs: 3, md: 4 },
               minWidth: { xs: 280, sm: 320, md: 360 },
               maxWidth: { xs: '90vw', sm: 400 },
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+              boxShadow: '0 20px 60px rgba(255, 215, 0, 0.3)',
               backdropFilter: 'blur(10px)',
-              border: '2px solid rgba(255, 255, 255, 0.2)',
+              border: '2px solid #FFD700',
               textAlign: 'center',
               animation: 'celebrationPulse 3s ease-in-out'
             }}
@@ -135,10 +141,10 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
                 position: 'absolute',
                 top: 8,
                 right: 8,
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: 'rgba(255, 215, 0, 0.8)',
                 '&:hover': {
-                  color: 'white',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  color: '#FFD700',
+                  backgroundColor: 'rgba(255, 215, 0, 0.1)'
                 }
               }}
               size="small"
@@ -152,10 +158,10 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
                 sx={{
                   width: { xs: 70, md: 80 },
                   height: { xs: 70, md: 80 },
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  bgcolor: config.iconBgColor,
                   mx: 'auto',
-                  border: '3px solid rgba(255, 255, 255, 0.3)',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+                  border: '3px solid #FFD700',
+                  boxShadow: '0 8px 24px rgba(255, 215, 0, 0.4)',
                   animation: 'iconBounce 0.6s ease-in-out'
                 }}
               >
@@ -167,10 +173,10 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
             <Typography
               variant="h5"
               sx={{
-                color: 'white',
+                color: '#FFD700',
                 fontWeight: 700,
                 mb: 1.5,
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+                textShadow: '0 2px 8px rgba(255, 215, 0, 0.5)',
                 fontSize: { xs: '1.25rem', md: '1.5rem' }
               }}
             >
@@ -195,7 +201,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               <Typography
                 variant="body2"
                 sx={{
-                  color: 'rgba(255, 255, 255, 0.9)',
+                  color: 'rgba(255, 255, 255, 0.8)',
                   fontSize: { xs: '0.875rem', md: '0.9375rem' },
                   lineHeight: 1.5,
                   maxWidth: '90%',
@@ -222,8 +228,8 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
                       height: 8,
                       borderRadius: '50%',
                       backgroundColor: index === currentIndex
-                        ? 'white'
-                        : 'rgba(255, 255, 255, 0.4)',
+                        ? '#FFD700'
+                        : 'rgba(255, 215, 0, 0.3)',
                       transition: 'all 0.3s ease'
                     }}
                   />
@@ -231,7 +237,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               </Box>
             )}
 
-            {/* Confetti effect */}
+            {/* Confetti effect - Sarı tonda */}
             <Box
               sx={{
                 position: 'absolute',
@@ -244,15 +250,19 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
                 borderRadius: 4
               }}
             >
-              {[...Array(6)].map((_, i) => (
+              {[...Array(8)].map((_, i) => (
                 <Box
                   key={i}
                   sx={{
                     position: 'absolute',
                     width: 8,
                     height: 8,
-                    backgroundColor: i % 2 === 0 ? '#FFD700' : 'white',
-                    opacity: 0.6,
+                    backgroundColor: i % 3 === 0
+                      ? '#FFD700'
+                      : i % 3 === 1
+                        ? '#FFA500'
+                        : '#FFED4E',
+                    opacity: 0.7,
                     borderRadius: '50%',
                     animation: `confettiFall ${2 + Math.random()}s ease-in-out infinite`,
                     animationDelay: `${Math.random() * 0.5}s`,
@@ -296,4 +306,3 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
 };
 
 export default CelebrationPopup;
-
