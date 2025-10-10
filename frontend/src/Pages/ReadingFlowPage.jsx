@@ -1351,48 +1351,6 @@ const ReadingFlowPage = () => {
               </Box>
             )}
           </Box>
-
-          {/* Static navigation button for non-news steps */}
-          {currentStepData.type !== 'completion' && currentStepData.type !== 'news' && (
-            <Box sx={{
-              position: 'absolute',
-              bottom: 30,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 3
-            }}>
-              <Box
-                onClick={handleNextStep}
-                sx={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255,255,255,0.15)',
-                  backdropFilter: 'blur(15px)',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  animation: 'bounce 2s infinite',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.25)',
-                    transform: 'scale(1.1)',
-                    borderColor: 'rgba(255,255,255,0.5)'
-                  }
-                }}
-              >
-                <KeyboardArrowDown
-                  sx={{
-                    color: 'white',
-                    fontSize: 32,
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                  }}
-                />
-              </Box>
-            </Box>
-          )}
         </Box>
       </Fade>
 
