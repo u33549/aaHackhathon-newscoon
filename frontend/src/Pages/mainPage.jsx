@@ -32,7 +32,8 @@ import {
 } from '../store/slices/stackSlice';
 import {
   setSearchQuery,
-  setActiveCategory
+  setActiveCategory,
+  addToast
 } from '../store/slices/uiSlice';
 import {
   loadDemoData,

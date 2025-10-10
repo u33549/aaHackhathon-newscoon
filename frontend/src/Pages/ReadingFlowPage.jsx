@@ -33,7 +33,8 @@ import {
   readNewsInStack,
   completeStack,
   addXP,
-  addBadge
+  addBadge,
+  updateReadingProgress
 } from '../store/slices/userSlice';
 
 // Constants
@@ -192,20 +193,29 @@ const ReadingFlowPage = () => {
     }
   }, [selectedStack]);
 
-  // Mevcut okuma progress'ini kontrol et
+  // Kaldığımız yerden devam et - kaydedilmiş progress'i yükle
   useEffect(() => {
-    if (selectedStack && currentlyReading.length > 0) {
+    if (selectedStack && steps.length > 0 && currentlyReading.length > 0) {
       const stackProgress = currentlyReading.find(r => r.stackId === selectedStack._id);
-      if (stackProgress) {
-        // Daha önce okunan haberleri işaretle
-        const readIndices = new Set();
-        for (let i = 0; i < stackProgress.readNews; i++) {
-          readIndices.add(i);
-        }
-        setReadNewsIndices(readIndices);
+      if (stackProgress && stackProgress.lastReadIndex > 0) {
+        // Kaydedilmiş adımdan devam et
+        console.log(`📖 Kaldığınız yerden devam ediliyor: Adım ${stackProgress.lastReadIndex}`);
+        setCurrentStep(stackProgress.lastReadIndex);
       }
     }
-  }, [selectedStack, currentlyReading]);
+  }, [selectedStack, steps.length, currentlyReading]);
+
+  // Her step değiştiğinde progress'i kaydet
+  useEffect(() => {
+    if (selectedStack && currentStep > 0 && steps.length > 0) {
+      // Progress'i Redux'a kaydet
+      dispatch(updateReadingProgress({
+        stackId: selectedStack._id,
+        currentStepIndex: currentStep
+      }));
+      console.log(`💾 Progress kaydedildi: Adım ${currentStep}`);
+    }
+  }, [currentStep, selectedStack, steps.length, dispatch]);
 
   const currentStepData = steps[currentStep];
 

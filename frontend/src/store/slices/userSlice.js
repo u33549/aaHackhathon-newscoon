@@ -85,8 +85,8 @@ const initialState = {
 
   // Okunan stackler ve progress
   readingProgress: {
-    readStacks: [], // { stackId, completedAt, totalNews, readNews, xpEarned }
-    currentlyReading: [], // { stackId, startedAt, readNews, totalNews }
+    readStacks: [], // { stackId, completedAt, totalNewsCount, completedNewsCount, lastReadIndex, xpEarned }
+    currentlyReading: [], // { stackId, startedAt, lastReadIndex, totalNews }
     recentlyRead: [], // Son 10 okunan stack
     totalStacksCompleted: 0,
     totalNewsRead: 0
@@ -167,7 +167,7 @@ const userSlice = createSlice({
         state.readingProgress.currentlyReading.push({
           stackId,
           startedAt: new Date().toISOString(),
-          readNews: 0,
+          lastReadIndex: 0,
           totalNews,
           xpEarned: 0
         });
@@ -184,7 +184,7 @@ const userSlice = createSlice({
       );
       
       if (readingStack) {
-        readingStack.readNews += 1;
+        readingStack.lastReadIndex += 1;
         readingStack.xpEarned += xpToAdd;
         
         // Total stats güncelle
@@ -192,6 +192,29 @@ const userSlice = createSlice({
         
         // XP ekle
         userSlice.caseReducers.addXP(state, { payload: xpToAdd });
+      }
+    },
+
+    // Okuma progress'ini güncelle (kaldığımız yeri kaydet)
+    updateReadingProgress: (state, action) => {
+      const { stackId, currentStepIndex } = action.payload;
+
+      // Currently reading'de bul
+      const readingStack = state.readingProgress.currentlyReading.find(
+        item => item.stackId === stackId
+      );
+
+      if (readingStack) {
+        readingStack.lastReadIndex = currentStepIndex;
+      } else {
+        // Eğer yoksa yeni ekle
+        state.readingProgress.currentlyReading.push({
+          stackId,
+          startedAt: new Date().toISOString(),
+          lastReadIndex: currentStepIndex,
+          totalNews: 0,
+          xpEarned: 0
+        });
       }
     },
 
@@ -328,6 +351,7 @@ export const {
   clearLevelUpFlag,
   startReadingStack,
   readNewsInStack,
+  updateReadingProgress,
   completeStack,
   addBadge,
   addAchievement,
