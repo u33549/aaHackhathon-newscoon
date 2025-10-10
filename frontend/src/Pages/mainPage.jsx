@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,9 +18,7 @@ import {
   useUserLevelProgress,
   useReadingProgress,
   useCurrentlyReading,
-  useUserAchievements,
-  useUserBadges,
-  useUserStreak
+  useUserAchievements
 } from '../hooks/redux';
 import {
   fetchAllNews
@@ -38,11 +36,8 @@ import {
 import {
   loadDemoData,
   addXP,
-  addBadge,
   addAchievement,
   startReadingStack,
-  readNewsInStack,
-  completeStack,
   clearLevelUpFlag
 } from '../store/slices/userSlice';
 
@@ -55,7 +50,6 @@ import SearchBar from '../components/navigation/SearchBar';
 
 // Data and utilities
 import {
-  allBadges,
   allAchievements,
   XP_CONSTANTS,
   checkAchievementCompleted
