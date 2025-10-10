@@ -265,12 +265,12 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
             }}
           >
             <Tab
-              label={`Rozetler (${earnedBadgeIds.size}/${allBadges.length})`}
+              label="Rozetler"
               icon={<EmojiEvents />}
               iconPosition="start"
             />
             <Tab
-              label={`Başarımlar (${earnedAchievementsCount}/${allAchievements.length})`}
+              label="Başarımlar"
               icon={<Star />}
               iconPosition="start"
             />
