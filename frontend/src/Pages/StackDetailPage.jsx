@@ -338,7 +338,7 @@ const StackDetailPage = () => {
                   variant="contained"
                   size={isMobile ? 'medium' : 'large'}
                   startIcon={<PlayArrow />}
-                  onClick={() => setPlayTrailer(true)}
+                  onClick={() => navigate(`/stack/${id}/read`)}
                   sx={{
                     backgroundColor: 'white',
                     color: 'black',
@@ -353,7 +353,7 @@ const StackDetailPage = () => {
                     }
                   }}
                 >
-                  Haberleri İncele
+                  Haberi İncele
                 </Button>
 
                 <Button
