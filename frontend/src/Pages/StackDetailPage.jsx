@@ -616,61 +616,69 @@ const StackDetailPage = () => {
                       }
                     }}
                   >
-                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                    <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
                       <Box sx={{
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: { xs: 1.5, md: 2 },
-                        flexDirection: { xs: 'column', sm: 'row' }
+                        flexDirection: 'column',
+                        gap: { xs: 1, md: 1.5 }
                       }}>
-                        <Avatar sx={{
-                          bgcolor: 'primary.main',
-                          mt: { xs: 0, sm: 0.5 },
-                          width: { xs: 32, md: 40 },
-                          height: { xs: 32, md: 40 },
-                          fontSize: { xs: '0.875rem', md: '1rem' },
-                          alignSelf: { xs: 'flex-start', sm: 'flex-start' }
+                        {/* İndeks ve Title - Aynı satırda */}
+                        <Box sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: { xs: 0.75, md: 1 }
                         }}>
-                          {index + 1}
-                        </Avatar>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Avatar sx={{
+                            bgcolor: 'primary.main',
+                            width: { xs: 28, md: 36 },
+                            height: { xs: 28, md: 36 },
+                            fontSize: { xs: '0.8rem', md: '0.9rem' },
+                            flexShrink: 0
+                          }}>
+                            {index + 1}
+                          </Avatar>
                           <Typography
                             variant="h6"
-                            gutterBottom
                             sx={{
                               fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
                               lineHeight: { xs: 1.3, md: 1.4 },
-                              mb: { xs: 1, md: 1.5 }
+                              flex: 1,
+                              textAlign: 'left'
                             }}
                           >
                             {typeof news === 'object' ? news.title : `Haber ${index + 1}`}
                           </Typography>
-                          {typeof news === 'object' && news.description && (
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{
-                                mb: { xs: 1, md: 1 },
-                                fontSize: { xs: '0.875rem', md: '0.875rem' },
-                                lineHeight: 1.5
-                              }}
-                            >
-                              {news.description}
-                            </Typography>
-                          )}
-                          {typeof news === 'object' && news.pubDate && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <AccessTime sx={{ fontSize: { xs: 14, md: 16 }, color: 'text.secondary' }} />
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ fontSize: { xs: '0.75rem', md: '0.75rem' } }}
-                              >
-                                {formatDate(news.pubDate)}
-                              </Typography>
-                            </Box>
-                          )}
                         </Box>
+                        
+                        {/* Açıklama - Alt satırda */}
+                        {typeof news === 'object' && news.description && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              mb: { xs: 1, md: 1 },
+                              fontSize: { xs: '0.875rem', md: '0.875rem' },
+                              lineHeight: 1.5,
+                              textAlign: 'left'
+                            }}
+                          >
+                            {news.description}
+                          </Typography>
+                        )}
+                        
+                        {/* Tarih - Alt satırda */}
+                        {typeof news === 'object' && news.pubDate && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <AccessTime sx={{ fontSize: { xs: 14, md: 16 }, color: 'text.secondary' }} />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: { xs: '0.75rem', md: '0.75rem' } }}
+                            >
+                              {formatDate(news.pubDate)}
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
                     </CardContent>
                   </Card>
