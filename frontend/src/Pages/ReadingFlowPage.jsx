@@ -112,7 +112,7 @@ const generateChronologicalSteps = (stack) => {
   });
 
   // Son step - Tebrik
-  const stackCompletionXP = XP_CONSTANTS.STACK_COMPLETION_BONUS;
+  const stackTotalXP = stack.xp || 0; // Sadece stack'in sahip olduğu XP
   steps.push({
     id: 'completion',
     type: 'completion',
@@ -120,7 +120,7 @@ const generateChronologicalSteps = (stack) => {
     content: `${stack.title} haber yığınını başarıyla tamamladınız!`,
     image: null,
     reward: {
-      cp: stackCompletionXP,
+      cp: stackTotalXP, // Sadece stack'in sahip olduğu XP
       badge: null
     }
   });
@@ -237,20 +237,17 @@ const ReadingFlowPage = () => {
   const handleStackCompletion = useCallback(() => {
     if (!selectedStack) return;
 
-    // Stack'in toplam XP'sini hesapla
+    // Sadece stack'in sahip olduğu XP'yi al
     const stackTotalXP = selectedStack.xp || 0;
 
-    // Stack completion bonus + stack'in kendi XP'si
-    const totalXPReward = XP_CONSTANTS.STACK_COMPLETION_BONUS + stackTotalXP;
-
-    // Stack'i tamamla
+    // Stack'i tamamla - sadece stack XP'si
     dispatch(completeStack({
       stackId: selectedStack._id,
-      stackXP: totalXPReward // Toplam XP'yi gönder
+      stackXP: stackTotalXP // Sadece stack'in sahip olduğu XP
     }));
 
     // Sadece console log - bildirim yok
-    console.log(`Stack tamamlandı: "${selectedStack.title}" - +${totalXPReward} XP kazanıldı`);
+    console.log(`Stack tamamlandı: "${selectedStack.title}" - +${stackTotalXP} XP kazanıldı`);
   }, [selectedStack, dispatch]);
 
   // Scroll pozisyon kontrolü
