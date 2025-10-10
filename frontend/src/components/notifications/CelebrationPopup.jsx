@@ -55,7 +55,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           icon: <Star sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Seviye Atladın! 🎉',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(255, 215, 0, 0.2)',
+          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah
           message: `Seviye ${currentCelebration.newLevel}`,
           subtitle: currentCelebration.xpBonus ? `+${currentCelebration.xpBonus} XP Bonus` : null,
           accentColor: '#FFD700'
@@ -68,9 +68,8 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
             : <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Yeni Rozet! 🏆',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: currentCelebration.badge?.color
-            ? `${currentCelebration.badge.color}33`
-            : 'rgba(255, 215, 0, 0.2)',
+          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah - rozet için
+          iconColor: '#FFD700', // Rozet ikonu sarı
           message: currentCelebration.badge?.name || 'Rozet Kazanıldı',
           subtitle: currentCelebration.badge?.description || null,
           accentColor: '#FFD700'
@@ -83,7 +82,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
             : <TrendingUp sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Başarım Açıldı! ⭐',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(255, 215, 0, 0.2)',
+          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah
           message: currentCelebration.achievement?.name || 'Başarım Tamamlandı',
           subtitle: currentCelebration.achievement?.description || null,
           accentColor: '#FFD700'
@@ -94,7 +93,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           icon: <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Tebrikler! 🎉',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(255, 215, 0, 0.2)',
+          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah
           message: 'Yeni Bir Başarı',
           subtitle: null,
           accentColor: '#FFD700'
@@ -104,22 +103,35 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
 
   const config = getPopupConfig();
 
+  // Backdrop'a tıklandığında kapat
+  const handleBackdropClick = (e) => {
+    // Sadece backdrop'a tıklandıysa kapat (popup içeriğine değil)
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
     <Fade in={isVisible} timeout={300}>
       <Box
+        onClick={handleBackdropClick}
         sx={{
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           zIndex: 9999,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Backdrop ekle
+          backdropFilter: 'blur(4px)'
         }}
       >
         <Zoom in={isVisible} timeout={400}>
           <Box
+            onClick={(e) => e.stopPropagation()} // Popup içeriğine tıklamayı durdur
             sx={{
               position: 'relative',
               background: config.bgColor,
@@ -158,11 +170,15 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
                 sx={{
                   width: { xs: 70, md: 80 },
                   height: { xs: 70, md: 80 },
-                  bgcolor: config.iconBgColor,
+                  bgcolor: config.iconBgColor, // Açık siyah arka plan
                   mx: 'auto',
                   border: '3px solid #FFD700',
                   boxShadow: '0 8px 24px rgba(255, 215, 0, 0.4)',
-                  animation: 'iconBounce 0.6s ease-in-out'
+                  animation: 'iconBounce 0.6s ease-in-out',
+                  // Icon'ları sarı yapmak için
+                  '& svg': {
+                    color: '#FFD700'
+                  }
                 }}
               >
                 {config.icon}
