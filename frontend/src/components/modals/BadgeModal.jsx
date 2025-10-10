@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -37,21 +37,28 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
     ? ((totalCp - currentLevelCp) / (nextLevelCp - currentLevelCp)) * 100
     : 0;
 
-  // Kullanıcı verisi - badge kontrolü için
-  const userData = {
+  // Kullanıcı verisi - tam userData objesi
+  const userData = useMemo(() => ({
     achievements: { badges },
     readingProgress: {
-      totalNewsRead: 0,
-      totalStacksCompleted: 0
+      totalNewsRead: 0, // Bu değerler gerçek verilerden gelmeli
+      totalStacksCompleted: 0 // Bu değerler gerçek verilerden gelmeli
     },
     stats: {
       currentLevel: level,
       totalXP: totalCp
     }
-  };
+  }), [badges, level, totalCp]);
 
   // Kazanılan rozetleri filtrele
   const earnedBadgeIds = new Set(badges.map(b => b.id));
+
+  // Kazanılan başarımları hesapla - gerçek kontrolle
+  const earnedAchievementsCount = useMemo(() => {
+    return allAchievements.filter(achievement =>
+      checkAchievementCompleted(achievement, userData)
+    ).length;
+  }, [userData]);
 
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
@@ -263,7 +270,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
               iconPosition="start"
             />
             <Tab
-              label={`Başarımlar (${earnedAchievements.size}/${allAchievements.length})`}
+              label={`Başarımlar (${earnedAchievementsCount}/${allAchievements.length})`}
               icon={<Star />}
               iconPosition="start"
             />
@@ -274,7 +281,8 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
         {currentTab === 0 && (
           <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ width: '100%', mx: 0 }}>
             {allBadges.map((badge) => {
-              const isEarned = earnedBadgeIds.has(badge.id);
+              // Rozet kazanılmış mı kontrol et - fonksiyon kullan
+              const isEarned = checkBadgeEarned(badge, userData);
 
               return (
                 <Grid item xs={12} key={badge.id} sx={{ width: '100%', px: 0 }}>
@@ -356,7 +364,8 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
         {currentTab === 1 && (
           <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ width: '100%', mx: 0 }}>
             {allAchievements.map((achievement) => {
-              const isEarned = earnedAchievements.has(achievement.id);
+              // Başarım tamamlanmış mı kontrol et - fonksiyon kullan
+              const isEarned = checkAchievementCompleted(achievement, userData);
 
               return (
                 <Grid item xs={12} key={achievement.id} sx={{ width: '100%', px: 0 }}>

@@ -133,7 +133,7 @@ const MainPage = () => {
     }
   }, [levelProgress.hasLeveledUp, dispatch]);
 
-  // Achievement kontrolü - BİLDİRİM OLMADAN
+  // Achievement kontrolü - BİLDİRİM VE XP OLMADAN
   useEffect(() => {
     const checkAchievements = () => {
       const userData = {
@@ -147,8 +147,8 @@ const MainPage = () => {
 
         if (!alreadyEarned && checkAchievementCompleted(achievement, userData)) {
           dispatch(addAchievement(achievement));
-          dispatch(addXP(achievement.xpReward));
-          // Bildirim kaldırıldı
+          // XP kaldırıldı - başarımlar XP kazandırmaz
+          // Bildirim de yok
         }
       });
     };
