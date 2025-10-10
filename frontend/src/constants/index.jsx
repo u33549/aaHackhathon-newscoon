@@ -472,6 +472,26 @@ export const leaderboardData = [
     { id: 7, name: 'Haber Okuyucusu', xp: 1687, level: 6 },
 ];
 
+// Leaderboard verilerini kullanıcının XP'si ile güncelle
+export const getUpdatedLeaderboard = (userXP, userLevel) => {
+    // Kullanıcının verisini güncelle
+    const updatedData = leaderboardData.map(user => {
+        if (user.isCurrentUser) {
+            return { ...user, xp: userXP, level: userLevel };
+        }
+        return user;
+    });
+
+    // XP'ye göre sırala (büyükten küçüğe)
+    const sorted = [...updatedData].sort((a, b) => b.xp - a.xp);
+
+    // Sıralama numaralarını ekle
+    return sorted.map((user, index) => ({
+        ...user,
+        rank: index + 1
+    }));
+};
+
 export const categoryColors = {
   gundem: '#3B82F6',
   dunya: '#10B981',
