@@ -57,7 +57,8 @@ import SearchBar from '../components/navigation/SearchBar';
 import {
   allBadges,
   allAchievements,
-  XP_CONSTANTS
+  XP_CONSTANTS,
+  checkAchievementCompleted
 } from '../constants/index.jsx';
 
 const MainPage = () => {
@@ -149,7 +150,7 @@ const MainPage = () => {
       allAchievements.forEach(achievement => {
         const alreadyEarned = userAchievements.achievements.find(a => a.id === achievement.id);
 
-        if (!alreadyEarned && achievement.isCompleted(userData)) {
+        if (!alreadyEarned && checkAchievementCompleted(achievement, userData)) {
           dispatch(addAchievement(achievement));
           dispatch(addXP(achievement.xpReward));
           // Bildirim kaldırıldı

@@ -164,73 +164,103 @@ export const levelThresholds = (() => {
   return thresholds;
 })();
 
-// Güncellenmiş başarım sistemi
+// Güncellenmiş başarım sistemi - Redux-friendly (fonksiyonsuz)
 export const allAchievements = [
     {
         id: 'beginner_reader',
         name: 'İlk Adım',
         description: 'İlk haberini tamamla.',
-        icon: 'LogoIcon', // String olarak sakla
+        icon: 'LogoIcon',
         xpReward: 50,
-        isCompleted: ({ readingProgress }) => readingProgress.totalNewsRead >= 1
+        checkType: 'totalNewsRead',
+        requiredValue: 1
     },
     {
         id: 'curious_mind',
         name: 'Meraklı Zihin',
         description: 'Tüm kategorilerden en az bir haber oku.',
-        icon: 'Science', // String olarak sakla
+        icon: 'Science',
         xpReward: 100,
-        isCompleted: ({ achievements }) => achievements.badges.length >= 4
+        checkType: 'badgeCount',
+        requiredValue: 4
     },
     {
         id: 'streak_starter',
         name: 'Ateşi Yaktın',
         description: '3 günlük okuma serisine ulaş.',
-        icon: 'Whatshot', // String olarak sakla
+        icon: 'Whatshot',
         xpReward: 75,
-        isCompleted: ({ achievements }) => achievements.streakData.current >= 3
+        checkType: 'streakCurrent',
+        requiredValue: 3
     },
     {
         id: 'stack_master',
         name: 'Yığın Ustası',
         description: 'İlk haber yığınını tamamla.',
-        icon: 'EmojiEvents', // String olarak sakla
+        icon: 'EmojiEvents',
         xpReward: 100,
-        isCompleted: ({ readingProgress }) => readingProgress.totalStacksCompleted >= 1
+        checkType: 'stacksCompleted',
+        requiredValue: 1
     },
     {
         id: 'news_addict',
         name: 'Haber Bağımlısı',
         description: '50 haber oku.',
-        icon: 'Computer', // String olarak sakla
+        icon: 'Computer',
         xpReward: 200,
-        isCompleted: ({ readingProgress }) => readingProgress.totalNewsRead >= 50
+        checkType: 'totalNewsRead',
+        requiredValue: 50
     },
     {
         id: 'level_climber',
         name: 'Seviye Tırmanıcısı',
         description: '5. seviyeye ulaş.',
-        icon: 'TrendingUp', // String olarak sakla
+        icon: 'TrendingUp',
         xpReward: 150,
-        isCompleted: ({ stats }) => stats.currentLevel >= 5
+        checkType: 'level',
+        requiredValue: 5
     },
     {
         id: 'streak_legend',
         name: 'Seri Efsanesi',
         description: '7 günlük okuma serisine ulaş.',
-        icon: 'Whatshot', // String olarak sakla
+        icon: 'Whatshot',
         xpReward: 300,
-        isCompleted: ({ achievements }) => achievements.streakData.current >= 7
+        checkType: 'streakCurrent',
+        requiredValue: 7
     },
     {
         id: 'xp_collector',
         name: 'XP Koleksiyoncusu',
         description: 'Toplamda 1000 XP kazan.',
-        icon: 'EmojiEvents', // String olarak sakla
+        icon: 'EmojiEvents',
         xpReward: 100,
-        isCompleted: ({ stats }) => stats.totalXP >= 1000
+        checkType: 'totalXP',
+        requiredValue: 1000
     }
 ];
+
+// Achievement kontrolü için utility fonksiyon
+export const checkAchievementCompleted = (achievement, userData) => {
+    const { checkType, requiredValue } = achievement;
+
+    switch (checkType) {
+        case 'totalNewsRead':
+            return userData.readingProgress.totalNewsRead >= requiredValue;
+        case 'badgeCount':
+            return userData.achievements.badges.length >= requiredValue;
+        case 'streakCurrent':
+            return userData.achievements.streakData.current >= requiredValue;
+        case 'stacksCompleted':
+            return userData.readingProgress.totalStacksCompleted >= requiredValue;
+        case 'level':
+            return userData.stats.currentLevel >= requiredValue;
+        case 'totalXP':
+            return userData.stats.totalXP >= requiredValue;
+        default:
+            return false;
+    }
+};
 
 // Demo leaderboard - XP bazlı
 export const leaderboardData = [
