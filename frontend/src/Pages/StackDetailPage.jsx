@@ -36,12 +36,17 @@ import { useAppDispatch } from '../hooks/redux';
 import {
   useSelectedStack,
   useStacksLoading,
-  useStacksError
+  useStacksError,
+  useCurrentlyReading,
+  useReadingProgress
 } from '../hooks/redux';
 import {
   fetchStackById,
   setSelectedStack
 } from '../store/slices/stackSlice';
+import {
+  startReadingStack
+} from '../store/slices/userSlice';
 
 // Components
 import ShareModal from '../components/modals/ShareModal';
@@ -57,6 +62,8 @@ const StackDetailPage = () => {
   const selectedStack = useSelectedStack();
   const loading = useStacksLoading();
   const error = useStacksError();
+  const currentlyReading = useCurrentlyReading();
+  const readingProgress = useReadingProgress();
 
   const [playTrailer, setPlayTrailer] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
@@ -72,6 +79,40 @@ const StackDetailPage = () => {
       dispatch(setSelectedStack(null));
     };
   }, [dispatch, id]);
+
+  // Check if this stack is already being read or completed
+  const getStackReadingStatus = () => {
+    if (!selectedStack) return { status: 'not_started', progress: 0 };
+
+    // Check if completed
+    const completedStack = readingProgress.readStacks.find(s => s.stackId === selectedStack._id);
+    if (completedStack) {
+      return {
+        status: 'completed',
+        progress: 100,
+        completedAt: completedStack.completedAt,
+        xpEarned: completedStack.xpEarned
+      };
+    }
+
+    // Check if currently reading
+    const currentStack = currentlyReading.find(s => s.stackId === selectedStack._id);
+    if (currentStack) {
+      const progress = currentStack.totalNews > 0
+        ? Math.floor((currentStack.readNews / currentStack.totalNews) * 100)
+        : 0;
+      return {
+        status: 'reading',
+        progress,
+        readNews: currentStack.readNews,
+        totalNews: currentStack.totalNews
+      };
+    }
+
+    return { status: 'not_started', progress: 0 };
+  };
+
+  const stackStatus = getStackReadingStatus();
 
   // Format date helper
   const formatDate = (dateString) => {
@@ -105,6 +146,25 @@ const StackDetailPage = () => {
   // Close page
   const handleClose = () => {
     navigate('/');
+  };
+
+  // Start reading handler
+  const handleStartReading = () => {
+    if (!selectedStack) return;
+
+    // Stack okumaya başla
+    dispatch(startReadingStack({
+      stackId: selectedStack._id,
+      totalNews: selectedStack.news?.length || 0
+    }));
+
+    // Reading flow page'e git
+    navigate(`/stack/${id}/read`);
+  };
+
+  // Continue reading handler
+  const handleContinueReading = () => {
+    navigate(`/stack/${id}/read`);
   };
 
   if (loading) {
@@ -248,6 +308,54 @@ const StackDetailPage = () => {
                 {stack.title}
               </Typography>
 
+              {/* Reading Progress */}
+              {stackStatus.status !== 'not_started' && (
+                <Box sx={{ mb: { xs: 2, md: 3 } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {stackStatus.status === 'completed' ? '✅ Tamamlandı' : '📖 Devam Ediyor'}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'rgba(255,255,255,0.8)' }}
+                    >
+                      %{stackStatus.progress}
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={stackStatus.progress}
+                    sx={{
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: 'rgba(255,255,255,0.2)',
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: stackStatus.status === 'completed' ? '#4CAF50' : '#FFD700',
+                        borderRadius: 3
+                      }
+                    }}
+                  />
+                  {stackStatus.status === 'reading' && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: 'rgba(255,255,255,0.7)',
+                        mt: 0.5,
+                        display: 'block'
+                      }}
+                    >
+                      {stackStatus.readNews}/{stackStatus.totalNews} haber okundu
+                    </Typography>
+                  )}
+                </Box>
+              )}
+
               {/* Stats */}
               <Box sx={{
                 display: 'flex',
@@ -332,29 +440,79 @@ const StackDetailPage = () => {
                 gap: { xs: 1.5, md: 2 },
                 flexWrap: 'wrap',
                 alignItems: 'center',
-                flexDirection: 'row' // Her zaman yatay
+                flexDirection: 'row'
               }}>
-                <Button
-                  variant="contained"
-                  size={isMobile ? 'medium' : 'large'}
-                  startIcon={<PlayArrow />}
-                  onClick={() => navigate(`/stack/${id}/read`)}
-                  sx={{
-                    backgroundColor: 'white',
-                    color: 'black',
-                    fontWeight: 'bold',
-                    px: { xs: 3, md: 4 },
-                    py: { xs: 1.2, md: 1.5 },
-                    fontSize: { xs: '0.875rem', md: '1rem' },
-                    flex: { xs: '1 1 auto', sm: '0 0 auto' }, // Mobilde esnek genişlik
-                    minWidth: { xs: 'auto', sm: 'auto' },
-                    '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.8)'
-                    }
-                  }}
-                >
-                  Haberi İncele
-                </Button>
+                {stackStatus.status === 'not_started' && (
+                  <Button
+                    variant="contained"
+                    size={isMobile ? 'medium' : 'large'}
+                    startIcon={<PlayArrow />}
+                    onClick={handleStartReading}
+                    sx={{
+                      backgroundColor: 'white',
+                      color: 'black',
+                      fontWeight: 'bold',
+                      px: { xs: 3, md: 4 },
+                      py: { xs: 1.2, md: 1.5 },
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      flex: { xs: '1 1 auto', sm: '0 0 auto' },
+                      minWidth: { xs: 'auto', sm: 'auto' },
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.8)'
+                      }
+                    }}
+                  >
+                    Okumaya Başla
+                  </Button>
+                )}
+
+                {stackStatus.status === 'reading' && (
+                  <Button
+                    variant="contained"
+                    size={isMobile ? 'medium' : 'large'}
+                    startIcon={<PlayArrow />}
+                    onClick={handleContinueReading}
+                    sx={{
+                      backgroundColor: '#FFD700',
+                      color: 'black',
+                      fontWeight: 'bold',
+                      px: { xs: 3, md: 4 },
+                      py: { xs: 1.2, md: 1.5 },
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      flex: { xs: '1 1 auto', sm: '0 0 auto' },
+                      minWidth: { xs: 'auto', sm: 'auto' },
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 215, 0, 0.8)'
+                      }
+                    }}
+                  >
+                    Okumaya Devam Et
+                  </Button>
+                )}
+
+                {stackStatus.status === 'completed' && (
+                  <Button
+                    variant="contained"
+                    size={isMobile ? 'medium' : 'large'}
+                    startIcon={<PlayArrow />}
+                    onClick={handleContinueReading}
+                    sx={{
+                      backgroundColor: '#4CAF50',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      px: { xs: 3, md: 4 },
+                      py: { xs: 1.2, md: 1.5 },
+                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      flex: { xs: '1 1 auto', sm: '0 0 auto' },
+                      minWidth: { xs: 'auto', sm: 'auto' },
+                      '&:hover': {
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)'
+                      }
+                    }}
+                  >
+                    Tekrar Oku
+                  </Button>
+                )}
 
                 <Button
                   variant="outlined"
@@ -367,7 +525,7 @@ const StackDetailPage = () => {
                     px: { xs: 3, md: 3 },
                     py: { xs: 1.2, md: 1.5 },
                     fontSize: { xs: '0.875rem', md: '1rem' },
-                    flex: { xs: '1 1 auto', sm: '0 0 auto' }, // Mobilde esnek genişlik
+                    flex: { xs: '1 1 auto', sm: '0 0 auto' },
                     minWidth: { xs: 'auto', sm: 'auto' },
                     '&:hover': {
                       borderColor: 'white',
@@ -378,13 +536,13 @@ const StackDetailPage = () => {
                   Takip Et
                 </Button>
 
-                {/* Tags - Like butonunun yerine */}
+                {/* Tags */}
                 {stack.tags && stack.tags.length > 0 && (
                   <Box sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: { xs: 0.75, md: 1 },
-                    mt: { xs: 1, md: 0 }, // Mobilde üstten margin
+                    mt: { xs: 1, md: 0 },
                     alignItems: 'center',
                     width: { xs: '100%', sm: 'auto' },
                     justifyContent: { xs: 'center', sm: 'flex-start' }

@@ -11,7 +11,15 @@ import {
   useActiveCategory,
   useStacksLoading,
   usePopularStacks,
-  useLatestStacks
+  useLatestStacks,
+  useUserStats,
+  useUserXP,
+  useUserLevel,
+  useUserLevelProgress,
+  useReadingProgress,
+  useUserAchievements,
+  useUserBadges,
+  useUserStreak
 } from '../hooks/redux';
 import {
   fetchAllNews,
@@ -28,6 +36,16 @@ import {
   addToast,
   openBadgeModal
 } from '../store/slices/uiSlice';
+import {
+  loadDemoData,
+  addXP,
+  addBadge,
+  addAchievement,
+  startReadingStack,
+  readNewsInStack,
+  completeStack,
+  clearLevelUpFlag
+} from '../store/slices/userSlice';
 
 // Components
 import Hero from '../components/sections/Hero';
@@ -42,8 +60,8 @@ import BadgeToast from '../components/notifications/BadgeToast';
 // Data and utilities
 import {
   allBadges,
-  levelThresholds,
-  allAchievements
+  allAchievements,
+  XP_CONSTANTS
 } from '../constants/index.jsx';
 
 const MainPage = () => {
@@ -57,13 +75,18 @@ const MainPage = () => {
   const searchQuery = useSearchQuery();
   const selectedCategory = useActiveCategory();
 
-  // Local state (will gradually move to Redux)
-  const [totalCp, setTotalCp] = useState(0);
-  const [readArticles, setReadArticles] = useState([]);
-  const [earnedBadges, setEarnedBadges] = useState([]);
+  // User Redux state
+  const userStats = useUserStats();
+  const totalXP = useUserXP();
+  const currentLevel = useUserLevel();
+  const levelProgress = useUserLevelProgress();
+  const readingProgress = useReadingProgress();
+  const userAchievements = useUserAchievements();
+  const earnedBadges = useUserBadges();
+  const streakData = useUserStreak();
+
+  // Local state (UI only)
   const [notificationToast, setNotificationToast] = useState(null);
-  const [streakData, setStreakData] = useState({ current: 0, lastDate: null });
-  const [earnedAchievements, setEarnedAchievements] = useState(new Set());
 
   // Refs for timers
   const toastTimerRef = useRef(null);
@@ -74,6 +97,11 @@ const MainPage = () => {
   // Load data on component mount
   useEffect(() => {
     const loadData = async () => {
+      // Demo verilerini yükle (sadece bir kez)
+      if (totalXP === 0 && currentLevel === 1) {
+        dispatch(loadDemoData());
+      }
+
       try {
         if (news.length === 0) {
           dispatch(fetchAllNews());
@@ -84,7 +112,7 @@ const MainPage = () => {
 
       try {
         if (popularStacks.length === 0) {
-          dispatch(fetchPopularStacks(20)); // En popüler 20 stack'i getir
+          dispatch(fetchPopularStacks(20));
         }
       } catch (error) {
         console.warn('Popular Stacks API hatası:', error);
@@ -92,7 +120,7 @@ const MainPage = () => {
 
       try {
         if (latestStacks.length === 0) {
-          dispatch(fetchLatestStacks(20)); // En son 20 stack'i getir
+          dispatch(fetchLatestStacks(20));
         }
       } catch (error) {
         console.warn('Latest Stacks API hatası:', error);
@@ -100,33 +128,60 @@ const MainPage = () => {
     };
 
     loadData();
-  }, [dispatch, news.length, popularStacks.length, latestStacks.length]);
+  }, [dispatch, news.length, popularStacks.length, latestStacks.length, totalXP, currentLevel]);
 
-  // Utility functions
-  const calculateLevel = (cp) => {
-    let level = 1;
-    for (let i = 1; i < levelThresholds.length; i++) {
-      if (cp >= levelThresholds[i]) {
-        level = i + 1;
-      } else {
-        break;
-      }
+  // Level up notification
+  useEffect(() => {
+    if (levelProgress.hasLeveledUp) {
+      dispatch(addToast({
+        type: 'success',
+        title: '🎉 Level Atladın!',
+        message: `Tebrikler! ${levelProgress.levelUpTo}. seviyeye ulaştın!`,
+        duration: 5000
+      }));
+
+      // Bonus XP ver
+      dispatch(addXP(XP_CONSTANTS.LEVEL_UP_BONUS));
+
+      // Flag'i temizle
+      dispatch(clearLevelUpFlag());
     }
-    return level;
-  };
+  }, [levelProgress.hasLeveledUp, dispatch]);
 
-  const currentLevel = calculateLevel(totalCp);
-  const currentLevelCp = levelThresholds[currentLevel - 1] ?? 0;
-  const nextLevelCp = levelThresholds[currentLevel] ?? Infinity;
+  // Achievement kontrolü
+  useEffect(() => {
+    const checkAchievements = () => {
+      const userData = {
+        stats: userStats,
+        readingProgress,
+        achievements: userAchievements
+      };
+
+      allAchievements.forEach(achievement => {
+        const alreadyEarned = userAchievements.achievements.find(a => a.id === achievement.id);
+
+        if (!alreadyEarned && achievement.isCompleted(userData)) {
+          dispatch(addAchievement(achievement));
+          dispatch(addXP(achievement.xpReward));
+          dispatch(addToast({
+            type: 'success',
+            title: '🏆 Yeni Başarım!',
+            message: `"${achievement.name}" başarımını kazandın! +${achievement.xpReward} XP`,
+            duration: 5000
+          }));
+        }
+      });
+    };
+
+    checkAchievements();
+  }, [userStats, readingProgress, userAchievements, dispatch]);
 
   // Event handlers
   const handleNewsCardClick = (articleId) => {
-    // Use Redux data if available
     const newsData = news.length > 0 ? news : [];
     const articleToOpen = newsData.find(article => article.id === articleId || article.guid === articleId);
     if (articleToOpen) {
       dispatch(setSelectedNews(articleToOpen));
-      // Navigate to article page
       navigate(`/article/${articleToOpen.guid || articleToOpen.id}`);
     }
   };
@@ -150,11 +205,17 @@ const MainPage = () => {
   };
 
   const handleStackClick = (stackId) => {
-    // Stack'e tıklandığında Netflix benzeri tanıtım sayfasına yönlendir
     const allStacks = [...popularStacks, ...latestStacks];
     const stackToOpen = allStacks.find(stack => stack._id === stackId);
     if (stackToOpen) {
       dispatch(setSelectedStack(stackToOpen));
+
+      // Stack okumaya başla
+      dispatch(startReadingStack({
+        stackId: stackToOpen._id,
+        totalNews: stackToOpen.news?.length || 0
+      }));
+
       navigate(`/stack/${stackId}`);
     }
   };
@@ -172,7 +233,6 @@ const MainPage = () => {
       const title = article.title?.toLowerCase() || '';
       const summary = article.summary?.toLowerCase() || article.description?.toLowerCase() || '';
 
-      // content array'ini string'e çevir
       let contentText = '';
       if (Array.isArray(article.content)) {
         contentText = article.content
@@ -195,16 +255,19 @@ const MainPage = () => {
     .sort((a, b) => {
       const dateA = new Date(a.pubDate || a.createdAt || Date.now());
       const dateB = new Date(b.pubDate || b.createdAt || Date.now());
-      return dateB - dateA; // En yeni haberler önce
+      return dateB - dateA;
     })
     .slice(0, 20);
 
-  // Generate recommendations
-  const readArticleIds = new Set(readArticles.map(a => a.id || a.guid));
+  // Generate recommendations based on reading history
+  const readStackIds = new Set(readingProgress.readStacks.map(s => s.stackId));
   const readCategories = new Set(
-    filteredNews
-      .filter(slide => readArticleIds.has(slide.id || slide.guid))
-      .map(slide => slide.category)
+    readingProgress.readStacks
+      .map(s => {
+        const stack = [...popularStacks, ...latestStacks].find(st => st._id === s.stackId);
+        return stack?.mainCategory;
+      })
+      .filter(Boolean)
   );
 
   const allArticlesAsNews = filteredNews.map(slide => ({
@@ -220,30 +283,24 @@ const MainPage = () => {
   if (readCategories.size > 0) {
     const recommendations = allArticlesAsNews.filter(newsItem => {
       const slide = filteredNews.find(s => (s.id || s.guid) === newsItem.id);
-      return !readArticleIds.has(newsItem.id) && readCategories.has(slide?.category);
+      return readCategories.has(slide?.category);
     });
     recommendedNews = recommendations.length > 0
       ? recommendations.slice(0, 8)
-      : allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
+      : allArticlesAsNews.slice(0, 8);
   } else {
-    recommendedNews = allArticlesAsNews.filter(newsItem => !readArticleIds.has(newsItem.id)).slice(0, 8);
+    recommendedNews = allArticlesAsNews.slice(0, 8);
   }
 
   // Convert stacks to NewsCard format
   const convertStackToNewsCard = (stack) => {
-    // Stack'in kendi resim verilerini kullan
     let imageUrl = null;
 
-    // Önce stack'in kendi imageUrl'ini kontrol et (Redux'tan gelen)
     if (stack.imageUrl) {
       imageUrl = stack.imageUrl;
-    }
-    // Eğer stack'te photoUrl field'ı varsa onu kullan
-    else if (stack.photoUrl) {
+    } else if (stack.photoUrl) {
       imageUrl = stack.photoUrl;
-    }
-    // Stack'teki son haberin resmini kullan
-    else if (stack.news && stack.news.length > 0) {
+    } else if (stack.news && stack.news.length > 0) {
       const firstNews = stack.news[stack.news.length-1];
       if (typeof firstNews === 'object' && firstNews.image) {
         imageUrl = firstNews.image;
@@ -254,7 +311,7 @@ const MainPage = () => {
       id: stack._id,
       thumbnailUrl: imageUrl,
       imageUrl: imageUrl,
-      category: stack.mainCategory || 'genel', // mainCategory field'ını kullan
+      category: stack.mainCategory || 'genel',
       title: stack.title,
       age: new Date(stack.createdAt).toLocaleDateString('tr-TR'),
       xp: stack.xp || 0,
@@ -266,14 +323,12 @@ const MainPage = () => {
   // Convert popular stacks to NewsCard format with category filtering
   const popularStacksAsNews = popularStacks
     .filter(stack => {
-      // Kategori filtresi uygula
       if (selectedCategory === 'all' || !selectedCategory) {
         return true;
       }
       return stack.mainCategory === selectedCategory;
     })
     .filter(stack => {
-      // Arama filtresi uygula
       if (!searchQuery) return true;
 
       const searchTerm = searchQuery.toLowerCase();
@@ -287,14 +342,12 @@ const MainPage = () => {
   // Convert latest stacks to NewsCard format with category filtering
   const latestStacksAsNews = latestStacks
     .filter(stack => {
-      // Kategori filtresi uygula
       if (selectedCategory === 'all' || !selectedCategory) {
         return true;
       }
       return stack.mainCategory === selectedCategory;
     })
     .filter(stack => {
-      // Arama filtresi uygula
       if (!searchQuery) return true;
 
       const searchTerm = searchQuery.toLowerCase();
@@ -304,6 +357,15 @@ const MainPage = () => {
       return title.includes(searchTerm) || description.includes(searchTerm);
     })
     .map(convertStackToNewsCard);
+
+  // Recently read stacks
+  const recentlyReadAsNews = readingProgress.recentlyRead
+    .map(recent => {
+      const stack = [...popularStacks, ...latestStacks].find(s => s._id === recent.stackId);
+      return stack ? convertStackToNewsCard(stack) : null;
+    })
+    .filter(Boolean)
+    .slice(0, 8);
 
   if (isLoading || stacksLoading) {
     return (
@@ -331,13 +393,13 @@ const MainPage = () => {
       {/* Badge Modal */}
       <BadgeModal
         badges={earnedBadges}
-        totalCp={totalCp}
-        earnedAchievements={earnedAchievements}
+        totalCp={totalXP}
+        earnedAchievements={new Set(userAchievements.achievements.map(a => a.id))}
         level={currentLevel}
       />
 
       <Box component="main">
-        {/* Hero Section - Her kategoriden 2 stack gösterir */}
+        {/* Hero Section */}
         <Hero onStackClick={handleStackClick} />
 
         {/* Search and Category Section */}
@@ -385,11 +447,11 @@ const MainPage = () => {
           </NewsSection>
 
           <NewsSection title="Son okunan haberler">
-            {readArticles.length > 0 ? (
+            {recentlyReadAsNews.length > 0 ? (
               <NewsCard
-                articles={readArticles}
+                articles={recentlyReadAsNews}
                 variant="horizontal"
-                onClick={(newsId) => handleNewsCardClick(newsId)}
+                onClick={(stackId) => handleStackClick(stackId)}
               />
             ) : (
               <Box sx={{ px: 2, color: 'text.secondary' }}>

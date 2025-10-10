@@ -17,6 +17,10 @@ export const useUI = () => {
   return useAppSelector((state) => state.ui);
 };
 
+export const useUser = () => {
+  return useAppSelector((state) => state.user);
+};
+
 // Specific selectors for common use cases
 export const useNewsLoading = () => {
   return useAppSelector((state) => state.news.loading);
@@ -42,20 +46,20 @@ export const useSelectedStack = () => {
   return useAppSelector((state) => state.stacks.selectedStack);
 };
 
+export const usePopularStacks = () => {
+  return useAppSelector((state) => state.stacks.popularStacks);
+};
+
+export const useLatestStacks = () => {
+  return useAppSelector((state) => state.stacks.latestStacks);
+};
+
 export const useGlobalLoading = () => {
   return useAppSelector((state) => state.ui.globalLoading);
 };
 
 export const useToasts = () => {
   return useAppSelector((state) => state.ui.notifications.toasts);
-};
-
-export const useModals = () => {
-  return useAppSelector((state) => state.ui.modals);
-};
-
-export const useTheme = () => {
-  return useAppSelector((state) => state.ui.theme);
 };
 
 export const useSearchQuery = () => {
@@ -66,40 +70,62 @@ export const useActiveCategory = () => {
   return useAppSelector((state) => state.ui.activeCategory);
 };
 
-// New selectors
-export const useAllNews = () => {
-  return useAppSelector((state) => state.news.allNews);
+// User-specific hooks
+export const useUserStats = () => {
+  return useAppSelector((state) => state.user.stats);
 };
 
-export const useAllStacks = () => {
-  return useAppSelector((state) => state.stacks.allStacks);
+export const useUserProfile = () => {
+  return useAppSelector((state) => state.user.profile);
 };
 
-export const useIsDarkMode = () => {
-  return useAppSelector((state) => state.ui.isDarkMode);
+export const useUserLevel = () => {
+  return useAppSelector((state) => state.user.stats.currentLevel);
 };
 
-export const useCurrentUser = () => {
-  return useAppSelector((state) => state.auth.currentUser);
+export const useUserXP = () => {
+  return useAppSelector((state) => state.user.stats.totalXP);
 };
 
-export const useAuthError = () => {
-  return useAppSelector((state) => state.auth.error);
+export const useUserLevelProgress = () => {
+  return useAppSelector((state) => ({
+    currentLevelXP: state.user.stats.currentLevelXP,
+    nextLevelXP: state.user.stats.nextLevelXP,
+    progress: state.user.stats.levelProgress,
+    hasLeveledUp: state.user.stats.hasLeveledUp,
+    levelUpFrom: state.user.stats.levelUpFrom,
+    levelUpTo: state.user.stats.levelUpTo
+  }));
 };
 
-export const useAuthLoading = () => {
-  return useAppSelector((state) => state.auth.loading);
+export const useReadingProgress = () => {
+  return useAppSelector((state) => state.user.readingProgress);
 };
 
-// Stack selectors
-export const useFeaturedStacks = () => {
-  return useAppSelector((state) => state.stacks.featuredStacks);
+export const useCurrentlyReading = () => {
+  return useAppSelector((state) => state.user.readingProgress.currentlyReading);
 };
 
-export const usePopularStacks = () => {
-  return useAppSelector((state) => state.stacks.popularStacks);
+export const useRecentlyRead = () => {
+  return useAppSelector((state) => state.user.readingProgress.recentlyRead);
 };
 
-export const useLatestStacks = () => {
-  return useAppSelector((state) => state.stacks.latestStacks);
+export const useUserAchievements = () => {
+  return useAppSelector((state) => state.user.achievements);
+};
+
+export const useUserBadges = () => {
+  return useAppSelector((state) => state.user.achievements.badges);
+};
+
+export const useUserStreak = () => {
+  return useAppSelector((state) => state.user.achievements.streakData);
+};
+
+export const useUserPreferences = () => {
+  return useAppSelector((state) => state.user.preferences);
+};
+
+export const useFavoriteCategories = () => {
+  return useAppSelector((state) => state.user.preferences.favoriteCategories);
 };

@@ -18,8 +18,27 @@ import {
   Category,
   KeyboardArrowUp
 } from '@mui/icons-material';
-import { useAppDispatch, useSelectedStack } from '../hooks/redux';
+
+// Redux hooks
+import { useAppDispatch } from '../hooks/redux';
+import {
+  useSelectedStack,
+  useCurrentlyReading,
+  useUserXP,
+  useUserLevel,
+  useUserLevelProgress
+} from '../hooks/redux';
 import { fetchStackById } from '../store/slices/stackSlice';
+import {
+  readNewsInStack,
+  completeStack,
+  addXP,
+  addBadge
+} from '../store/slices/userSlice';
+import { addToast } from '../store/slices/uiSlice';
+
+// Constants
+import { XP_CONSTANTS, allBadges, categoryColors } from '../constants/index.jsx';
 
 // Görüntülenme sayısını kısaltılmış formatta göstermek için yardımcı fonksiyon
 const formatViewCount = (count) => {
@@ -34,18 +53,21 @@ const formatViewCount = (count) => {
   return num.toString();
 };
 
+// Her haber için XP hesaplama
+const generateNewsXP = () => {
+  return Math.floor(Math.random() * (XP_CONSTANTS.NEWS_XP_MAX - XP_CONSTANTS.NEWS_XP_MIN + 1)) + XP_CONSTANTS.NEWS_XP_MIN;
+};
+
 // Kronolojik haber parçalarını simüle eden data
 const generateChronologicalSteps = (stack) => {
   if (!stack || !stack.news || stack.news.length === 0) return [];
 
   const steps = [];
   
-  // Stack'in resim verilerini al - önce stack'in kendi resmi, sonra ilk haberin resmi
+  // Stack'in resim verilerini al
   const getStackImage = (stack) => {
-    // Önce stack'in kendi resim verilerini kontrol et
     if (stack?.imageUrl) return stack.imageUrl;
     if (stack?.photoUrl) return stack.photoUrl;
-    // Stack'teki son haberin resmini kullan
     if (stack?.news && stack.news.length > 0) {
       const lastNews = stack.news[stack.news.length - 1];
       if (typeof lastNews === 'object' && lastNews.image) {
@@ -55,15 +77,14 @@ const generateChronologicalSteps = (stack) => {
     return 'https://via.placeholder.com/1920x1080';
   };
 
-  // İlk step - Giriş (Stack'in kendi bilgileriyle)
+  // İlk step - Giriş
   steps.push({
     id: 'intro',
     type: 'intro',
     title: stack.title,
     content: stack.description || 'Bu haber yığınında kronolojik olarak gelişen olayları inceleceğiz.',
-    image: getStackImage(stack), // Stack'in kendi resmi
+    image: getStackImage(stack),
     timestamp: null,
-    // Stack verileri
     stackData: {
       newsCount: stack.news?.length || 0,
       viewCount: stack.viewCount || 0,
@@ -82,15 +103,17 @@ const generateChronologicalSteps = (stack) => {
       id: `step-${index}`,
       type: 'news',
       title: newsItem.title || `Gelişme ${index + 1}`,
-      content:  newsItem.newstext || newsItem.description ||'Bu gelişmede önemli detaylar ortaya çıktı.',
+      content: newsItem.newstext || newsItem.description || 'Bu gelişmede önemli detaylar ortaya çıktı.',
       image: newsItem.image || getStackImage(stack),
       timestamp: newsItem.pubDate || new Date().toISOString(),
       stepNumber: index + 1,
-      totalSteps: stack.news.length
+      totalSteps: stack.news.length,
+      newsXP: generateNewsXP() // Her haber için XP
     });
   });
 
   // Son step - Tebrik
+  const stackCompletionXP = XP_CONSTANTS.STACK_COMPLETION_BONUS;
   steps.push({
     id: 'completion',
     type: 'completion',
@@ -98,7 +121,7 @@ const generateChronologicalSteps = (stack) => {
     content: `${stack.title} haber yığınını başarıyla tamamladınız!`,
     image: null,
     reward: {
-      cp: stack.xp || 50,
+      cp: stackCompletionXP,
       badge: null
     }
   });
@@ -114,31 +137,37 @@ const ReadingFlowPage = () => {
   const dispatch = useAppDispatch();
   
   const selectedStack = useSelectedStack();
+  const currentlyReading = useCurrentlyReading();
+  const userXP = useUserXP();
+  const userLevel = useUserLevel();
+  const levelProgress = useUserLevelProgress();
+
   const [currentStep, setCurrentStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [steps, setSteps] = useState([]);
+  const [readNewsIndices, setReadNewsIndices] = useState(new Set()); // Okunan haberleri takip et
 
-  // Hibrit scroll sistemi için state'ler - Gelişmiş pull sistem
+  // Hibrit scroll sistemi için state'ler
   const [pullState, setPullState] = useState({
     isAtTop: true,
     isAtBottom: false,
     pullDistance: 0,
     isPulling: false,
-    pullDirection: null, // 'up' | 'down'
+    pullDirection: null,
     canNavigate: false,
-    isAboveThreshold: false, // Eşik değerini aştı mı?
-    isAboveConfirmationThreshold: false, // "Bırakın" mesajı için eşik
-    initialScrollPos: 0, // Çekme başladığındaki scroll pozisyonu
-    isSpringBack: false // Geri dönüş animasyonu aktif mi?
+    isAboveThreshold: false,
+    isAboveConfirmationThreshold: false,
+    initialScrollPos: 0,
+    isSpringBack: false
   });
 
-  // Eşik değerleri ve hassasiyet ayarları - İyileştirilmiş
-  const PULL_THRESHOLD = 60; // Ana eşik - navigation için (azaltıldı, daha responsive)
-  const VISUAL_FEEDBACK_THRESHOLD = 25; // Görsel feedback başlangıcı (daha erken başlasın)
-  const CONFIRMATION_THRESHOLD = 45; // "Bırakın" mesajı için eşik
-  const MAX_PULL_DISTANCE = 100; // Maximum çekme mesafesi (azaltıldı)
-  const DAMPING_FACTOR = 0.7; // Çekme direnci artırıldı (daha yumuşak)
-  const SPRING_BACK_DURATION = 300; // Geri dönüş animasyon süresi
+  // Eşik değerleri
+  const PULL_THRESHOLD = 60;
+  const VISUAL_FEEDBACK_THRESHOLD = 25;
+  const CONFIRMATION_THRESHOLD = 45;
+  const MAX_PULL_DISTANCE = 100;
+  const DAMPING_FACTOR = 0.7;
+  const SPRING_BACK_DURATION = 300;
 
   // Refs
   const newsContentRef = useRef(null);
@@ -164,8 +193,83 @@ const ReadingFlowPage = () => {
     }
   }, [selectedStack]);
 
-  // Safety check for currentStepData - EN BAŞTA TANIMLA
+  // Mevcut okuma progress'ini kontrol et
+  useEffect(() => {
+    if (selectedStack && currentlyReading.length > 0) {
+      const stackProgress = currentlyReading.find(r => r.stackId === selectedStack._id);
+      if (stackProgress) {
+        // Daha önce okunan haberleri işaretle
+        const readIndices = new Set();
+        for (let i = 0; i < stackProgress.readNews; i++) {
+          readIndices.add(i);
+        }
+        setReadNewsIndices(readIndices);
+      }
+    }
+  }, [selectedStack, currentlyReading]);
+
   const currentStepData = steps[currentStep];
+
+  // Haber okuma işlemi
+  const handleNewsRead = useCallback((stepIndex) => {
+    if (!selectedStack || readNewsIndices.has(stepIndex)) return;
+
+    const step = steps[stepIndex + 1]; // +1 çünkü intro step var
+    if (step && step.type === 'news') {
+      const newsXP = step.newsXP || generateNewsXP();
+
+      // Redux'ta progress güncelle
+      dispatch(readNewsInStack({
+        stackId: selectedStack._id,
+        newsXP: newsXP
+      }));
+
+      // Local state güncelle
+      setReadNewsIndices(prev => new Set([...prev, stepIndex]));
+
+      // XP kazanma toastı
+      dispatch(addToast({
+        type: 'success',
+        title: '📖 Haber Okundu!',
+        message: `+${newsXP} XP kazandın`,
+        duration: 3000
+      }));
+
+      // Kategori bazlı rozet kontrolü
+      const category = selectedStack.mainCategory;
+      if (category && !readNewsIndices.has(0)) { // İlk haber ise
+        const categoryBadge = allBadges.find(badge => badge.id === category);
+        if (categoryBadge) {
+          dispatch(addBadge(categoryBadge));
+          dispatch(addToast({
+            type: 'success',
+            title: '🏆 Yeni Rozet!',
+            message: `"${categoryBadge.name}" rozetini kazandın!`,
+            duration: 5000
+          }));
+        }
+      }
+    }
+  }, [selectedStack, steps, readNewsIndices, dispatch]);
+
+  // Stack tamamlama işlemi
+  const handleStackCompletion = useCallback(() => {
+    if (!selectedStack) return;
+
+    // Stack'i tamamla
+    dispatch(completeStack({ stackId: selectedStack._id }));
+
+    // Stack completion bonus XP
+    dispatch(addXP(XP_CONSTANTS.STACK_COMPLETION_BONUS));
+
+    // Tebrik mesajı
+    dispatch(addToast({
+      type: 'success',
+      title: '🎉 Stack Tamamlandı!',
+      message: `"${selectedStack.title}" yığınını tamamladın! +${XP_CONSTANTS.STACK_COMPLETION_BONUS} bonus XP`,
+      duration: 5000
+    }));
+  }, [selectedStack, dispatch]);
 
   // Scroll pozisyon kontrolü
   const checkScrollPosition = useCallback(() => {
@@ -173,8 +277,8 @@ const ReadingFlowPage = () => {
     if (!container) return;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
-    const isAtTop = scrollTop <= 1; // 1px tolerance
-    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1; // 1px tolerance
+    const isAtTop = scrollTop <= 1;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
 
     setPullState(prev => ({
       ...prev,
@@ -195,12 +299,22 @@ const ReadingFlowPage = () => {
     if (currentStep < steps.length - 1 && !isTransitioning) {
       setIsTransitioning(true);
 
+      // Eğer news step'inden çıkıyorsak, haber okundu olarak işaretle
+      if (currentStepData?.type === 'news' && currentStepData?.stepNumber) {
+        handleNewsRead(currentStepData.stepNumber - 1);
+      }
+
       setTimeout(() => {
         setCurrentStep(prev => prev + 1);
         setIsTransitioning(false);
+
+        // Eğer completion step'ine geçtiyse, stack'i tamamla
+        if (currentStep + 1 === steps.length - 1) {
+          handleStackCompletion();
+        }
       }, 300);
     }
-  }, [currentStep, steps.length, isTransitioning]);
+  }, [currentStep, steps.length, isTransitioning, currentStepData, handleNewsRead, handleStackCompletion]);
 
   const handlePrevStep = useCallback(() => {
     if (currentStep > 0 && !isTransitioning) {

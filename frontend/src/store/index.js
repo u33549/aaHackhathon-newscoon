@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import newsReducer from './slices/newsSlice';
 import stackReducer from './slices/stackSlice';
 import uiReducer from './slices/uiSlice';
+import userReducer from './slices/userSlice';
 
 export const store = configureStore({
   reducer: {
     news: newsReducer,
     stacks: stackReducer,
     ui: uiReducer,
+    user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

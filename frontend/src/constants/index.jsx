@@ -85,50 +85,137 @@ export const allBadges = [
     },
 ];
 
-// --- GAMIFICATION CONSTANTS ---
-export const levelThresholds = [
-  0, 100, 250, 500, 750, 1000, 1500, 2000, 2750, 3500, 4500, 5500, 7000, 8500, 10000, 12000, 14000, 16000, 18500, 21000, 24000, 27000, 30000, 34000, 38000, 42000
-];
+// --- XP AND LEVEL CONSTANTS ---
+export const XP_CONSTANTS = {
+  // Her haber için XP aralığı
+  NEWS_XP_MIN: 40,
+  NEWS_XP_MAX: 50,
 
+  // Level hesaplama sabitleri
+  BASE_XP: 100,           // İlk level için base XP
+  LEVEL_MULTIPLIER: 200,  // ln(x) çarpanı
+
+  // Bonus XP'ler
+  STACK_COMPLETION_BONUS: 25,     // Stack tamamlama bonusu
+  STREAK_DAILY_BONUS: 10,         // Günlük streak bonusu
+  FIRST_CATEGORY_BONUS: 50,       // İlk defa kategori okuma bonusu
+  LEVEL_UP_BONUS: 100,            // Level atlama bonusu
+};
+
+// Level hesaplama fonksiyonu - ln(x) bazlı
+export const calculateLevelFromXP = (totalXP) => {
+  if (totalXP <= 0) return 1;
+
+  const { BASE_XP, LEVEL_MULTIPLIER } = XP_CONSTANTS;
+
+  let level = 1;
+  let totalRequired = 0;
+
+  while (totalRequired < totalXP) {
+    const levelXP = BASE_XP + (Math.log(level) * LEVEL_MULTIPLIER);
+    totalRequired += levelXP;
+
+    if (totalRequired <= totalXP) {
+      level++;
+    } else {
+      break;
+    }
+  }
+
+  return Math.max(1, level);
+};
+
+// Yeni level threshold'ları - ln(x) sistemi için (ilk 30 level)
+export const levelThresholds = (() => {
+  const thresholds = [0]; // Level 1 = 0 XP
+  let totalXP = 0;
+
+  for (let level = 1; level <= 30; level++) {
+    const levelXP = XP_CONSTANTS.BASE_XP + (Math.log(level) * XP_CONSTANTS.LEVEL_MULTIPLIER);
+    totalXP += levelXP;
+    thresholds.push(Math.floor(totalXP));
+  }
+
+  return thresholds;
+})();
+
+// Güncellenmiş başarım sistemi
 export const allAchievements = [
     {
         id: 'beginner_reader',
         name: 'İlk Adım',
         description: 'İlk haberini tamamla.',
         icon: React.createElement(LogoIcon),
-        isCompleted: ({ readArticles }) => readArticles.length >= 1
+        xpReward: 50,
+        isCompleted: ({ readingProgress }) => readingProgress.totalNewsRead >= 1
     },
     {
         id: 'curious_mind',
         name: 'Meraklı Zihin',
         description: 'Tüm kategorilerden en az bir haber oku.',
         icon: React.createElement(BilimBadgeIcon),
-        isCompleted: ({ badges }) => badges.length >= 4
+        xpReward: 100,
+        isCompleted: ({ achievements }) => achievements.badges.length >= 4
     },
     {
         id: 'streak_starter',
         name: 'Ateşi Yaktın',
         description: '3 günlük okuma serisine ulaş.',
         icon: React.createElement(FlameIcon),
-        isCompleted: ({ streak }) => streak >= 3
+        xpReward: 75,
+        isCompleted: ({ achievements }) => achievements.streakData.current >= 3
     },
     {
-        id: 'cp_hoarder',
-        name: 'Puan Avcısı',
-        description: 'Toplamda 1000 CP kazan.',
-        icon: React.createElement(EkonomiBadgeIcon),
-        isCompleted: ({ totalCp }) => totalCp >= 1000
+        id: 'stack_master',
+        name: 'Yığın Ustası',
+        description: 'İlk haber yığınını tamamla.',
+        icon: React.createElement(EmojiEvents),
+        xpReward: 100,
+        isCompleted: ({ readingProgress }) => readingProgress.totalStacksCompleted >= 1
     },
+    {
+        id: 'news_addict',
+        name: 'Haber Bağımlısı',
+        description: '50 haber oku.',
+        icon: React.createElement(Computer),
+        xpReward: 200,
+        isCompleted: ({ readingProgress }) => readingProgress.totalNewsRead >= 50
+    },
+    {
+        id: 'level_climber',
+        name: 'Seviye Tırmanıcısı',
+        description: '5. seviyeye ulaş.',
+        icon: React.createElement(TrendingUp),
+        xpReward: 150,
+        isCompleted: ({ stats }) => stats.currentLevel >= 5
+    },
+    {
+        id: 'streak_legend',
+        name: 'Seri Efsanesi',
+        description: '7 günlük okuma serisine ulaş.',
+        icon: React.createElement(FlameIcon),
+        xpReward: 300,
+        isCompleted: ({ achievements }) => achievements.streakData.current >= 7
+    },
+    {
+        id: 'xp_collector',
+        name: 'XP Koleksiyoncusu',
+        description: 'Toplamda 1000 XP kazan.',
+        icon: React.createElement(EmojiEvents),
+        xpReward: 100,
+        isCompleted: ({ stats }) => stats.totalXP >= 1000
+    }
 ];
 
+// Demo leaderboard - XP bazlı
 export const leaderboardData = [
-    { id: 1, name: 'Kripto Kaşifi', cp: 7850, level: 12 },
-    { id: 2, name: 'Veri Vandalı', cp: 7600, level: 12 },
-    { id: 3, name: 'Siber Sultan', cp: 7120, level: 11 },
-    { id: 4, name: 'Sen', cp: 0, level: 1, isCurrentUser: true },
-    { id: 5, name: 'Algoritma Avcısı', cp: 6540, level: 10 },
-    { id: 6, name: 'Piksel Profesörü', cp: 6110, level: 10 },
-    { id: 7, name: 'Kod Kaptanı', cp: 5890, level: 9 },
+    { id: 1, name: 'Haber Avcısı', xp: 2847, level: 8 },
+    { id: 2, name: 'Bilgi Kurdu', xp: 2653, level: 8 },
+    { id: 3, name: 'Gündem Takipçisi', xp: 2401, level: 7 },
+    { id: 4, name: 'Sen', xp: 0, level: 1, isCurrentUser: true },
+    { id: 5, name: 'Analiz Uzmanı', xp: 2156, level: 7 },
+    { id: 6, name: 'Medya Meraklısı', xp: 1924, level: 6 },
+    { id: 7, name: 'Haber Okuyucusu', xp: 1687, level: 6 },
 ];
 
 export const categoryColors = {
