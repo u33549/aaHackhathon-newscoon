@@ -100,12 +100,9 @@ const Footer = () => {
 
         <Divider sx={{ my: 3 }} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="body2" color="text.secondary">
             © 2025 Newscoon. Tüm hakları saklıdır.
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Route yapısı başarıyla kuruldu!
           </Typography>
         </Box>
       </Container>
