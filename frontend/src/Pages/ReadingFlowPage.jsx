@@ -760,22 +760,12 @@ const ReadingFlowPage = () => {
               overflowY: 'auto',
               overflowX: 'hidden',
               scrollBehavior: 'smooth',
-              // Modern scrollbar styling
+              // Hide scrollbar completely
               '&::-webkit-scrollbar': {
-                width: '6px'
+                display: 'none'
               },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-                borderRadius: '10px'
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(255, 255, 255, 0.3)',
-                borderRadius: '10px',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.5)'
-                }
-              }
+              scrollbarWidth: 'none', // Firefox
+              msOverflowStyle: 'none' // IE and Edge
             })
           }}>
             {/* Intro Page - Pull feedback UI için relative container */}
@@ -1235,27 +1225,12 @@ const ReadingFlowPage = () => {
                       pullState.pullDirection === 'down' ? pullState.pullDistance * 0.2 : -pullState.pullDistance * 0.2
                     }px)` : 'none',
                     transition: pullState.isPulling ? 'none' : 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    // Modern scrollbar
+                    // Hide scrollbar completely
                     '&::-webkit-scrollbar': {
-                      width: '6px',
-                      '&:hover': { width: '8px' }
+                      display: 'none'
                     },
-                    '&::-webkit-scrollbar-track': {
-                      background: 'transparent',
-                      borderRadius: '10px'
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      background: theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.2)'
-                        : 'rgba(0, 0, 0, 0.2)',
-                      borderRadius: '10px',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        background: theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.3)'
-                          : 'rgba(0, 0, 0, 0.3)'
-                      }
-                    }
+                    scrollbarWidth: 'none', // Firefox
+                    msOverflowStyle: 'none' // IE and Edge
                   }}
                 >
                   {/* News Image */}
