@@ -62,7 +62,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
           iconBgColor: 'rgba(26, 26, 26, 0.8)',
           message: `Seviye ${currentCelebration.newLevel}`,
-          subtitle: currentCelebration.xpBonus ? `+${currentCelebration.xpBonus} XP Bonus` : null,
+          subtitle: null, // XP bonus bilgisi kaldırıldı
           accentColor: '#FFD700'
         };
 

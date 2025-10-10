@@ -34,7 +34,8 @@ import {
   completeStack,
   addXP,
   addBadge,
-  updateReadingProgress
+  updateReadingProgress,
+  clearLevelUpFlag
 } from '../store/slices/userSlice';
 import { addCelebrationToQueue } from '../store/slices/uiSlice';
 
@@ -248,6 +249,20 @@ const ReadingFlowPage = () => {
     }
   }, [currentStep, currentStepData?.type]);
 
+  // Level up notification - Celebration queue'ya ekle (ReadingFlowPage'de)
+  useEffect(() => {
+    if (levelProgress.hasLeveledUp) {
+      // Celebration queue'ya ekle
+      dispatch(addCelebrationToQueue({
+        type: 'levelUp',
+        newLevel: levelProgress.levelUpTo,
+        oldLevel: levelProgress.levelUpFrom
+      }));
+
+      // Flag'i temizle
+      dispatch(clearLevelUpFlag());
+    }
+  }, [levelProgress.hasLeveledUp, levelProgress.levelUpTo, levelProgress.levelUpFrom, dispatch]);
 
   // Haber okuma işlemi - Celebration queue ile
   const handleNewsRead = useCallback((stepIndex) => {

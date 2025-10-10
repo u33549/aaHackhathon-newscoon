@@ -116,24 +116,6 @@ const MainPage = () => {
     loadData();
   }, [dispatch, news.length, popularStacks.length, latestStacks.length, totalXP, currentLevel]);
 
-  // Level up notification - Celebration queue'ya ekle
-  useEffect(() => {
-    if (levelProgress.hasLeveledUp) {
-      // Celebration queue'ya ekle
-      dispatch(addCelebrationToQueue({
-        type: 'levelUp',
-        newLevel: levelProgress.levelUpTo,
-        oldLevel: levelProgress.levelUpFrom,
-        xpBonus: XP_CONSTANTS.LEVEL_UP_BONUS
-      }));
-
-      // Bonus XP ver
-      dispatch(addXP(XP_CONSTANTS.LEVEL_UP_BONUS));
-
-      // Flag'i temizle
-      dispatch(clearLevelUpFlag());
-    }
-  }, [levelProgress.hasLeveledUp, levelProgress.levelUpTo, levelProgress.levelUpFrom, dispatch]);
 
   // Achievement kontrolü - BİLDİRİM VE XP OLMADAN
   useEffect(() => {
