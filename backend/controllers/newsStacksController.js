@@ -190,6 +190,12 @@ exports.createNewsStack = async (req, res) => {
       stackObj.news = [];
     }
 
+    // Kategoriler pre-save middleware'de hesaplanıyor, güncel stack'i al
+    const updatedStack = await NewsStacks.findById(newsStack._id);
+    stackObj.categories = updatedStack.categories;
+    stackObj.mainCategory = updatedStack.mainCategory;
+    stackObj.xp = updatedStack.xp;
+
     res.status(201).json({
       success: true,
       data: stackObj

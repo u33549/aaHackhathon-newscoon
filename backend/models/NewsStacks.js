@@ -64,35 +64,41 @@ function calculateXP(newsCount) {
 // Kategorileri hesaplama metodları
 newsStacksSchema.methods.updateCategories = async function() {
   if (this.news && this.news.length > 0) {
-    // Populate edilmiş haberleri al
-    const populatedDoc = await this.populate('news', 'category');
+    try {
+      const RssNews = mongoose.model('RssNews');
+      const newsItems = await RssNews.find({ guid: { $in: this.news } }, 'category');
 
-    // Kategorileri topla ve sayılarını hesapla
-    const categoryCount = {};
-    const uniqueCategories = new Set();
+      // Kategorileri topla ve sayılarını hesapla
+      const categoryCount = {};
+      const uniqueCategories = new Set();
 
-    populatedDoc.news.forEach(newsItem => {
-      if (newsItem && newsItem.category) {
-        uniqueCategories.add(newsItem.category);
-        categoryCount[newsItem.category] = (categoryCount[newsItem.category] || 0) + 1;
+      newsItems.forEach(newsItem => {
+        if (newsItem && newsItem.category) {
+          uniqueCategories.add(newsItem.category);
+          categoryCount[newsItem.category] = (categoryCount[newsItem.category] || 0) + 1;
+        }
+      });
+
+      // Categories dizisini güncelle (benzersiz kategoriler)
+      this.categories = Array.from(uniqueCategories);
+
+      // En çok temsil edilen kategoriyi bul
+      let maxCount = 0;
+      let mainCat = null;
+
+      for (const [category, count] of Object.entries(categoryCount)) {
+        if (count > maxCount) {
+          maxCount = count;
+          mainCat = category;
+        }
       }
-    });
 
-    // Categories dizisini güncelle (benzersiz kategoriler)
-    this.categories = Array.from(uniqueCategories);
-
-    // En çok temsil edilen kategoriyi bul
-    let maxCount = 0;
-    let mainCat = null;
-
-    for (const [category, count] of Object.entries(categoryCount)) {
-      if (count > maxCount) {
-        maxCount = count;
-        mainCat = category;
-      }
+      this.mainCategory = mainCat;
+    } catch (error) {
+      console.error('Kategoriler hesaplanırken hata:', error);
+      this.categories = [];
+      this.mainCategory = null;
     }
-
-    this.mainCategory = mainCat;
   } else {
     this.categories = [];
     this.mainCategory = null;
@@ -101,34 +107,56 @@ newsStacksSchema.methods.updateCategories = async function() {
 
 // Static method for updating categories by news array
 newsStacksSchema.statics.calculateCategoriesFromNews = async function(newsGuids) {
-  const RssNews = mongoose.model('RssNews');
-  const newsItems = await RssNews.find({ guid: { $in: newsGuids } }, 'category');
-
-  const categoryCount = {};
-  const uniqueCategories = new Set();
-
-  newsItems.forEach(newsItem => {
-    if (newsItem && newsItem.category) {
-      uniqueCategories.add(newsItem.category);
-      categoryCount[newsItem.category] = (categoryCount[newsItem.category] || 0) + 1;
+  try {
+    if (!newsGuids || newsGuids.length === 0) {
+      return {
+        categories: [],
+        mainCategory: null
+      };
     }
-  });
 
-  // En çok temsil edilen kategoriyi bul
-  let maxCount = 0;
-  let mainCategory = null;
+    const RssNews = mongoose.model('RssNews');
+    const newsItems = await RssNews.find({ guid: { $in: newsGuids } }, 'category');
 
-  for (const [category, count] of Object.entries(categoryCount)) {
-    if (count > maxCount) {
-      maxCount = count;
-      mainCategory = category;
+    if (!newsItems || newsItems.length === 0) {
+      return {
+        categories: [],
+        mainCategory: null
+      };
     }
+
+    const categoryCount = {};
+    const uniqueCategories = new Set();
+
+    newsItems.forEach(newsItem => {
+      if (newsItem && newsItem.category) {
+        uniqueCategories.add(newsItem.category);
+        categoryCount[newsItem.category] = (categoryCount[newsItem.category] || 0) + 1;
+      }
+    });
+
+    // En çok temsil edilen kategoriyi bul
+    let maxCount = 0;
+    let mainCategory = null;
+
+    for (const [category, count] of Object.entries(categoryCount)) {
+      if (count > maxCount) {
+        maxCount = count;
+        mainCategory = category;
+      }
+    }
+
+    return {
+      categories: Array.from(uniqueCategories),
+      mainCategory: mainCategory
+    };
+  } catch (error) {
+    console.error('Static kategori hesaplama hatası:', error);
+    return {
+      categories: [],
+      mainCategory: null
+    };
   }
-
-  return {
-    categories: Array.from(uniqueCategories),
-    mainCategory: mainCategory
-  };
 };
 
 // Pre-save middleware - XP ve kategorileri otomatik hesaplama
