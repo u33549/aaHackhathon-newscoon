@@ -36,6 +36,7 @@ import {
   addBadge,
   updateReadingProgress
 } from '../store/slices/userSlice';
+import { addCelebrationToQueue } from '../store/slices/uiSlice';
 
 // Components - Header'ı ekle
 import Header from '../components/layout/Header';
@@ -236,7 +237,7 @@ const ReadingFlowPage = () => {
   }, [currentStep, currentStepData?.type]);
 
 
-  // Haber okuma işlemi - BİLDİRİM OLMADAN
+  // Haber okuma işlemi - Celebration queue ile
   const handleNewsRead = useCallback((stepIndex) => {
     if (!selectedStack || readNewsIndices.has(stepIndex)) return;
 
@@ -248,13 +249,18 @@ const ReadingFlowPage = () => {
       // Haber okundu bilgisi - sadece console log
       console.log(`Haber okundu: ${step.title}`);
 
-      // Kategori bazlı rozet kontrolü - sadece ilk haber ise - BİLDİRİM OLMADAN
+      // Kategori bazlı rozet kontrolü - sadece ilk haber ise
       const category = selectedStack.mainCategory;
       if (category && !readNewsIndices.has(0)) { // İlk haber ise
         const categoryBadge = allBadges.find(badge => badge.id === category);
         if (categoryBadge) {
           dispatch(addBadge(categoryBadge));
-          // Bildirim kaldırıldı
+
+          // Celebration queue'ya ekle
+          dispatch(addCelebrationToQueue({
+            type: 'badge',
+            badge: categoryBadge
+          }));
         }
       }
     }

@@ -31,7 +31,8 @@ import {
 import {
   setSearchQuery,
   setActiveCategory,
-  addToast
+  addToast,
+  addCelebrationToQueue
 } from '../store/slices/uiSlice';
 import {
   loadDemoData,
@@ -115,14 +116,15 @@ const MainPage = () => {
     loadData();
   }, [dispatch, news.length, popularStacks.length, latestStacks.length, totalXP, currentLevel]);
 
-  // Level up notification
+  // Level up notification - Celebration queue'ya ekle
   useEffect(() => {
     if (levelProgress.hasLeveledUp) {
-      dispatch(addToast({
-        type: 'success',
-        title: '🎉 Level Atladın!',
-        message: `Tebrikler! ${levelProgress.levelUpTo}. seviyeye ulaştın!`,
-        duration: 5000
+      // Celebration queue'ya ekle
+      dispatch(addCelebrationToQueue({
+        type: 'levelUp',
+        newLevel: levelProgress.levelUpTo,
+        oldLevel: levelProgress.levelUpFrom,
+        xpBonus: XP_CONSTANTS.LEVEL_UP_BONUS
       }));
 
       // Bonus XP ver
@@ -131,7 +133,7 @@ const MainPage = () => {
       // Flag'i temizle
       dispatch(clearLevelUpFlag());
     }
-  }, [levelProgress.hasLeveledUp, dispatch]);
+  }, [levelProgress.hasLeveledUp, levelProgress.levelUpTo, levelProgress.levelUpFrom, dispatch]);
 
   // Achievement kontrolü - BİLDİRİM VE XP OLMADAN
   useEffect(() => {

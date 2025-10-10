@@ -20,9 +20,13 @@ import AdminDashboard from './Pages/admin/AdminDashboard';
 import TestPage from './Pages/TestPage';
 
 // Redux hooks
-import { useAppDispatch, useUserXP, useUserLevel, useXPForNextLevel, useUserAchievements, useUserBadges } from './hooks/redux';
+import { useAppDispatch, useUserXP, useUserLevel, useXPForNextLevel, useUserAchievements, useUserBadges, useCelebrationQueue } from './hooks/redux';
 import { loadDemoData } from './store/slices/userSlice';
+import { clearCelebrationQueue } from './store/slices/uiSlice';
 import { allAchievements } from './constants/index.jsx';
+
+// Components - CelebrationPopup ekle
+import CelebrationPopup from './components/notifications/CelebrationPopup';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -33,6 +37,9 @@ function App() {
   const cpForNextLevel = useXPForNextLevel();
   const userAchievements = useUserAchievements();
   const earnedBadges = useUserBadges();
+
+  // Celebration queue
+  const celebrationQueue = useCelebrationQueue();
 
   // Badge modal state
   const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
@@ -49,6 +56,11 @@ function App() {
 
   const handleCloseBadges = () => {
     setIsBadgeModalOpen(false);
+  };
+
+  // Celebration popup'ı kapat
+  const handleCloseCelebrations = () => {
+    dispatch(clearCelebrationQueue());
   };
 
   // Earned achievements as Set for efficient lookup
@@ -114,6 +126,14 @@ function App() {
           earnedAchievements={earnedAchievementIds}
           level={level}
         />
+
+        {/* Celebration Popup - Yeni eklendi */}
+        {celebrationQueue.length > 0 && (
+          <CelebrationPopup
+            celebrations={celebrationQueue}
+            onClose={handleCloseCelebrations}
+          />
+        )}
       </div>
     </ThemeProvider>
   );

@@ -25,6 +25,12 @@ const initialState = {
     achievements: [],
   },
 
+  // Celebration queue - yeni eklendi
+  celebrations: {
+    queue: [], // Kutlama kuyruğu
+    isShowing: false, // Şu anda bir kutlama gösteriliyor mu?
+  },
+
   // Loading durumları
   globalLoading: false,
 
@@ -121,6 +127,20 @@ const uiSlice = createSlice({
       );
     },
 
+    // Celebration queue işlemleri
+    addCelebrationToQueue: (state, action) => {
+      state.celebrations.queue.push(action.payload);
+    },
+    removeCelebrationFromQueue: (state) => {
+      state.celebrations.queue.shift();
+    },
+    clearCelebrationQueue: (state) => {
+      state.celebrations.queue = [];
+    },
+    setCelebrationIsShowing: (state, action) => {
+      state.celebrations.isShowing = action.payload;
+    },
+
     // Global loading
     setGlobalLoading: (state, action) => {
       state.globalLoading = action.payload;
@@ -179,6 +199,12 @@ export const {
   clearToasts,
   addAchievement,
   removeAchievement,
+
+  // Celebration queue
+  addCelebrationToQueue,
+  removeCelebrationFromQueue,
+  clearCelebrationQueue,
+  setCelebrationIsShowing,
 
   // Loading
   setGlobalLoading,

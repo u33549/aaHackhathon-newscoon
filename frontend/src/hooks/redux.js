@@ -158,3 +158,12 @@ export const useSearchQuery = () => {
 export const useActiveCategory = () => {
   return useAppSelector((state) => state.ui.activeCategory);
 };
+
+// Celebration queue hooks - yeni eklendi
+export const useCelebrationQueue = () => {
+  return useAppSelector((state) => state.ui.celebrations.queue);
+};
+
+export const useCelebrationIsShowing = () => {
+  return useAppSelector((state) => state.ui.celebrations.isShowing);
+};
