@@ -75,15 +75,15 @@ const MainPage = () => {
   const searchQuery = useSearchQuery();
   const selectedCategory = useActiveCategory();
 
-  // User Redux state
+  // User Redux state - Yeni state yapısına göre güncelle
   const userStats = useUserStats();
   const totalXP = useUserXP();
   const currentLevel = useUserLevel();
   const levelProgress = useUserLevelProgress();
   const readingProgress = useReadingProgress();
   const userAchievements = useUserAchievements();
-  const earnedBadges = useUserBadges();
-  const streakData = useUserStreak();
+  const earnedBadges = userAchievements?.badges || [];
+  const streakData = userAchievements?.streakData || { current: 0 };
 
   // Local state (UI only)
   const [notificationToast, setNotificationToast] = useState(null);

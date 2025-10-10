@@ -210,32 +210,21 @@ const ReadingFlowPage = () => {
 
   const currentStepData = steps[currentStep];
 
-  // Haber okuma işlemi
+  // Haber okuma işlemi - XP vermeyi kaldır
   const handleNewsRead = useCallback((stepIndex) => {
     if (!selectedStack || readNewsIndices.has(stepIndex)) return;
 
     const step = steps[stepIndex + 1]; // +1 çünkü intro step var
     if (step && step.type === 'news') {
-      const newsXP = step.newsXP || generateNewsXP();
+      // XP vermeyi kaldır - sadece progress takibi yap
 
-      // Redux'ta progress güncelle
-      dispatch(readNewsInStack({
-        stackId: selectedStack._id,
-        newsXP: newsXP
-      }));
-
-      // Local state güncelle
+      // Local state güncelle - sadece okunan haberleri işaretle
       setReadNewsIndices(prev => new Set([...prev, stepIndex]));
 
-      // XP kazanma toastı
-      dispatch(addToast({
-        type: 'success',
-        title: '📖 Haber Okundu!',
-        message: `+${newsXP} XP kazandın`,
-        duration: 3000
-      }));
+      // Haber okundu bilgisi - XP olmadan
+      console.log(`Haber okundu: ${step.title}`);
 
-      // Kategori bazlı rozet kontrolü
+      // Kategori bazlı rozet kontrolü - sadece ilk haber ise
       const category = selectedStack.mainCategory;
       if (category && !readNewsIndices.has(0)) { // İlk haber ise
         const categoryBadge = allBadges.find(badge => badge.id === category);
@@ -252,21 +241,27 @@ const ReadingFlowPage = () => {
     }
   }, [selectedStack, steps, readNewsIndices, dispatch]);
 
-  // Stack tamamlama işlemi
+  // Stack tamamlama işlemi - Burada toplam XP ver
   const handleStackCompletion = useCallback(() => {
     if (!selectedStack) return;
 
+    // Stack'in toplam XP'sini hesapla
+    const stackTotalXP = selectedStack.xp || 0;
+
+    // Stack completion bonus + stack'in kendi XP'si
+    const totalXPReward = XP_CONSTANTS.STACK_COMPLETION_BONUS + stackTotalXP;
+
     // Stack'i tamamla
-    dispatch(completeStack({ stackId: selectedStack._id }));
+    dispatch(completeStack({
+      stackId: selectedStack._id,
+      stackXP: totalXPReward // Toplam XP'yi gönder
+    }));
 
-    // Stack completion bonus XP
-    dispatch(addXP(XP_CONSTANTS.STACK_COMPLETION_BONUS));
-
-    // Tebrik mesajı
+    // Tebrik mesajı - toplam XP ile
     dispatch(addToast({
       type: 'success',
       title: '🎉 Stack Tamamlandı!',
-      message: `"${selectedStack.title}" yığınını tamamladın! +${XP_CONSTANTS.STACK_COMPLETION_BONUS} bonus XP`,
+      message: `"${selectedStack.title}" yığınını tamamladın! +${totalXPReward} XP kazandın`,
       duration: 5000
     }));
   }, [selectedStack, dispatch]);

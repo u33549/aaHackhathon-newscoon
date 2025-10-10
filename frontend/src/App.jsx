@@ -18,7 +18,15 @@ import ReadingFlowPage from './Pages/ReadingFlowPage';
 import AdminDashboard from './Pages/admin/AdminDashboard';
 import TestPage from './Pages/TestPage';
 
+// Redux hooks
+import { useUserXP, useUserLevel, useXPForNextLevel } from './hooks/redux';
+
 function App() {
+  // User bilgilerini Redux'tan al
+  const totalCp = useUserXP();
+  const level = useUserLevel();
+  const cpForNextLevel = useXPForNextLevel();
+
   return (
     <ThemeProvider theme={newscoonTheme}>
       <CssBaseline />
@@ -27,42 +35,42 @@ function App() {
           {/* Ana sayfa ve diğer sayfalar - Header ve Footer ile */}
           <Route path="/" element={
             <>
-              <Header />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
               <MainPage />
               <Footer />
             </>
           } />
           <Route path="/article/:id" element={
             <>
-              <Header />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
               <ArticlePage />
               <Footer />
             </>
           } />
           <Route path="/stack/:id" element={
             <>
-              <Header />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
               <StackDetailPage />
               <Footer />
             </>
           } />
           <Route path="/all-news" element={
             <>
-              <Header />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
               <AllNewsPage />
               <Footer />
             </>
           } />
           <Route path="/admin" element={
             <>
-              <Header />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
               <AdminDashboard />
               <Footer />
             </>
           } />
           <Route path="/test" element={
             <>
-              <Header />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
               <TestPage />
               <Footer />
             </>
@@ -74,6 +82,9 @@ function App() {
 
         {/* Global Toast Notifications */}
         <ToastNotification />
+
+        {/* Scroll to top component */}
+        <ScrollToTop />
       </div>
     </ThemeProvider>
   );

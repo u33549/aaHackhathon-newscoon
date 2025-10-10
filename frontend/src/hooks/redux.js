@@ -17,8 +17,103 @@ export const useUI = () => {
   return useAppSelector((state) => state.ui);
 };
 
+// User-specific hooks with null safety - Yeni state yapısına göre güncelle
 export const useUser = () => {
   return useAppSelector((state) => state.user);
+};
+
+export const useUserXP = () => {
+  return useAppSelector((state) => state.user?.stats?.totalXP || 0);
+};
+
+export const useUserLevel = () => {
+  return useAppSelector((state) => state.user?.stats?.currentLevel || 1);
+};
+
+export const useUserStats = () => {
+  return useAppSelector((state) => state.user?.stats || {
+    totalXP: 0,
+    currentLevel: 1,
+    currentLevelXP: 0,
+    nextLevelXP: 100,
+    levelProgress: 0
+  });
+};
+
+export const useUserLevelProgress = () => {
+  return useAppSelector((state) => state.user?.stats || {
+    currentLevelXP: 0,
+    nextLevelXP: 100,
+    levelProgress: 0,
+    hasLeveledUp: false,
+    levelUpFrom: null,
+    levelUpTo: null
+  });
+};
+
+export const useReadingProgress = () => {
+  return useAppSelector((state) => state.user?.readingProgress || {
+    readStacks: [],
+    currentlyReading: [],
+    recentlyRead: [],
+    totalStacksCompleted: 0,
+    totalNewsRead: 0
+  });
+};
+
+export const useUserAchievements = () => {
+  return useAppSelector((state) => state.user?.achievements || {
+    badges: [],
+    achievements: [],
+    streakData: { current: 0, longest: 0, lastDate: null }
+  });
+};
+
+export const useUserBadges = () => {
+  return useAppSelector((state) => state.user?.achievements?.badges || []);
+};
+
+export const useUserStreak = () => {
+  return useAppSelector((state) => state.user?.achievements?.streakData || { current: 0 });
+};
+
+export const useCurrentlyReading = () => {
+  return useAppSelector((state) => state.user?.readingProgress?.currentlyReading || []);
+};
+
+export const useReadStacks = () => {
+  return useAppSelector((state) => state.user?.readingProgress?.readStacks || []);
+};
+
+export const useEarnedBadges = () => {
+  return useAppSelector((state) => state.user?.achievements?.badges || []);
+};
+
+export const useStackProgress = (stackId) => {
+  return useAppSelector((state) =>
+    state.user?.readingProgress?.readStacks?.find(s => s.stackId === stackId) || null
+  );
+};
+
+export const useXPForNextLevel = () => {
+  return useAppSelector((state) => {
+    const stats = state.user?.stats;
+    if (!stats) {
+      return {
+        current: 0,
+        max: 100,
+        total: 0,
+        nextLevelTotal: 100,
+      };
+    }
+
+    return {
+      current: stats.currentLevelXP || 0,
+      max: (stats.nextLevelXP || 100) - (stats.currentLevelXP || 0),
+      total: stats.totalXP || 0,
+      nextLevelTotal: stats.nextLevelXP || 100,
+    };
+  });
 };
 
 // Specific selectors for common use cases
@@ -69,65 +164,3 @@ export const useSearchQuery = () => {
 export const useActiveCategory = () => {
   return useAppSelector((state) => state.ui.activeCategory);
 };
-
-// User-specific hooks
-export const useUserStats = () => {
-  return useAppSelector((state) => state.user.stats);
-};
-
-export const useUserProfile = () => {
-  return useAppSelector((state) => state.user.profile);
-};
-
-export const useUserLevel = () => {
-  return useAppSelector((state) => state.user.stats.currentLevel);
-};
-
-export const useUserXP = () => {
-  return useAppSelector((state) => state.user.stats.totalXP);
-};
-
-export const useUserLevelProgress = () => {
-  return useAppSelector((state) => ({
-    currentLevelXP: state.user.stats.currentLevelXP,
-    nextLevelXP: state.user.stats.nextLevelXP,
-    progress: state.user.stats.levelProgress,
-    hasLeveledUp: state.user.stats.hasLeveledUp,
-    levelUpFrom: state.user.stats.levelUpFrom,
-    levelUpTo: state.user.stats.levelUpTo
-  }));
-};
-
-export const useReadingProgress = () => {
-  return useAppSelector((state) => state.user.readingProgress);
-};
-
-export const useCurrentlyReading = () => {
-  return useAppSelector((state) => state.user.readingProgress.currentlyReading);
-};
-
-export const useRecentlyRead = () => {
-  return useAppSelector((state) => state.user.readingProgress.recentlyRead);
-};
-
-export const useUserAchievements = () => {
-  return useAppSelector((state) => state.user.achievements);
-};
-
-export const useUserBadges = () => {
-  return useAppSelector((state) => state.user.achievements.badges);
-// Additional user hooks that are being imported by components
-
-  return useAppSelector((state) => state.user.currentUser.readStacks || []);
-  return useAppSelector((state) => state.user.achievements.streakData);
-};
-
-  return useAppSelector((state) => ({
-    totalNewsRead: state.user.currentUser.readStacks.reduce((total, stack) => total + (stack.completedNewsCount || 0), 0),
-    totalStacksCompleted: state.user.currentUser.readStacks.filter(stack => stack.completedAt).length,
-    readStacks: state.user.currentUser.readStacks,
-    recentlyRead: state.user.currentUser.readStacks
-      .filter(stack => stack.completedAt)
-      .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
-      .slice(0, 5)
-  }));

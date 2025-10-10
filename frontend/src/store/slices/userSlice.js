@@ -195,67 +195,23 @@ const userSlice = createSlice({
       }
     },
 
+    // Stack tamamlandı - XP kazan
     completeStack: (state, action) => {
-      const { stackId } = action.payload;
-      
-      // Currently reading'den al
-      const readingStackIndex = state.readingProgress.currentlyReading.findIndex(
-        item => item.stackId === stackId
-      );
-      
-      if (readingStackIndex !== -1) {
-        const completedStack = state.readingProgress.currentlyReading[readingStackIndex];
-        
-        // Read stacks'e ekle
-        state.readingProgress.readStacks.push({
-          stackId: completedStack.stackId,
-          completedAt: new Date().toISOString(),
-          totalNews: completedStack.totalNews,
-          readNews: completedStack.readNews,
-          xpEarned: completedStack.xpEarned,
-          startedAt: completedStack.startedAt
-        });
-        
-        // Recently read'e ekle (son 10'u tut)
-        state.readingProgress.recentlyRead.unshift({
-          stackId: completedStack.stackId,
-          completedAt: new Date().toISOString(),
-          xpEarned: completedStack.xpEarned
-        });
-        
-        if (state.readingProgress.recentlyRead.length > 10) {
-          state.readingProgress.recentlyRead.pop();
-        }
-        
-        // Currently reading'den kaldır
-        state.readingProgress.currentlyReading.splice(readingStackIndex, 1);
-        
-        // Total completed stacks artır
-        state.readingProgress.totalStacksCompleted += 1;
-        
-        // Streak güncelle
-        const today = new Date().toDateString();
-        const lastDate = state.achievements.streakData.lastDate;
-        
-        if (!lastDate || new Date(lastDate).toDateString() !== today) {
-          const yesterday = new Date();
-          yesterday.setDate(yesterday.getDate() - 1);
-          
-          if (lastDate && new Date(lastDate).toDateString() === yesterday.toDateString()) {
-            // Consecutive day
-            state.achievements.streakData.current += 1;
-          } else {
-            // New streak
-            state.achievements.streakData.current = 1;
-          }
-          
-          state.achievements.streakData.lastDate = new Date().toISOString();
-          
-          // Longest streak güncelle
-          if (state.achievements.streakData.current > state.achievements.streakData.longest) {
-            state.achievements.streakData.longest = state.achievements.streakData.current;
-          }
-        }
+      const { stackId, stackXP } = action.payload;
+
+      const existingStack = state.readingProgress.readStacks.find(s => s.stackId === stackId);
+
+      if (existingStack && !existingStack.completedAt) {
+        // Stack'i tamamla
+        existingStack.completedAt = new Date().toISOString();
+        existingStack.completedNewsCount = existingStack.totalNewsCount;
+        existingStack.lastReadIndex = existingStack.totalNewsCount - 1;
+
+        // Toplam XP kazan (stack XP + completion bonus)
+        state.stats.totalXP += stackXP;
+
+        // Level hesapla
+        state.stats.currentLevel = calculateLevelFromXP(state.stats.totalXP);
       }
     },
 
