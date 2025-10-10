@@ -177,6 +177,7 @@ const ReadingFlowPage = () => {
   const newsContentRef = useRef(null);
   const touchStartRef = useRef(null);
   const lastTouchY = useRef(null);
+  const hasLoadedProgress = useRef(false); // Progress yüklenme kontrolü için flag
 
   // Touch/Mouse state
   const [isMouseDown, setIsMouseDown] = useState(false);
@@ -194,26 +195,37 @@ const ReadingFlowPage = () => {
     if (selectedStack) {
       const chronologicalSteps = generateChronologicalSteps(selectedStack);
       setSteps(chronologicalSteps);
+      // Stack değiştiğinde progress yükleme flag'ini sıfırla
+      hasLoadedProgress.current = false;
     }
   }, [selectedStack]);
 
   // currentStepData'yı burada tanımla - useEffect'lerden önce
   const currentStepData = steps[currentStep];
 
-  // Kaldığımız yerden devam et - kaydedilmiş progress'i yükle
+  // Kaldığımız yerden devam et - kaydedilmiş progress'i yükle (SADECE BİR KEZ)
   useEffect(() => {
+    // Sadece ilk yüklemede çalışsın
+    if (hasLoadedProgress.current) return;
+
     if (selectedStack && steps.length > 0 && currentlyReading.length > 0) {
       const stackProgress = currentlyReading.find(r => r.stackId === selectedStack._id);
       if (stackProgress && stackProgress.lastReadIndex > 0) {
         // Kaydedilmiş adımdan devam et
         console.log(`📖 Kaldığınız yerden devam ediliyor: Adım ${stackProgress.lastReadIndex}`);
         setCurrentStep(stackProgress.lastReadIndex);
+        hasLoadedProgress.current = true; // Flag'i işaretle
+      } else {
+        hasLoadedProgress.current = true; // Progress yoksa da işaretle
       }
     }
   }, [selectedStack, steps.length, currentlyReading]);
 
   // Her step değiştiğinde progress'i kaydet
   useEffect(() => {
+    // Sadece progress yüklendikten sonra kaydet
+    if (!hasLoadedProgress.current) return;
+
     if (selectedStack && currentStep > 0 && steps.length > 0) {
       // Progress'i Redux'a kaydet
       dispatch(updateReadingProgress({

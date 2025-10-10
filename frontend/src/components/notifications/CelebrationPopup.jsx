@@ -4,13 +4,11 @@ import {
   Typography,
   Avatar,
   Fade,
-  Zoom,
-  IconButton
+  Zoom
 } from '@mui/material';
 import {
   EmojiEvents,
   Star,
-  Close,
   TrendingUp
 } from '@mui/icons-material';
 import { getIconComponent } from '../../constants/index.jsx';
@@ -34,8 +32,10 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
         // Fade out animasyonu için kısa bir bekleme
         setTimeout(() => {
           if (currentIndex < celebrations.length - 1) {
+            // Sonraki kutlamaya geç
             setCurrentIndex(currentIndex + 1);
           } else {
+            // Tüm kutlamalar bitti, kapat
             onClose();
           }
         }, 300);
@@ -55,7 +55,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           icon: <Star sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Seviye Atladın! 🎉',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah
+          iconBgColor: 'rgba(26, 26, 26, 0.8)',
           message: `Seviye ${currentCelebration.newLevel}`,
           subtitle: currentCelebration.xpBonus ? `+${currentCelebration.xpBonus} XP Bonus` : null,
           accentColor: '#FFD700'
@@ -68,8 +68,8 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
             : <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Yeni Rozet! 🏆',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah - rozet için
-          iconColor: '#FFD700', // Rozet ikonu sarı
+          iconBgColor: 'rgba(26, 26, 26, 0.8)',
+          iconColor: '#FFD700',
           message: currentCelebration.badge?.name || 'Rozet Kazanıldı',
           subtitle: currentCelebration.badge?.description || null,
           accentColor: '#FFD700'
@@ -82,7 +82,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
             : <TrendingUp sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Başarım Açıldı! ⭐',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah
+          iconBgColor: 'rgba(26, 26, 26, 0.8)',
           message: currentCelebration.achievement?.name || 'Başarım Tamamlandı',
           subtitle: currentCelebration.achievement?.description || null,
           accentColor: '#FFD700'
@@ -93,7 +93,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           icon: <EmojiEvents sx={{ fontSize: 48, color: '#FFD700' }} />,
           title: 'Tebrikler! 🎉',
           bgColor: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)',
-          iconBgColor: 'rgba(26, 26, 26, 0.8)', // Açık siyah
+          iconBgColor: 'rgba(26, 26, 26, 0.8)',
           message: 'Yeni Bir Başarı',
           subtitle: null,
           accentColor: '#FFD700'
@@ -125,13 +125,13 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Backdrop ekle
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           backdropFilter: 'blur(4px)'
         }}
       >
         <Zoom in={isVisible} timeout={400}>
           <Box
-            onClick={(e) => e.stopPropagation()} // Popup içeriğine tıklamayı durdur
+            onClick={(e) => e.stopPropagation()}
             sx={{
               position: 'relative',
               background: config.bgColor,
@@ -146,36 +146,17 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               animation: 'celebrationPulse 3s ease-in-out'
             }}
           >
-            {/* Close Button */}
-            <IconButton
-              onClick={onClose}
-              sx={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                color: 'rgba(255, 215, 0, 0.8)',
-                '&:hover': {
-                  color: '#FFD700',
-                  backgroundColor: 'rgba(255, 215, 0, 0.1)'
-                }
-              }}
-              size="small"
-            >
-              <Close fontSize="small" />
-            </IconButton>
-
             {/* Icon */}
             <Box sx={{ mb: 2 }}>
               <Avatar
                 sx={{
                   width: { xs: 70, md: 80 },
                   height: { xs: 70, md: 80 },
-                  bgcolor: config.iconBgColor, // Açık siyah arka plan
+                  bgcolor: config.iconBgColor,
                   mx: 'auto',
                   border: '3px solid #FFD700',
                   boxShadow: '0 8px 24px rgba(255, 215, 0, 0.4)',
                   animation: 'iconBounce 0.6s ease-in-out',
-                  // Icon'ları sarı yapmak için
                   '& svg': {
                     color: '#FFD700'
                   }
@@ -228,7 +209,7 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               </Typography>
             )}
 
-            {/* Progress indicator */}
+            {/* Progress indicator - Sadece birden fazla kutlama varsa göster */}
             {celebrations.length > 1 && (
               <Box sx={{
                 display: 'flex',
