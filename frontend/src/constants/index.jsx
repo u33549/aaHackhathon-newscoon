@@ -39,48 +39,73 @@ export const FlameIcon = () => React.createElement(Whatshot);
 export const AchievementIcon = () => React.createElement(EmojiEvents);
 export const ShareIcon = () => React.createElement(Share);
 
+// Icon string'lerini component'lere dönüştüren helper fonksiyon
+export const getIconComponent = (iconName) => {
+  const iconMap = {
+    'Computer': Computer,
+    'TrendingUp': TrendingUp,
+    'Science': Science,
+    'LocalHospital': LocalHospital,
+    'Whatshot': Whatshot,
+    'EmojiEvents': EmojiEvents,
+    'Share': Share,
+    'LogoIcon': LogoIcon
+  };
+
+  const IconComponent = iconMap[iconName];
+  if (!IconComponent) {
+    return Computer; // Fallback
+  }
+
+  if (iconName === 'LogoIcon') {
+    return LogoIcon;
+  }
+
+  return React.createElement(IconComponent);
+};
+
 // --- DATA ---
 export const allBadges = [
     {
       id: 'gundem',
       name: 'Gündem Uzmanı',
       description: 'Gündem kategorisindeki ilk haberini okudun.',
-      icon: React.createElement(TeknolojiBadgeIcon),
+      icon: 'Computer', // String olarak sakla
       color: '#3B82F6'
     },
     {
       id: 'dunya',
       name: 'Dünya Gözlemcisi',
       description: 'Dünya kategorisindeki ilk haberini okudun.',
-      icon: React.createElement(EkonomiBadgeIcon),
+      icon: 'TrendingUp', // String olarak sakla
       color: '#10B981'
     },
     {
       id: 'ekonomi',
       name: 'Finans Gurusu',
       description: 'Ekonomi kategorisindeki ilk haberini okudun.',
-      icon: React.createElement(EkonomiBadgeIcon),
+      icon: 'TrendingUp', // String olarak sakla
       color: '#10B981'
     },
     {
       id: 'spor',
       name: 'Spor Tutkunusu',
       description: 'Spor kategorisindeki ilk haberini okudun.',
-      icon: React.createElement(BilimBadgeIcon),
+      icon: 'Science', // String olarak sakla
       color: '#8B5CF6'
     },
     {
       id: 'analiz',
       name: 'Analiz Uzmanı',
       description: 'Analiz kategorisindeki ilk haberini okudun.',
-      icon: React.createElement(SaglikBadgeIcon),
+      icon: 'LocalHospital', // String olarak sakla
       color: '#EF4444'
     },
     {
       id: 'kultur',
       name: 'Kültür Elçisi',
       description: 'Kültür kategorisindeki ilk haberini okudun.',
-      icon: React.createElement(TeknolojiBadgeIcon),
+      icon: 'Computer', // String olarak sakla
       color: '#F59E0B'
     },
 ];
@@ -145,7 +170,7 @@ export const allAchievements = [
         id: 'beginner_reader',
         name: 'İlk Adım',
         description: 'İlk haberini tamamla.',
-        icon: React.createElement(LogoIcon),
+        icon: 'LogoIcon', // String olarak sakla
         xpReward: 50,
         isCompleted: ({ readingProgress }) => readingProgress.totalNewsRead >= 1
     },
@@ -153,7 +178,7 @@ export const allAchievements = [
         id: 'curious_mind',
         name: 'Meraklı Zihin',
         description: 'Tüm kategorilerden en az bir haber oku.',
-        icon: React.createElement(BilimBadgeIcon),
+        icon: 'Science', // String olarak sakla
         xpReward: 100,
         isCompleted: ({ achievements }) => achievements.badges.length >= 4
     },
@@ -161,7 +186,7 @@ export const allAchievements = [
         id: 'streak_starter',
         name: 'Ateşi Yaktın',
         description: '3 günlük okuma serisine ulaş.',
-        icon: React.createElement(FlameIcon),
+        icon: 'Whatshot', // String olarak sakla
         xpReward: 75,
         isCompleted: ({ achievements }) => achievements.streakData.current >= 3
     },
@@ -169,7 +194,7 @@ export const allAchievements = [
         id: 'stack_master',
         name: 'Yığın Ustası',
         description: 'İlk haber yığınını tamamla.',
-        icon: React.createElement(EmojiEvents),
+        icon: 'EmojiEvents', // String olarak sakla
         xpReward: 100,
         isCompleted: ({ readingProgress }) => readingProgress.totalStacksCompleted >= 1
     },
@@ -177,7 +202,7 @@ export const allAchievements = [
         id: 'news_addict',
         name: 'Haber Bağımlısı',
         description: '50 haber oku.',
-        icon: React.createElement(Computer),
+        icon: 'Computer', // String olarak sakla
         xpReward: 200,
         isCompleted: ({ readingProgress }) => readingProgress.totalNewsRead >= 50
     },
@@ -185,7 +210,7 @@ export const allAchievements = [
         id: 'level_climber',
         name: 'Seviye Tırmanıcısı',
         description: '5. seviyeye ulaş.',
-        icon: React.createElement(TrendingUp),
+        icon: 'TrendingUp', // String olarak sakla
         xpReward: 150,
         isCompleted: ({ stats }) => stats.currentLevel >= 5
     },
@@ -193,7 +218,7 @@ export const allAchievements = [
         id: 'streak_legend',
         name: 'Seri Efsanesi',
         description: '7 günlük okuma serisine ulaş.',
-        icon: React.createElement(FlameIcon),
+        icon: 'Whatshot', // String olarak sakla
         xpReward: 300,
         isCompleted: ({ achievements }) => achievements.streakData.current >= 7
     },
@@ -201,7 +226,7 @@ export const allAchievements = [
         id: 'xp_collector',
         name: 'XP Koleksiyoncusu',
         description: 'Toplamda 1000 XP kazan.',
-        icon: React.createElement(EmojiEvents),
+        icon: 'EmojiEvents', // String olarak sakla
         xpReward: 100,
         isCompleted: ({ stats }) => stats.totalXP >= 1000
     }

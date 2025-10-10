@@ -20,7 +20,7 @@ import {
   Stack
 } from '@mui/material';
 import { Close, EmojiEvents, Star } from '@mui/icons-material';
-import { allAchievements, levelThresholds } from '../../constants/index.jsx';
+import { allAchievements, levelThresholds, getIconComponent } from '../../constants/index.jsx';
 
 const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, level }) => {
   const theme = useTheme();
@@ -181,7 +181,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
                     width: { xs: 32, md: 40 },
                     height: { xs: 32, md: 40 }
                   }}>
-                    {badge.icon}
+                    {getIconComponent(badge.icon)}
                   </Avatar>
                   <Box>
                     <Typography
@@ -240,7 +240,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
                       width: { xs: 32, md: 40 },
                       height: { xs: 32, md: 40 }
                     }}>
-                      {achievement.icon}
+                      {getIconComponent(achievement.icon)}
                     </Avatar>
                     <Box sx={{ flex: 1 }}>
                       <Typography

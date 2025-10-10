@@ -199,19 +199,51 @@ const userSlice = createSlice({
     completeStack: (state, action) => {
       const { stackId, stackXP } = action.payload;
 
-      const existingStack = state.readingProgress.readStacks.find(s => s.stackId === stackId);
+      // Stack'i readStacks array'inde bul veya oluştur
+      let existingStack = state.readingProgress.readStacks.find(s => s.stackId === stackId);
 
-      if (existingStack && !existingStack.completedAt) {
-        // Stack'i tamamla
+      if (!existingStack) {
+        // Stack daha önce readStacks'e eklenmemişse, yeni bir entry oluştur
+        existingStack = {
+          stackId,
+          startedAt: new Date().toISOString(),
+          completedAt: null,
+          totalNewsCount: 0, // Bu bilgi mevcut değilse 0 olarak ayarla
+          completedNewsCount: 0,
+          lastReadIndex: -1,
+          xpEarned: 0
+        };
+        state.readingProgress.readStacks.push(existingStack);
+      }
+
+      // Stack'i tamamla (eğer daha önce tamamlanmamışsa)
+      if (!existingStack.completedAt) {
         existingStack.completedAt = new Date().toISOString();
-        existingStack.completedNewsCount = existingStack.totalNewsCount;
-        existingStack.lastReadIndex = existingStack.totalNewsCount - 1;
+        existingStack.xpEarned += stackXP;
 
         // XP ekle ve level bilgilerini güncelle (addXP reducer'ını kullan)
         userSlice.caseReducers.addXP(state, { payload: stackXP });
 
         // Completed stacks sayısını artır
         state.readingProgress.totalStacksCompleted += 1;
+
+        // currentlyReading array'inden kaldır
+        state.readingProgress.currentlyReading = state.readingProgress.currentlyReading.filter(
+          cr => cr.stackId !== stackId
+        );
+
+        // recentlyRead array'ine ekle (en başa)
+        const recentEntry = {
+          stackId,
+          completedAt: existingStack.completedAt,
+          xpEarned: stackXP
+        };
+        state.readingProgress.recentlyRead.unshift(recentEntry);
+
+        // recentlyRead'i 10 ile sınırla
+        if (state.readingProgress.recentlyRead.length > 10) {
+          state.readingProgress.recentlyRead = state.readingProgress.recentlyRead.slice(0, 10);
+        }
       }
     },
 

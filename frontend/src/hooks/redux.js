@@ -99,19 +99,13 @@ export const useXPForNextLevel = () => {
   return useAppSelector((state) => {
     const stats = state.user?.stats;
     if (!stats) {
-      return {
-        current: 0,
-        max: 100,
-        total: 0,
-        nextLevelTotal: 100,
-      };
+      return { current: 0, max: 100 };
     }
 
+    // Basit: mevcut level için kazanılan XP ve level için gereken toplam XP
     return {
       current: stats.currentLevelXP || 0,
-      max: (stats.nextLevelXP || 100) - (stats.currentLevelXP || 0),
-      total: stats.totalXP || 0,
-      nextLevelTotal: stats.nextLevelXP || 100,
+      max: (stats.nextLevelXP || 100) - (stats.totalXP || 0) + (stats.currentLevelXP || 0)
     };
   });
 };
