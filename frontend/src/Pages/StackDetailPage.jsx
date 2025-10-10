@@ -524,27 +524,6 @@ const StackDetailPage = () => {
                   </Button>
                 )}
 
-                <Button
-                  variant="outlined"
-                  size={isMobile ? 'medium' : 'large'}
-                  startIcon={<Add />}
-                  sx={{
-                    borderColor: 'rgba(255,255,255,0.5)',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    px: { xs: 3, md: 3 },
-                    py: { xs: 1.2, md: 1.5 },
-                    fontSize: { xs: '0.875rem', md: '1rem' },
-                    flex: { xs: '1 1 auto', sm: '0 0 auto' },
-                    minWidth: { xs: 'auto', sm: 'auto' },
-                    '&:hover': {
-                      borderColor: 'white',
-                      backgroundColor: 'rgba(255,255,255,0.1)'
-                    }
-                  }}
-                >
-                  Takip Et
-                </Button>
 
                 {/* Tags */}
                 {stack.tags && stack.tags.length > 0 && (
