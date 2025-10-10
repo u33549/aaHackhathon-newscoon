@@ -13,7 +13,6 @@ import BadgeModal from './components/modals/BadgeModal';
 
 // Pages
 import MainPage from './Pages/MainPage';
-import ArticlePage from './Pages/ArticlePage';
 import AllNewsPage from './Pages/AllNewsPage';
 import StackDetailPage from './Pages/StackDetailPage';
 import ReadingFlowPage from './Pages/ReadingFlowPage';
@@ -58,13 +57,6 @@ function App() {
             <>
               <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <MainPage />
-              <Footer />
-            </>
-          } />
-          <Route path="/article/:id" element={
-            <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
-              <ArticlePage />
               <Footer />
             </>
           } />

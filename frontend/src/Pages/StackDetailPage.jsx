@@ -148,10 +148,6 @@ const StackDetailPage = () => {
     return 'https://via.placeholder.com/1920x1080';
   };
 
-  // News click handler
-  const handleNewsClick = (newsGuid) => {
-    navigate(`/article/${newsGuid}`);
-  };
 
   // Close page
   const handleClose = () => {
@@ -619,11 +615,6 @@ const StackDetailPage = () => {
                         boxShadow: 4
                       }
                     }}
-                    onClick={() => {
-                      if (typeof news === 'object' && news.guid) {
-                        handleNewsClick(news.guid);
-                      }
-                    }}
                   >
                     <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                       <Box sx={{
@@ -771,12 +762,6 @@ const StackDetailPage = () => {
                           height: '100%',
                           display: 'flex',
                           flexDirection: 'column'
-                        }}
-                        onClick={() => {
-                          if (typeof news === 'object' && news.guid) {
-                            setPlayTrailer(false);
-                            handleNewsClick(news.guid);
-                          }
                         }}
                       >
                         {typeof news === 'object' && news.image && (

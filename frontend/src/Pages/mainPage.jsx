@@ -23,8 +23,7 @@ import {
   useUserStreak
 } from '../hooks/redux';
 import {
-  fetchAllNews,
-  setSelectedNews
+  fetchAllNews
 } from '../store/slices/newsSlice';
 import {
   fetchPopularStacks,
@@ -164,14 +163,6 @@ const MainPage = () => {
   }, [userStats, readingProgress, userAchievements, dispatch]);
 
   // Event handlers
-  const handleNewsCardClick = (articleId) => {
-    const newsData = news.length > 0 ? news : [];
-    const articleToOpen = newsData.find(article => article.id === articleId || article.guid === articleId);
-    if (articleToOpen) {
-      dispatch(setSelectedNews(articleToOpen));
-      navigate(`/article/${articleToOpen.guid || articleToOpen.id}`);
-    }
-  };
 
   const handleSearchChange = (query) => {
     dispatch(setSearchQuery(query));
