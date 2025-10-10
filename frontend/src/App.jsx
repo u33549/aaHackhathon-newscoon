@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { newscoonTheme } from './theme/theme';
@@ -7,6 +7,9 @@ import { newscoonTheme } from './theme/theme';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ScrollToTop from './components/common/ScrollToTop';
+
+// Modal Components
+import BadgeModal from './components/modals/BadgeModal';
 
 // Pages
 import MainPage from './Pages/MainPage';
@@ -18,13 +21,32 @@ import AdminDashboard from './Pages/admin/AdminDashboard';
 import TestPage from './Pages/TestPage';
 
 // Redux hooks
-import { useUserXP, useUserLevel, useXPForNextLevel } from './hooks/redux';
+import { useUserXP, useUserLevel, useXPForNextLevel, useUserAchievements, useUserBadges } from './hooks/redux';
+import { allAchievements } from './constants/index.jsx';
 
 function App() {
   // User bilgilerini Redux'tan al
   const totalCp = useUserXP();
   const level = useUserLevel();
   const cpForNextLevel = useXPForNextLevel();
+  const userAchievements = useUserAchievements();
+  const earnedBadges = useUserBadges();
+
+  // Badge modal state
+  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
+
+  const handleOpenBadges = () => {
+    setIsBadgeModalOpen(true);
+  };
+
+  const handleCloseBadges = () => {
+    setIsBadgeModalOpen(false);
+  };
+
+  // Earned achievements as Set for efficient lookup
+  const earnedAchievementIds = new Set(
+    userAchievements?.achievements?.map(a => a.id) || []
+  );
 
   return (
     <ThemeProvider theme={newscoonTheme}>
@@ -34,42 +56,42 @@ function App() {
           {/* Ana sayfa ve diğer sayfalar - Header ve Footer ile */}
           <Route path="/" element={
             <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <MainPage />
               <Footer />
             </>
           } />
           <Route path="/article/:id" element={
             <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <ArticlePage />
               <Footer />
             </>
           } />
           <Route path="/stack/:id" element={
             <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <StackDetailPage />
               <Footer />
             </>
           } />
           <Route path="/all-news" element={
             <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <AllNewsPage />
               <Footer />
             </>
           } />
           <Route path="/admin" element={
             <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <AdminDashboard />
               <Footer />
             </>
           } />
           <Route path="/test" element={
             <>
-              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <TestPage />
               <Footer />
             </>
@@ -81,6 +103,16 @@ function App() {
 
         {/* Scroll to top component */}
         <ScrollToTop />
+
+        {/* Badge Modal - Always render it, controlled by its own state */}
+        <BadgeModal
+          isOpen={isBadgeModalOpen}
+          onClose={handleCloseBadges}
+          badges={earnedBadges}
+          totalCp={totalCp}
+          earnedAchievements={earnedAchievementIds}
+          level={level}
+        />
       </div>
     </ThemeProvider>
   );

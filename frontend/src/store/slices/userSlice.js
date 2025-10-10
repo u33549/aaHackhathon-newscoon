@@ -207,11 +207,11 @@ const userSlice = createSlice({
         existingStack.completedNewsCount = existingStack.totalNewsCount;
         existingStack.lastReadIndex = existingStack.totalNewsCount - 1;
 
-        // Toplam XP kazan (stack XP + completion bonus)
-        state.stats.totalXP += stackXP;
+        // XP ekle ve level bilgilerini güncelle (addXP reducer'ını kullan)
+        userSlice.caseReducers.addXP(state, { payload: stackXP });
 
-        // Level hesapla
-        state.stats.currentLevel = calculateLevelFromXP(state.stats.totalXP);
+        // Completed stacks sayısını artır
+        state.readingProgress.totalStacksCompleted += 1;
       }
     },
 
