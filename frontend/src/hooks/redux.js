@@ -116,16 +116,18 @@ export const useUserAchievements = () => {
 
 export const useUserBadges = () => {
   return useAppSelector((state) => state.user.achievements.badges);
-};
+// Additional user hooks that are being imported by components
 
-export const useUserStreak = () => {
+  return useAppSelector((state) => state.user.currentUser.readStacks || []);
   return useAppSelector((state) => state.user.achievements.streakData);
 };
 
-export const useUserPreferences = () => {
-  return useAppSelector((state) => state.user.preferences);
-};
-
-export const useFavoriteCategories = () => {
-  return useAppSelector((state) => state.user.preferences.favoriteCategories);
-};
+  return useAppSelector((state) => ({
+    totalNewsRead: state.user.currentUser.readStacks.reduce((total, stack) => total + (stack.completedNewsCount || 0), 0),
+    totalStacksCompleted: state.user.currentUser.readStacks.filter(stack => stack.completedAt).length,
+    readStacks: state.user.currentUser.readStacks,
+    recentlyRead: state.user.currentUser.readStacks
+      .filter(stack => stack.completedAt)
+      .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+      .slice(0, 5)
+  }));
