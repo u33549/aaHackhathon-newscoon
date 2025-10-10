@@ -1334,56 +1334,6 @@ const ReadingFlowPage = () => {
                     {currentStepData.content}
                   </Typography>
 
-                  {/* Bottom navigation hints - Modern tasarım */}
-                  <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    py: 3,
-                    mt: 4,
-                    borderTop: `1px solid ${theme.palette.divider}`,
-                    position: 'sticky',
-                    bottom: 0,
-                    background: theme.palette.mode === 'dark'
-                      ? 'rgba(18, 18, 18, 0.95)'
-                      : 'rgba(255, 255, 255, 0.95)',
-                    backdropFilter: 'blur(20px)',
-                    borderRadius: '16px 16px 0 0',
-                    mx: -3,
-                    px: 3
-                  }}>
-                    {currentStep > 0 && (
-                      <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        opacity: 0.7,
-                        transition: 'opacity 0.3s ease',
-                        '&:hover': { opacity: 1 }
-                      }}>
-                        <KeyboardArrowUp sx={{ fontSize: 16 }} />
-                        <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
-                          Önceki haber
-                        </Typography>
-                      </Box>
-                    )}
-                    <Box sx={{ flex: 1 }} />
-                    {currentStep < steps.length - 1 && (
-                      <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        opacity: 0.7,
-                        transition: 'opacity 0.3s ease',
-                        '&:hover': { opacity: 1 }
-                      }}>
-                        <Typography variant="caption" sx={{ fontSize: '0.8rem' }}>
-                          Sonraki haber
-                        </Typography>
-                        <KeyboardArrowDown sx={{ fontSize: 16 }} />
-                      </Box>
-                    )}
-                  </Box>
                 </Box>
               </Box>
             )}
