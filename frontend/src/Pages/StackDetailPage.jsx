@@ -106,6 +106,11 @@ const StackDetailPage = () => {
         ? Math.floor((readCount / totalNews) * 100)
         : 0;
 
+      // Eğer hiç okunmamışsa (progress = 0), 'not_started' döndür
+      if (progress === 0) {
+        return { status: 'not_started', progress: 0 };
+      }
+
       return {
         status: 'reading',
         progress: Math.max(0, progress), // Negatif değerleri engelle
