@@ -221,7 +221,7 @@ const StackDetailPage = () => {
       <Box
         sx={{
           position: 'relative',
-          height: { xs: '60vh', sm: '70vh', md: '80vh' },
+          height: { xs: '45vh', sm: '55vh', md: '65vh' },
           backgroundImage: `url(${heroImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -246,19 +246,19 @@ const StackDetailPage = () => {
         {/* Close and Share buttons */}
         <Box sx={{
           position: 'absolute',
-          top: { xs: 16, md: 20 },
-          right: { xs: 16, md: 20 },
+          top: { xs: 8, sm: 12, md: 16 },
+          right: { xs: 8, sm: 12, md: 16 },
           zIndex: 3,
           display: 'flex',
-          gap: { xs: 0.5, md: 1 }
+          gap: { xs: 0.25, sm: 0.5, md: 0.75 }
         }}>
           <IconButton
             onClick={() => setShareModalOpen(true)}
             sx={{
               backgroundColor: 'rgba(0,0,0,0.5)',
               color: 'white',
-              width: { xs: 40, md: 48 },
-              height: { xs: 40, md: 48 },
+              width: { xs: 32, sm: 36, md: 44 },
+              height: { xs: 32, sm: 36, md: 44 },
               '&:hover': {
                 backgroundColor: 'rgba(0,0,0,0.8)'
               }
@@ -272,8 +272,8 @@ const StackDetailPage = () => {
             sx={{
               backgroundColor: 'rgba(0,0,0,0.5)',
               color: 'white',
-              width: { xs: 40, md: 48 },
-              height: { xs: 40, md: 48 },
+              width: { xs: 32, sm: 36, md: 44 },
+              height: { xs: 32, sm: 36, md: 44 },
               '&:hover': {
                 backgroundColor: 'rgba(0,0,0,0.8)'
               }
@@ -284,8 +284,8 @@ const StackDetailPage = () => {
         </Box>
 
         {/* Hero Content */}
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, pb: { xs: 4, md: 8 } }}>
-          <Grid container spacing={4} alignItems="flex-end">
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, pb: { xs: 2, sm: 3, md: 6 } }}>
+          <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} alignItems="flex-end">
             <Grid item xs={12} md={8}>
               {/* Category */}
               <Chip
@@ -293,9 +293,9 @@ const StackDetailPage = () => {
                 color="primary"
                 size={isMobile ? 'small' : 'medium'}
                 sx={{
-                  mb: { xs: 1.5, md: 2 },
+                  mb: { xs: 0.75, sm: 1, md: 1.5 },
                   fontWeight: 'bold',
-                  fontSize: { xs: '0.75rem', md: '0.875rem' }
+                  fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.8rem' }
                 }}
               />
 
@@ -305,10 +305,10 @@ const StackDetailPage = () => {
                 sx={{
                   color: 'white',
                   fontWeight: 'bold',
-                  mb: { xs: 1.5, md: 2 },
-                  fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3.5rem' },
+                  mb: { xs: 0.75, sm: 1, md: 1.5 },
+                  fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.5rem' },
                   textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                  lineHeight: { xs: 1.2, md: 1.1 }
+                  lineHeight: { xs: 1.05, sm: 1.1, md: 1.1 }
                 }}
               >
                 {stack.title}
@@ -316,8 +316,8 @@ const StackDetailPage = () => {
 
               {/* Reading Progress */}
               {stackStatus.status !== 'not_started' && (
-                <Box sx={{ mb: { xs: 2, md: 3 } }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                <Box sx={{ mb: { xs: 1, sm: 1.5, md: 2 } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.75, sm: 1.5 }, mb: 0.75 }}>
                     <Typography
                       variant="body2"
                       sx={{
@@ -366,44 +366,44 @@ const StackDetailPage = () => {
               <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: { xs: 2, md: 3 },
-                mb: { xs: 2, md: 3 },
+                gap: { xs: 1, sm: 1.5, md: 2 },
+                mb: { xs: 1, sm: 1.5, md: 2 },
                 flexWrap: 'wrap'
               }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Star sx={{ color: '#ffd700', fontSize: { xs: 18, md: 20 } }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                  <Star sx={{ color: '#ffd700', fontSize: { xs: 14, sm: 16, md: 18 } }} />
                   <Typography
                     variant="body1"
                     sx={{
                       color: 'white',
                       fontWeight: 'bold',
-                      fontSize: { xs: '0.875rem', md: '1rem' }
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }
                     }}
                   >
                     {stack.xp || 0} CP
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Visibility sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: 18, md: 20 } }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                  <Visibility sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: 14, sm: 16, md: 18 } }} />
                   <Typography
                     variant="body1"
                     sx={{
                       color: 'rgba(255,255,255,0.8)',
-                      fontSize: { xs: '0.875rem', md: '1rem' }
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }
                     }}
                   >
                     {stack.viewCount || 0} görüntülenme
                   </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Category sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: 18, md: 20 } }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                  <Category sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: 14, sm: 16, md: 18 } }} />
                   <Typography
                     variant="body1"
                     sx={{
                       color: 'rgba(255,255,255,0.8)',
-                      fontSize: { xs: '0.875rem', md: '1rem' }
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }
                     }}
                   >
                     {stack.news?.length || 0} haber
@@ -414,7 +414,7 @@ const StackDetailPage = () => {
                   variant="body1"
                   sx={{
                     color: 'rgba(255,255,255,0.8)',
-                    fontSize: { xs: '0.875rem', md: '1rem' }
+                    fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }
                   }}
                 >
                   {formatDate(stack.createdAt)}
@@ -426,13 +426,13 @@ const StackDetailPage = () => {
                 variant="body1"
                 sx={{
                   color: 'rgba(255,255,255,0.9)',
-                  mb: { xs: 3, md: 4 },
+                  mb: { xs: 1.5, sm: 2, md: 3 },
                   maxWidth: { xs: '100%', md: '600px' },
-                  fontSize: { xs: '0.95rem', md: '1.1rem' },
-                  lineHeight: { xs: 1.5, md: 1.6 },
+                  fontSize: { xs: '0.75rem', sm: '0.85rem', md: '1rem' },
+                  lineHeight: { xs: 1.3, sm: 1.4, md: 1.5 },
                   textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                   display: { xs: '-webkit-box', md: 'block' },
-                  WebkitLineClamp: { xs: 3, md: 'none' },
+                  WebkitLineClamp: { xs: 3, sm: 4, md: 'none' },
                   WebkitBoxOrient: { xs: 'vertical', md: 'unset' },
                   overflow: { xs: 'hidden', md: 'visible' }
                 }}
@@ -443,7 +443,7 @@ const StackDetailPage = () => {
               {/* Action Buttons */}
               <Box sx={{
                 display: 'flex',
-                gap: { xs: 1.5, md: 2 },
+                gap: { xs: 0.75, sm: 1, md: 1.5 },
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 flexDirection: 'row'
@@ -458,9 +458,9 @@ const StackDetailPage = () => {
                       backgroundColor: 'white',
                       color: 'black',
                       fontWeight: 'bold',
-                      px: { xs: 3, md: 4 },
-                      py: { xs: 1.2, md: 1.5 },
-                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      px: { xs: 1.5, sm: 2, md: 3 },
+                      py: { xs: 0.75, sm: 1, md: 1.25 },
+                      fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
                       flex: { xs: '1 1 auto', sm: '0 0 auto' },
                       minWidth: { xs: 'auto', sm: 'auto' },
                       '&:hover': {
@@ -482,9 +482,9 @@ const StackDetailPage = () => {
                       backgroundColor: '#FFD700',
                       color: 'black',
                       fontWeight: 'bold',
-                      px: { xs: 3, md: 4 },
-                      py: { xs: 1.2, md: 1.5 },
-                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      px: { xs: 1.5, sm: 2, md: 3 },
+                      py: { xs: 0.75, sm: 1, md: 1.25 },
+                      fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
                       flex: { xs: '1 1 auto', sm: '0 0 auto' },
                       minWidth: { xs: 'auto', sm: 'auto' },
                       '&:hover': {
@@ -506,9 +506,9 @@ const StackDetailPage = () => {
                       backgroundColor: '#4CAF50',
                       color: 'white',
                       fontWeight: 'bold',
-                      px: { xs: 3, md: 4 },
-                      py: { xs: 1.2, md: 1.5 },
-                      fontSize: { xs: '0.875rem', md: '1rem' },
+                      px: { xs: 1.5, sm: 2, md: 3 },
+                      py: { xs: 0.75, sm: 1, md: 1.25 },
+                      fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
                       flex: { xs: '1 1 auto', sm: '0 0 auto' },
                       minWidth: { xs: 'auto', sm: 'auto' },
                       '&:hover': {
@@ -526,8 +526,8 @@ const StackDetailPage = () => {
                   <Box sx={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: { xs: 0.75, md: 1 },
-                    mt: { xs: 1, md: 0 },
+                    gap: { xs: 0.25, sm: 0.5, md: 0.75 },
+                    mt: { xs: 0.75, sm: 0.75, md: 0 },
                     alignItems: 'center',
                     width: { xs: '100%', sm: 'auto' },
                     justifyContent: { xs: 'center', sm: 'flex-start' }
@@ -541,9 +541,9 @@ const StackDetailPage = () => {
                           backgroundColor: 'rgba(255,255,255,0.15)',
                           color: 'white',
                           border: '1px solid rgba(255,255,255,0.4)',
-                          fontSize: { xs: '0.7rem', md: '0.8rem' },
+                          fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
                           fontWeight: 500,
-                          height: { xs: 24, md: 28 },
+                          height: { xs: 20, sm: 22, md: 26 },
                           backdropFilter: 'blur(10px)',
                           '&:hover': {
                             backgroundColor: 'rgba(255,255,255,0.25)',
@@ -562,9 +562,9 @@ const StackDetailPage = () => {
                           backgroundColor: 'rgba(255,255,255,0.1)',
                           color: 'rgba(255,255,255,0.8)',
                           border: '1px solid rgba(255,255,255,0.3)',
-                          fontSize: { xs: '0.65rem', md: '0.75rem' },
+                          fontSize: { xs: '0.55rem', sm: '0.6rem', md: '0.7rem' },
                           fontWeight: 400,
-                          height: { xs: 24, md: 28 },
+                          height: { xs: 20, sm: 22, md: 26 },
                           backdropFilter: 'blur(10px)',
                           '&:hover': {
                             backgroundColor: 'rgba(255,255,255,0.2)',
@@ -616,61 +616,69 @@ const StackDetailPage = () => {
                       }
                     }}
                   >
-                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                    <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
                       <Box sx={{
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: { xs: 1.5, md: 2 },
-                        flexDirection: { xs: 'column', sm: 'row' }
+                        flexDirection: 'column',
+                        gap: { xs: 1, md: 1.5 }
                       }}>
-                        <Avatar sx={{
-                          bgcolor: 'primary.main',
-                          mt: { xs: 0, sm: 0.5 },
-                          width: { xs: 32, md: 40 },
-                          height: { xs: 32, md: 40 },
-                          fontSize: { xs: '0.875rem', md: '1rem' },
-                          alignSelf: { xs: 'flex-start', sm: 'flex-start' }
+                        {/* İndeks ve Title - Aynı satırda */}
+                        <Box sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: { xs: 0.75, md: 1 }
                         }}>
-                          {index + 1}
-                        </Avatar>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Avatar sx={{
+                            bgcolor: 'primary.main',
+                            width: { xs: 28, md: 36 },
+                            height: { xs: 28, md: 36 },
+                            fontSize: { xs: '0.8rem', md: '0.9rem' },
+                            flexShrink: 0
+                          }}>
+                            {index + 1}
+                          </Avatar>
                           <Typography
                             variant="h6"
-                            gutterBottom
                             sx={{
                               fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
                               lineHeight: { xs: 1.3, md: 1.4 },
-                              mb: { xs: 1, md: 1.5 }
+                              flex: 1,
+                              textAlign: 'left'
                             }}
                           >
                             {typeof news === 'object' ? news.title : `Haber ${index + 1}`}
                           </Typography>
-                          {typeof news === 'object' && news.description && (
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{
-                                mb: { xs: 1, md: 1 },
-                                fontSize: { xs: '0.875rem', md: '0.875rem' },
-                                lineHeight: 1.5
-                              }}
-                            >
-                              {news.description}
-                            </Typography>
-                          )}
-                          {typeof news === 'object' && news.pubDate && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              <AccessTime sx={{ fontSize: { xs: 14, md: 16 }, color: 'text.secondary' }} />
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ fontSize: { xs: '0.75rem', md: '0.75rem' } }}
-                              >
-                                {formatDate(news.pubDate)}
-                              </Typography>
-                            </Box>
-                          )}
                         </Box>
+                        
+                        {/* Açıklama - Alt satırda */}
+                        {typeof news === 'object' && news.description && (
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              mb: { xs: 1, md: 1 },
+                              fontSize: { xs: '0.875rem', md: '0.875rem' },
+                              lineHeight: 1.5,
+                              textAlign: 'left'
+                            }}
+                          >
+                            {news.description}
+                          </Typography>
+                        )}
+                        
+                        {/* Tarih - Alt satırda */}
+                        {typeof news === 'object' && news.pubDate && (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <AccessTime sx={{ fontSize: { xs: 14, md: 16 }, color: 'text.secondary' }} />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: { xs: '0.75rem', md: '0.75rem' } }}
+                            >
+                              {formatDate(news.pubDate)}
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
                     </CardContent>
                   </Card>
