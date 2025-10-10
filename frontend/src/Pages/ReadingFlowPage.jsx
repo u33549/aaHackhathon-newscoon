@@ -193,6 +193,9 @@ const ReadingFlowPage = () => {
     }
   }, [selectedStack]);
 
+  // currentStepData'yı burada tanımla - useEffect'lerden önce
+  const currentStepData = steps[currentStep];
+
   // Kaldığımız yerden devam et - kaydedilmiş progress'i yükle
   useEffect(() => {
     if (selectedStack && steps.length > 0 && currentlyReading.length > 0) {
@@ -217,7 +220,18 @@ const ReadingFlowPage = () => {
     }
   }, [currentStep, selectedStack, steps.length, dispatch]);
 
-  const currentStepData = steps[currentStep];
+  // Her step değiştiğinde sayfayı en üste kaydır
+  useEffect(() => {
+    const container = newsContentRef.current;
+    if (container && currentStepData?.type === 'news') {
+      // Smooth scroll to top
+      container.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentStep, currentStepData?.type]);
+
 
   // Haber okuma işlemi - BİLDİRİM OLMADAN
   const handleNewsRead = useCallback((stepIndex) => {
