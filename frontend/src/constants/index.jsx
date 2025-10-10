@@ -6,7 +6,18 @@ import {
   LocalHospital,
   Whatshot,
   EmojiEvents,
-  Share
+  Share,
+  School,
+  Lightbulb,
+  Speed,
+  Psychology,
+  AttachMoney,
+  SportsBasketball,
+  AutoStories,
+  Star,
+  Public,
+  Article,
+  MenuBook
 } from '@mui/icons-material';
 import LogoImage from '../assets/Logo_Newscoon.png';
 
@@ -49,7 +60,18 @@ export const getIconComponent = (iconName) => {
     'Whatshot': Whatshot,
     'EmojiEvents': EmojiEvents,
     'Share': Share,
-    'LogoIcon': LogoIcon
+    'LogoIcon': LogoIcon,
+    'School': School,
+    'Lightbulb': Lightbulb,
+    'Speed': Speed,
+    'Psychology': Psychology,
+    'AttachMoney': AttachMoney,
+    'SportsBasketball': SportsBasketball,
+    'AutoStories': AutoStories,
+    'Star': Star,
+    'Public': Public,
+    'Article': Article,
+    'MenuBook': MenuBook
   };
 
   const IconComponent = iconMap[iconName];
@@ -64,51 +86,149 @@ export const getIconComponent = (iconName) => {
   return React.createElement(IconComponent);
 };
 
-// --- DATA ---
+// --- ROZETLER (Badges) - Sıfat/Unvan olanlar ---
 export const allBadges = [
+    // Kategori Rozetleri (6 adet)
     {
       id: 'gundem',
       name: 'Gündem Uzmanı',
       description: 'Gündem kategorisindeki ilk haberini okudun.',
-      icon: 'Computer', // String olarak sakla
-      color: '#3B82F6'
+      icon: 'Computer',
+      color: '#3B82F6',
+      checkType: 'category',
+      requiredValue: 'gundem'
     },
     {
       id: 'dunya',
       name: 'Dünya Gözlemcisi',
       description: 'Dünya kategorisindeki ilk haberini okudun.',
-      icon: 'TrendingUp', // String olarak sakla
-      color: '#10B981'
+      icon: 'Public',
+      color: '#10B981',
+      checkType: 'category',
+      requiredValue: 'dunya'
     },
     {
       id: 'ekonomi',
       name: 'Finans Gurusu',
       description: 'Ekonomi kategorisindeki ilk haberini okudun.',
-      icon: 'TrendingUp', // String olarak sakla
-      color: '#10B981'
+      icon: 'AttachMoney',
+      color: '#F59E0B',
+      checkType: 'category',
+      requiredValue: 'ekonomi'
     },
     {
       id: 'spor',
       name: 'Spor Tutkunusu',
       description: 'Spor kategorisindeki ilk haberini okudun.',
-      icon: 'Science', // String olarak sakla
-      color: '#8B5CF6'
+      icon: 'SportsBasketball',
+      color: '#8B5CF6',
+      checkType: 'category',
+      requiredValue: 'spor'
     },
     {
       id: 'analiz',
       name: 'Analiz Uzmanı',
       description: 'Analiz kategorisindeki ilk haberini okudun.',
-      icon: 'LocalHospital', // String olarak sakla
-      color: '#EF4444'
+      icon: 'Psychology',
+      color: '#EF4444',
+      checkType: 'category',
+      requiredValue: 'analiz'
     },
     {
       id: 'kultur',
       name: 'Kültür Elçisi',
       description: 'Kültür kategorisindeki ilk haberini okudun.',
-      icon: 'Computer', // String olarak sakla
-      color: '#F59E0B'
+      icon: 'AutoStories',
+      color: '#EC4899',
+      checkType: 'category',
+      requiredValue: 'kultur'
     },
+    // Özel Sıfat Rozetleri (6 adet)
+    {
+      id: 'curious_mind',
+      name: 'Meraklı Zihin',
+      description: 'Tüm kategorilerden en az bir haber okudun.',
+      icon: 'Lightbulb',
+      color: '#9C27B0',
+      checkType: 'badgeCount',
+      requiredValue: 6
+    },
+    {
+      id: 'news_addict',
+      name: 'Haber Bağımlısı',
+      description: '50 haber okudun.',
+      icon: 'Article',
+      color: '#FF5722',
+      checkType: 'totalNewsRead',
+      requiredValue: 50
+    },
+    {
+      id: 'level_climber',
+      name: 'Seviye Tırmanıcısı',
+      description: '5. seviyeye ulaştın.',
+      icon: 'Star',
+      color: '#FFD700',
+      checkType: 'level',
+      requiredValue: 5
+    },
+    {
+      id: 'stack_master',
+      name: 'Yığın Ustası',
+      description: '10 haber yığını tamamladın.',
+      icon: 'EmojiEvents',
+      color: '#4CAF50',
+      checkType: 'stacksCompleted',
+      requiredValue: 10
+    },
+    {
+      id: 'streak_legend',
+      name: 'Seri Efsanesi',
+      description: '7 günlük okuma serisi yaptın.',
+      icon: 'Whatshot',
+      color: '#FF6B6B',
+      checkType: 'manual',
+      requiredValue: 7
+    },
+    {
+      id: 'xp_collector',
+      name: 'XP Koleksiyoncusu',
+      description: 'Toplamda 1000 XP kazandın.',
+      icon: 'Speed',
+      color: '#00BCD4',
+      checkType: 'totalXP',
+      requiredValue: 1000
+    }
 ];
+
+// Rozet kazanma kontrolü
+export const checkBadgeEarned = (badge, userData) => {
+    const { checkType, requiredValue } = badge;
+
+    switch (checkType) {
+        case 'category':
+            // Kategori rozeti - kullanıcının rozetlerinde var mı?
+            return userData.achievements.badges.some(b => b.id === badge.id);
+        case 'totalNewsRead':
+            return userData.readingProgress.totalNewsRead >= requiredValue;
+        case 'badgeCount':
+            // Kategori rozetlerinin sayısını kontrol et (ilk 6 rozet)
+            const categoryBadges = userData.achievements.badges.filter(b =>
+                ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'].includes(b.id)
+            );
+            return categoryBadges.length >= requiredValue;
+        case 'stacksCompleted':
+            return userData.readingProgress.totalStacksCompleted >= requiredValue;
+        case 'level':
+            return userData.stats.currentLevel >= requiredValue;
+        case 'totalXP':
+            return userData.stats.totalXP >= requiredValue;
+        case 'manual':
+            // Manuel kontrol - MVP için direkt badge listesine bakıyoruz
+            return userData.achievements.badges.some(b => b.id === badge.id);
+        default:
+            return false;
+    }
+};
 
 // --- XP AND LEVEL CONSTANTS ---
 export const XP_CONSTANTS = {
@@ -164,38 +284,49 @@ export const levelThresholds = (() => {
   return thresholds;
 })();
 
-// Güncellenmiş başarım sistemi - Redux-friendly (fonksiyonsuz)
+// --- BAŞARIMLAR (Achievements) - Eylem/Hedef odaklı ---
 export const allAchievements = [
+    // Okuma Başarımları
     {
-        id: 'beginner_reader',
+        id: 'first_step',
         name: 'İlk Adım',
         description: 'İlk haberini tamamla.',
-        icon: 'LogoIcon',
+        icon: 'School',
         xpReward: 50,
         checkType: 'totalNewsRead',
         requiredValue: 1
     },
     {
-        id: 'curious_mind',
-        name: 'Meraklı Zihin',
-        description: 'Tüm kategorilerden en az bir haber oku.',
-        icon: 'Science',
-        xpReward: 100,
-        checkType: 'badgeCount',
-        requiredValue: 4
-    },
-    {
-        id: 'streak_starter',
-        name: 'Ateşi Yaktın',
-        description: '3 günlük okuma serisine ulaş.',
-        icon: 'Whatshot',
+        id: 'early_reader',
+        name: 'Erken Okuyucu',
+        description: '5 haber oku.',
+        icon: 'MenuBook',
         xpReward: 75,
-        checkType: 'streakCurrent',
-        requiredValue: 3
+        checkType: 'totalNewsRead',
+        requiredValue: 5
     },
     {
-        id: 'stack_master',
-        name: 'Yığın Ustası',
+        id: 'dedicated_reader',
+        name: 'Kararlı Okuyucu',
+        description: '25 haber oku.',
+        icon: 'Article',
+        xpReward: 150,
+        checkType: 'totalNewsRead',
+        requiredValue: 25
+    },
+    {
+        id: 'news_marathon',
+        name: 'Haber Maratonu',
+        description: '100 haber oku.',
+        icon: 'Speed',
+        xpReward: 350,
+        checkType: 'totalNewsRead',
+        requiredValue: 100
+    },
+    // Stack Başarımları
+    {
+        id: 'stack_beginner',
+        name: 'Yığın Başlangıcı',
         description: 'İlk haber yığınını tamamla.',
         icon: 'EmojiEvents',
         xpReward: 100,
@@ -203,40 +334,106 @@ export const allAchievements = [
         requiredValue: 1
     },
     {
-        id: 'news_addict',
-        name: 'Haber Bağımlısı',
-        description: '50 haber oku.',
-        icon: 'Computer',
+        id: 'stack_enthusiast',
+        name: 'Yığın Meraklısı',
+        description: '5 haber yığını tamamla.',
+        icon: 'EmojiEvents',
         xpReward: 200,
-        checkType: 'totalNewsRead',
-        requiredValue: 50
+        checkType: 'stacksCompleted',
+        requiredValue: 5
     },
     {
-        id: 'level_climber',
-        name: 'Seviye Tırmanıcısı',
+        id: 'stack_pro',
+        name: 'Yığın Profesyoneli',
+        description: '20 haber yığını tamamla.',
+        icon: 'EmojiEvents',
+        xpReward: 500,
+        checkType: 'stacksCompleted',
+        requiredValue: 20
+    },
+    // Kategori Başarımları
+    {
+        id: 'category_explorer',
+        name: 'Kategori Kaşifi',
+        description: '3 farklı kategoriden haber oku.',
+        icon: 'Public',
+        xpReward: 100,
+        checkType: 'badgeCount',
+        requiredValue: 3
+    },
+    {
+        id: 'category_master',
+        name: 'Kategori Ustası',
+        description: 'Tüm kategorilerden haber oku.',
+        icon: 'Public',
+        xpReward: 250,
+        checkType: 'badgeCount',
+        requiredValue: 6
+    },
+    // Level Başarımları
+    {
+        id: 'level_2',
+        name: 'Seviye 2',
+        description: '2. seviyeye ulaş.',
+        icon: 'Star',
+        xpReward: 75,
+        checkType: 'level',
+        requiredValue: 2
+    },
+    {
+        id: 'level_3',
+        name: 'Seviye 3',
+        description: '3. seviyeye ulaş.',
+        icon: 'Star',
+        xpReward: 100,
+        checkType: 'level',
+        requiredValue: 3
+    },
+    {
+        id: 'level_5',
+        name: 'Seviye 5',
         description: '5. seviyeye ulaş.',
-        icon: 'TrendingUp',
-        xpReward: 150,
+        icon: 'Star',
+        xpReward: 200,
         checkType: 'level',
         requiredValue: 5
     },
     {
-        id: 'streak_legend',
-        name: 'Seri Efsanesi',
-        description: '7 günlük okuma serisine ulaş.',
-        icon: 'Whatshot',
-        xpReward: 300,
-        checkType: 'streakCurrent',
-        requiredValue: 7
+        id: 'level_10',
+        name: 'Seviye 10',
+        description: '10. seviyeye ulaş.',
+        icon: 'Star',
+        xpReward: 500,
+        checkType: 'level',
+        requiredValue: 10
+    },
+    // XP Başarımları
+    {
+        id: 'xp_500',
+        name: 'İlk 500 XP',
+        description: 'Toplamda 500 XP kazan.',
+        icon: 'TrendingUp',
+        xpReward: 75,
+        checkType: 'totalXP',
+        requiredValue: 500
     },
     {
-        id: 'xp_collector',
-        name: 'XP Koleksiyoncusu',
-        description: 'Toplamda 1000 XP kazan.',
-        icon: 'EmojiEvents',
-        xpReward: 100,
+        id: 'xp_1500',
+        name: '1500 XP Hedefi',
+        description: 'Toplamda 1500 XP kazan.',
+        icon: 'TrendingUp',
+        xpReward: 150,
         checkType: 'totalXP',
-        requiredValue: 1000
+        requiredValue: 1500
+    },
+    {
+        id: 'xp_3000',
+        name: '3000 XP Ustası',
+        description: 'Toplamda 3000 XP kazan.',
+        icon: 'TrendingUp',
+        xpReward: 300,
+        checkType: 'totalXP',
+        requiredValue: 3000
     }
 ];
 
@@ -248,9 +445,11 @@ export const checkAchievementCompleted = (achievement, userData) => {
         case 'totalNewsRead':
             return userData.readingProgress.totalNewsRead >= requiredValue;
         case 'badgeCount':
-            return userData.achievements.badges.length >= requiredValue;
-        case 'streakCurrent':
-            return userData.achievements.streakData.current >= requiredValue;
+            // Kategori rozetlerinin sayısını kontrol et
+            const categoryBadges = userData.achievements.badges.filter(b =>
+                ['gundem', 'dunya', 'ekonomi', 'spor', 'analiz', 'kultur'].includes(b.id)
+            );
+            return categoryBadges.length >= requiredValue;
         case 'stacksCompleted':
             return userData.readingProgress.totalStacksCompleted >= requiredValue;
         case 'level':

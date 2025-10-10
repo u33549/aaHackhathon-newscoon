@@ -16,11 +16,10 @@ import {
   LinearProgress,
   useTheme,
   useMediaQuery,
-  IconButton,
-  Stack
+  IconButton
 } from '@mui/material';
 import { Close, EmojiEvents, Star } from '@mui/icons-material';
-import { allAchievements, levelThresholds, getIconComponent } from '../../constants/index.jsx';
+import { allAchievements, allBadges, checkBadgeEarned, checkAchievementCompleted, levelThresholds, getIconComponent } from '../../constants/index.jsx';
 
 const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, level }) => {
   const theme = useTheme();
@@ -33,13 +32,29 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
     ? ((totalCp - currentLevelCp) / (nextLevelCp - currentLevelCp)) * 100
     : 0;
 
+  // Kullanıcı verisi - badge kontrolü için
+  const userData = {
+    achievements: { badges },
+    readingProgress: {
+      totalNewsRead: 0, // Bu değerler App.jsx'ten gelmeli ama MVP için basitleştirdik
+      totalStacksCompleted: 0
+    },
+    stats: {
+      currentLevel: level,
+      totalXP: totalCp
+    }
+  };
+
+  // Kazanılan rozetleri filtrele
+  const earnedBadgeIds = new Set(badges.map(b => b.id));
+
   return (
     <Dialog
       open={isOpen}
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      fullScreen={isSmall} // Mobilde tam ekran
+      fullScreen={isSmall}
       PaperProps={{
         sx: {
           borderRadius: { xs: 0, sm: 3 },
@@ -78,7 +93,9 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
       </DialogTitle>
 
       <DialogContent sx={{
-        p: { xs: 2, md: 3 },
+        p: 0,
+        px: { xs: 2, md: 3 },
+        py: { xs: 2, md: 3 },
         maxHeight: { xs: 'calc(100vh - 120px)', sm: 'none' },
         overflowY: 'auto'
       }}>
@@ -164,7 +181,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
           </Card>
         </Box>
 
-        {/* Progress Bar - Ayrı bir box olarak */}
+        {/* Progress Bar */}
         <Card sx={{
           mb: { xs: 3, md: 4 },
           bgcolor: 'background.paper',
@@ -209,62 +226,97 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
           </CardContent>
         </Card>
 
-        {/* Badges Section */}
+        {/* Badges Section - Rozetler */}
         <Typography
           variant={isSmall ? "body1" : "h6"}
           fontWeight={600}
           sx={{ mb: { xs: 1.5, md: 2 } }}
         >
-          Kazanılan Rozetler ({badges.length}/4)
+          Kazanılan Rozetler ({earnedBadgeIds.size}/{allBadges.length})
         </Typography>
 
-        <Grid container spacing={{ xs: 1.5, md: 2 }} sx={{ mb: { xs: 3, md: 4 } }}>
-          {badges.map((badge) => (
-            <Grid item xs={12} sm={6} key={badge.id}>
-              <Card sx={{
-                border: `2px solid ${badge.color}`,
-                bgcolor: 'background.paper'
-              }}>
-                <CardContent sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: { xs: 1.5, md: 2 },
-                  p: { xs: 1.5, md: 2 },
-                  '&:last-child': { pb: { xs: 1.5, md: 2 } }
+        <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ mb: { xs: 3, md: 4 }, width: '100%', mx: 0 }}>
+          {allBadges.map((badge) => {
+            const isEarned = earnedBadgeIds.has(badge.id);
+
+            return (
+              <Grid item xs={12} key={badge.id} sx={{ width: '100%', px: 0 }}>
+                <Card sx={{
+                  opacity: isEarned ? 1 : 0.5,
+                  border: isEarned ? `2px solid ${badge.color}` : '1px solid',
+                  borderColor: isEarned ? badge.color : 'divider',
+                  bgcolor: 'background.paper',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}>
-                  <Avatar sx={{
-                    bgcolor: badge.color,
-                    color: 'white',
-                    width: { xs: 32, md: 40 },
-                    height: { xs: 32, md: 40 }
+                  <CardContent sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: { xs: 2, md: 2.5 },
+                    p: { xs: 2, md: 2.5 },
+                    '&:last-child': { pb: { xs: 2, md: 2.5 } }
                   }}>
-                    {getIconComponent(badge.icon)}
-                  </Avatar>
-                  <Box>
-                    <Typography
-                      variant={isSmall ? "body1" : "h6"}
-                      fontWeight={600}
-                      fontSize={{ xs: '0.9rem', md: '1rem' }}
-                    >
-                      {badge.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      fontSize={{ xs: '0.75rem', md: '0.875rem' }}
-                    >
-                      {badge.description}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+                    <Avatar sx={{
+                      bgcolor: isEarned ? badge.color : 'grey.500',
+                      color: 'white',
+                      width: { xs: 50, md: 62 },
+                      height: { xs: 50, md: 62 },
+                      flexShrink: 0
+                    }}>
+                      {getIconComponent(badge.icon)}
+                    </Avatar>
+                    <Box sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center'
+                    }}>
+                      <Typography
+                        variant={isSmall ? "body1" : "h6"}
+                        fontWeight={600}
+                        fontSize={{ xs: '1.125rem', md: '1.25rem' }}
+                        sx={{
+                          lineHeight: 1.3,
+                          mb: 0.5
+                        }}
+                      >
+                        {badge.name}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontSize={{ xs: '0.9375rem', md: '1.09375rem' }}
+                        sx={{ lineHeight: 1.5 }}
+                      >
+                        {badge.description}
+                      </Typography>
+                    </Box>
+                    {isEarned && (
+                      <Chip
+                        label="✓"
+                        size="small"
+                        sx={{
+                          minWidth: 40,
+                          height: 30,
+                          fontSize: '0.875rem',
+                          flexShrink: 0,
+                          bgcolor: badge.color,
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
         </Grid>
 
         <Divider sx={{ my: { xs: 2, md: 3 } }} />
 
-        {/* Achievements Section */}
+        {/* Achievements Section - Başarımlar */}
         <Typography
           variant={isSmall ? "body1" : "h6"}
           fontWeight={600}
@@ -273,44 +325,58 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
           Başarımlar ({earnedAchievements.size}/{allAchievements.length})
         </Typography>
 
-        <Grid container spacing={{ xs: 1.5, md: 2 }}>
+        <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ width: '100%', mx: 0 }}>
           {allAchievements.map((achievement) => {
             const isEarned = earnedAchievements.has(achievement.id);
 
             return (
-              <Grid item xs={12} sm={6} key={achievement.id}>
+              <Grid item xs={12} key={achievement.id} sx={{ width: '100%', px: 0 }}>
                 <Card sx={{
                   opacity: isEarned ? 1 : 0.5,
                   border: isEarned ? '2px solid' : '1px solid',
-                  borderColor: isEarned ? 'success.main' : 'divider'
+                  borderColor: isEarned ? 'success.main' : 'divider',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}>
                   <CardContent sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: { xs: 1.5, md: 2 },
-                    p: { xs: 1.5, md: 2 },
-                    '&:last-child': { pb: { xs: 1.5, md: 2 } }
+                    gap: { xs: 2, md: 2.5 },
+                    p: { xs: 2, md: 2.5 },
+                    '&:last-child': { pb: { xs: 2, md: 2.5 } }
                   }}>
                     <Avatar sx={{
                       bgcolor: isEarned ? 'success.main' : 'grey.500',
                       color: 'white',
-                      width: { xs: 32, md: 40 },
-                      height: { xs: 32, md: 40 }
+                      width: { xs: 50, md: 62 },
+                      height: { xs: 50, md: 62 },
+                      flexShrink: 0
                     }}>
                       {getIconComponent(achievement.icon)}
                     </Avatar>
-                    <Box sx={{ flex: 1 }}>
+                    <Box sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center'
+                    }}>
                       <Typography
                         variant={isSmall ? "body1" : "h6"}
                         fontWeight={600}
-                        fontSize={{ xs: '0.9rem', md: '1rem' }}
+                        fontSize={{ xs: '1.125rem', md: '1.25rem' }}
+                        sx={{
+                          lineHeight: 1.3,
+                          mb: 0.5
+                        }}
                       >
                         {achievement.name}
                       </Typography>
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        fontSize={{ xs: '0.75rem', md: '0.875rem' }}
+                        fontSize={{ xs: '0.9375rem', md: '1.09375rem' }}
+                        sx={{ lineHeight: 1.5 }}
                       >
                         {achievement.description}
                       </Typography>
@@ -321,9 +387,10 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
                         size="small"
                         color="success"
                         sx={{
-                          minWidth: 32,
-                          height: 24,
-                          fontSize: '0.7rem'
+                          minWidth: 40,
+                          height: 30,
+                          fontSize: '0.875rem',
+                          flexShrink: 0
                         }}
                       />
                     )}
