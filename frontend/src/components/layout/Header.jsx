@@ -15,10 +15,17 @@ import {
 } from '@mui/material';
 import { EmojiEvents, Star } from '@mui/icons-material';
 import LogoNewscoon from '../../assets/Logo_Newscoon.png';
+import { levelThresholds } from '../../constants/index.jsx';
 
 const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Mevcut levelin minimum CP'sini al
+  const currentLevelMinCp = levelThresholds[level - 1] || 0;
+
+  // Kullanıcının levelinden fazla olan CP'yi hesapla
+  const effectiveCp = totalCp - currentLevelMinCp;
 
   const progressPercentage = cpForNextLevel.max > 0
     ? (cpForNextLevel.current / cpForNextLevel.max) * 100
@@ -94,7 +101,7 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
               {/* CP Progress */}
               <Box sx={{ minWidth: 150 }}>
                 <Typography variant="caption" color="text.secondary">
-                  CP: {cpForNextLevel.current}/{cpForNextLevel.max}
+                  CP: {effectiveCp}/{cpForNextLevel.max}
                 </Typography>
                 <LinearProgress
                   variant="determinate"
@@ -151,7 +158,7 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
                   fontSize: '0.8rem'
                 }}
               >
-                {totalCp} CP
+                {effectiveCp} CP
               </Typography>
 
               {/* Badges Icon Button - Kupa ikonu sarı */}
