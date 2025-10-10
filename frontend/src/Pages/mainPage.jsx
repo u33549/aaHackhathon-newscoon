@@ -17,6 +17,7 @@ import {
   useUserLevel,
   useUserLevelProgress,
   useReadingProgress,
+  useCurrentlyReading,
   useUserAchievements,
   useUserBadges,
   useUserStreak
@@ -78,6 +79,7 @@ const MainPage = () => {
   const currentLevel = useUserLevel();
   const levelProgress = useUserLevelProgress();
   const readingProgress = useReadingProgress();
+  const currentlyReading = useCurrentlyReading();
   const userAchievements = useUserAchievements();
   const earnedBadges = userAchievements?.badges || [];
   const streakData = userAchievements?.streakData || { current: 0 };
@@ -333,14 +335,28 @@ const MainPage = () => {
     })
     .map(convertStackToNewsCard);
 
-  // Recently read stacks
-  const recentlyReadAsNews = readingProgress.recentlyRead
-    .map(recent => {
+  // Recently read stacks - YARIM KALMIŞ VE TAMAMLANMIŞ STACK'LERİ BİRLEŞTİR
+  const recentlyReadAsNews = (() => {
+    // Önce devam etmekte olan stack'leri al (currentlyReading)
+    const continueReadingStacks = currentlyReading.map(reading => {
+      const stack = [...popularStacks, ...latestStacks].find(s => s._id === reading.stackId);
+      return stack ? convertStackToNewsCard(stack) : null;
+    }).filter(Boolean);
+
+    // Sonra son okunanları al (recentlyRead)
+    const completedStacks = readingProgress.recentlyRead.map(recent => {
       const stack = [...popularStacks, ...latestStacks].find(s => s._id === recent.stackId);
       return stack ? convertStackToNewsCard(stack) : null;
-    })
-    .filter(Boolean)
-    .slice(0, 8);
+    }).filter(Boolean);
+
+    // Birleştir ve duplicate'leri kaldır (stackId'ye göre)
+    const allRecentStacks = [...continueReadingStacks, ...completedStacks];
+    const uniqueStacks = allRecentStacks.filter((stack, index, self) =>
+      index === self.findIndex(s => s.id === stack.id)
+    );
+
+    return uniqueStacks.slice(0, 8);
+  })();
 
   if (isLoading || stacksLoading) {
     return (
