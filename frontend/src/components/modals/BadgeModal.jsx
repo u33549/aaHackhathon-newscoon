@@ -44,7 +44,9 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
         sx: {
           borderRadius: { xs: 0, sm: 3 },
           minHeight: { xs: '100vh', sm: 600 },
-          m: { xs: 0, sm: 2 }
+          m: { xs: 0, sm: 2 },
+          bgcolor: theme.palette.mode === 'dark' ? '#121212' : 'background.paper',
+          backgroundImage: 'none'
         }
       }}
     >
