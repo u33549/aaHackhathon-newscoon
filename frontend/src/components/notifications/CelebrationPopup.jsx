@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -15,35 +15,40 @@ import { getIconComponent } from '../../constants/index.jsx';
 
 const CelebrationPopup = ({ celebrations, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   // Mevcut kutlama
   const currentCelebration = celebrations[currentIndex];
 
-  useEffect(() => {
-    if (currentCelebration) {
-      // Popup'ı göster
-      setIsVisible(true);
+  // Backdrop'a veya popup'a tıklandığında bir sonraki celebration'a geç veya kapat
+  const handleClose = () => {
+    setIsVisible(false);
 
-      // 3 saniye sonra sonraki kutlamaya geç veya kapat
-      const timer = setTimeout(() => {
-        setIsVisible(false);
+    // Fade out animasyonu için kısa bir bekleme
+    setTimeout(() => {
+      if (currentIndex < celebrations.length - 1) {
+        // Sonraki kutlamaya geç
+        setCurrentIndex(currentIndex + 1);
+        setIsVisible(true);
+      } else {
+        // Tüm kutlamalar bitti, kapat
+        onClose();
+      }
+    }, 300);
+  };
 
-        // Fade out animasyonu için kısa bir bekleme
-        setTimeout(() => {
-          if (currentIndex < celebrations.length - 1) {
-            // Sonraki kutlamaya geç
-            setCurrentIndex(currentIndex + 1);
-          } else {
-            // Tüm kutlamalar bitti, kapat
-            onClose();
-          }
-        }, 300);
-      }, 3000);
-
-      return () => clearTimeout(timer);
+  // Backdrop'a tıklandığında kapat
+  const handleBackdropClick = (e) => {
+    // Sadece backdrop'a tıklandıysa kapat (popup içeriğine değil)
+    if (e.target === e.currentTarget) {
+      handleClose();
     }
-  }, [currentIndex, currentCelebration, celebrations.length, onClose]);
+  };
+
+  // Popup içeriğine tıklandığında da kapat
+  const handlePopupClick = () => {
+    handleClose();
+  };
 
   if (!currentCelebration) return null;
 
@@ -103,14 +108,6 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
 
   const config = getPopupConfig();
 
-  // Backdrop'a tıklandığında kapat
-  const handleBackdropClick = (e) => {
-    // Sadece backdrop'a tıklandıysa kapat (popup içeriğine değil)
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
     <Fade in={isVisible} timeout={300}>
       <Box
@@ -126,12 +123,13 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(4px)'
+          backdropFilter: 'blur(4px)',
+          cursor: 'pointer'
         }}
       >
         <Zoom in={isVisible} timeout={400}>
           <Box
-            onClick={(e) => e.stopPropagation()}
+            onClick={handlePopupClick}
             sx={{
               position: 'relative',
               background: config.bgColor,
@@ -143,7 +141,8 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               backdropFilter: 'blur(10px)',
               border: '2px solid #FFD700',
               textAlign: 'center',
-              animation: 'celebrationPulse 3s ease-in-out'
+              animation: 'celebrationPulse 3s ease-in-out',
+              cursor: 'pointer'
             }}
           >
             {/* Icon */}
@@ -209,29 +208,21 @@ const CelebrationPopup = ({ celebrations, onClose }) => {
               </Typography>
             )}
 
-            {/* Progress indicator - Sadece birden fazla kutlama varsa göster */}
+            {/* Kapatma mesajı - Sadece birden fazla celebration varsa göster */}
             {celebrations.length > 1 && (
-              <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 1,
-                mt: 2
-              }}>
-                {celebrations.map((_, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: index === currentIndex
-                        ? '#FFD700'
-                        : 'rgba(255, 215, 0, 0.3)',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                ))}
-              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  mt: 2,
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontSize: '0.75rem'
+                }}
+              >
+                {currentIndex < celebrations.length - 1
+                  ? 'Devam etmek için tıkla'
+                  : 'Kapatmak için tıkla'}
+              </Typography>
             )}
 
             {/* Confetti effect - Sarı tonda */}
