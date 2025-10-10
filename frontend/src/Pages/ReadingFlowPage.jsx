@@ -331,6 +331,8 @@ const ReadingFlowPage = () => {
   }, [currentStep, isTransitioning]);
 
   const handleClose = useCallback(() => {
+    // Scroll pozisyonunu en başa ayarla
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     navigate(-1);
   }, [navigate]);
 
