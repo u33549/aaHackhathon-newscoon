@@ -238,7 +238,7 @@ export const XP_CONSTANTS = {
 
   // Level hesaplama sabitleri
   BASE_XP: 100,           // İlk level için base XP
-  LEVEL_MULTIPLIER: 200,  // ln(x) çarpanı
+  LEVEL_MULTIPLIER: 350,  // ln(x) çarpanı - 200'den 350'ye çıkarıldı (level atlamak daha zor)
 
   // Bonus XP'ler
   STACK_COMPLETION_BONUS: 25,     // Stack tamamlama bonusu

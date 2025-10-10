@@ -1,20 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { XP_CONSTANTS } from '../../constants/index.jsx';
 
 // Level hesaplama fonksiyonu - ln(x) bazlı
 const calculateLevelFromXP = (totalXP) => {
   if (totalXP <= 0) return 1;
   
-  // ln(x) fonksiyonu ile level hesaplama
-  // Her level için gereken XP artışı logaritmik olarak artar
-  // Base XP = 100, her level için ln(level) * multiplier kadar daha fazla XP gerekir
-  const baseXP = 100;
-  const multiplier = 200;
-  
+  const { BASE_XP, LEVEL_MULTIPLIER } = XP_CONSTANTS;
+
   let level = 1;
   let totalRequired = 0;
   
   while (totalRequired < totalXP) {
-    const levelXP = baseXP + (Math.log(level) * multiplier);
+    const levelXP = BASE_XP + (Math.log(level) * LEVEL_MULTIPLIER);
     totalRequired += levelXP;
     
     if (totalRequired <= totalXP) {
@@ -29,12 +26,11 @@ const calculateLevelFromXP = (totalXP) => {
 
 // Sonraki level için gereken XP'yi hesaplama
 const calculateXPForNextLevel = (currentLevel) => {
-  const baseXP = 100;
-  const multiplier = 200;
-  
+  const { BASE_XP, LEVEL_MULTIPLIER } = XP_CONSTANTS;
+
   let totalRequired = 0;
   for (let i = 1; i <= currentLevel; i++) {
-    const levelXP = baseXP + (Math.log(i) * multiplier);
+    const levelXP = BASE_XP + (Math.log(i) * LEVEL_MULTIPLIER);
     totalRequired += levelXP;
   }
   
@@ -45,12 +41,11 @@ const calculateXPForNextLevel = (currentLevel) => {
 const calculateXPForCurrentLevel = (currentLevel) => {
   if (currentLevel <= 1) return 0;
   
-  const baseXP = 100;
-  const multiplier = 200;
-  
+  const { BASE_XP, LEVEL_MULTIPLIER } = XP_CONSTANTS;
+
   let totalRequired = 0;
   for (let i = 1; i < currentLevel; i++) {
-    const levelXP = baseXP + (Math.log(i) * multiplier);
+    const levelXP = BASE_XP + (Math.log(i) * LEVEL_MULTIPLIER);
     totalRequired += levelXP;
   }
   
@@ -59,7 +54,8 @@ const calculateXPForCurrentLevel = (currentLevel) => {
 
 // Her haber için XP (40-50 arası rastgele)
 const generateNewsXP = () => {
-  return Math.floor(Math.random() * (50 - 40 + 1)) + 40;
+  const { NEWS_XP_MIN, NEWS_XP_MAX } = XP_CONSTANTS;
+  return Math.floor(Math.random() * (NEWS_XP_MAX - NEWS_XP_MIN + 1)) + NEWS_XP_MIN;
 };
 
 // Demo user verisi
