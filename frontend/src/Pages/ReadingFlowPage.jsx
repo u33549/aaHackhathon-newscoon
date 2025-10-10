@@ -217,12 +217,9 @@ const ReadingFlowPage = () => {
     navigate(-1);
   }, [navigate]);
 
-  // Gelişmiş Pull-to-navigate logic for touch
+  // Gelişmiş Pull-to-navigate logic for touch - TÜM SAYFA TİPLERİ İÇİN
   const handleTouchStart = useCallback((e) => {
-    if (currentStepData?.type !== 'news') return;
-
     const container = newsContentRef.current;
-    if (!container) return;
 
     touchStartRef.current = e.touches[0].clientY;
     lastTouchY.current = e.touches[0].clientY;
@@ -232,117 +229,167 @@ const ReadingFlowPage = () => {
       ...prev,
       isPulling: false,
       pullDistance: 0,
-      initialScrollPos: container.scrollTop
+      initialScrollPos: container?.scrollTop || 0
     }));
 
-    console.log('👆 Enhanced Touch Start:', {
+    console.log('👆 Touch Start - Step Type:', currentStepData?.type, {
       touchY: touchStartRef.current,
-      scrollPos: container.scrollTop
+      scrollPos: container?.scrollTop || 0
     });
   }, [currentStepData?.type]);
 
   const handleTouchMove = useCallback((e) => {
-    if (currentStepData?.type !== 'news' || !touchStartRef.current || !lastTouchY.current) return;
-
-    const container = newsContentRef.current;
-    if (!container) return;
+    if (!touchStartRef.current) return;
 
     const currentY = e.touches[0].clientY;
     const totalDelta = currentY - touchStartRef.current;
 
-    // Hibrit Kaydırma Kuralı: Ortada iken sadece metin scroll
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    const hasScrollableContent = scrollHeight > clientHeight + 5;
-    const isInMiddle = scrollTop > 1 && scrollTop < scrollHeight - clientHeight - 1;
+    // NEWS tipi için özel logic
+    if (currentStepData?.type === 'news') {
+      const container = newsContentRef.current;
+      if (!container) return;
 
-    // Eğer metin ortasındaysa, sadece normal scroll - pull sistemini devre dışı bırak
-    if (hasScrollableContent && isInMiddle) {
-      // Normal scroll davranışına izin ver
-      setPullState(prev => ({
-        ...prev,
-        isPulling: false,
-        pullDistance: 0,
-        pullDirection: null
-      }));
-      return;
+      // Hibrit Kaydırma Kuralı: Ortada iken sadece metin scroll
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const hasScrollableContent = scrollHeight > clientHeight + 5;
+      const isInMiddle = scrollTop > 5 && scrollTop < scrollHeight - clientHeight - 5;
+
+      // Eğer metin ortasındaysa, pull sistemini devre dışı bırak
+      if (hasScrollableContent && isInMiddle) {
+        setPullState(prev => ({
+          ...prev,
+          isPulling: false,
+          pullDistance: 0,
+          pullDirection: null,
+          canNavigate: false,
+          isAboveThreshold: false,
+          isAboveConfirmationThreshold: false
+        }));
+        return; // Normal scroll'a izin ver
+      }
+
+      // Scroll pozisyonu kontrolü
+      checkScrollPosition();
+
+      // Pull logic - sadece sınırlarda aktif (NEWS için)
+      let shouldPreventDefault = false;
+
+      if (pullState.isAtTop && totalDelta > 0) {
+        // En üstte ve aşağı çekiliyor (previous için)
+        shouldPreventDefault = true;
+
+        const dampedDistance = totalDelta * DAMPING_FACTOR;
+        const clampedDistance = Math.min(dampedDistance, MAX_PULL_DISTANCE);
+
+        const isAboveThreshold = clampedDistance >= PULL_THRESHOLD;
+        const isVisible = clampedDistance >= VISUAL_FEEDBACK_THRESHOLD;
+
+        setPullState(prev => ({
+          ...prev,
+          isPulling: isVisible,
+          pullDirection: 'down',
+          pullDistance: clampedDistance,
+          canNavigate: isAboveThreshold,
+          isAboveThreshold,
+          isAboveConfirmationThreshold: clampedDistance >= CONFIRMATION_THRESHOLD
+        }));
+
+      } else if (pullState.isAtBottom && totalDelta < 0) {
+        // En altta ve yukarı çekiliyor (next için)
+        shouldPreventDefault = true;
+
+        const dampedDistance = Math.abs(totalDelta) * DAMPING_FACTOR;
+        const clampedDistance = Math.min(dampedDistance, MAX_PULL_DISTANCE);
+
+        const isAboveThreshold = clampedDistance >= PULL_THRESHOLD;
+        const isVisible = clampedDistance >= VISUAL_FEEDBACK_THRESHOLD;
+
+        setPullState(prev => ({
+          ...prev,
+          isPulling: isVisible,
+          pullDirection: 'up',
+          pullDistance: clampedDistance,
+          canNavigate: isAboveThreshold,
+          isAboveThreshold,
+          isAboveConfirmationThreshold: clampedDistance >= CONFIRMATION_THRESHOLD
+        }));
+
+      } else {
+        // Pull koşulları sağlanmıyorsa temizle
+        setPullState(prev => ({
+          ...prev,
+          isPulling: false,
+          pullDistance: 0,
+          pullDirection: null,
+          canNavigate: false,
+          isAboveThreshold: false,
+          isAboveConfirmationThreshold: false
+        }));
+      }
+
+      // preventDefault'i sadece gerekli durumlarda çağır
+      if (shouldPreventDefault) {
+        e.preventDefault();
+      }
     }
+    // INTRO ve COMPLETION tipleri için basit kaydırma mantığı
+    else if (currentStepData?.type === 'intro' || currentStepData?.type === 'completion') {
+      const MIN_SWIPE_DISTANCE = 50; // Minimum kaydırma mesafesi
 
-    // Sadece sınırlarda pull özelliği aktif
-    if (pullState.isAtTop && totalDelta > 0) {
-      // En üstte ve aşağı çekiliyor (previous için)
-      e.preventDefault();
+      // Aşağı kaydırma (sonraki sayfaya geç)
+      if (totalDelta < -MIN_SWIPE_DISTANCE) {
+        e.preventDefault();
 
-      const rawDistance = totalDelta;
-      const dampedDistance = rawDistance * DAMPING_FACTOR;
-      const clampedDistance = Math.min(dampedDistance, MAX_PULL_DISTANCE);
+        const dampedDistance = Math.abs(totalDelta) * 0.5;
+        const clampedDistance = Math.min(dampedDistance, 80);
+        const isVisible = clampedDistance >= 20;
 
-      const isAboveThreshold = clampedDistance >= PULL_THRESHOLD;
-      const isVisible = clampedDistance >= VISUAL_FEEDBACK_THRESHOLD;
+        setPullState(prev => ({
+          ...prev,
+          isPulling: isVisible,
+          pullDirection: 'up',
+          pullDistance: clampedDistance,
+          canNavigate: clampedDistance >= 40,
+          isAboveThreshold: clampedDistance >= 40,
+          isAboveConfirmationThreshold: clampedDistance >= 35
+        }));
+      }
+      // Yukarı kaydırma (önceki sayfaya geç) - sadece intro değilse
+      else if (totalDelta > MIN_SWIPE_DISTANCE && currentStepData?.type !== 'intro') {
+        e.preventDefault();
 
-      setPullState(prev => ({
-        ...prev,
-        isPulling: isVisible,
-        pullDirection: 'down',
-        pullDistance: clampedDistance,
-        canNavigate: isAboveThreshold,
-        isAboveThreshold,
-        isAboveConfirmationThreshold: clampedDistance >= CONFIRMATION_THRESHOLD
-      }));
+        const dampedDistance = totalDelta * 0.5;
+        const clampedDistance = Math.min(dampedDistance, 80);
+        const isVisible = clampedDistance >= 20;
 
-      console.log('⬇️ Enhanced Pull Down:', {
-        rawDistance,
-        dampedDistance: clampedDistance,
-        isAboveThreshold,
-        isVisible
-      });
-
-    } else if (pullState.isAtBottom && totalDelta < 0) {
-      // En altta ve yukarı çekiliyor (next için)
-      e.preventDefault();
-
-      const rawDistance = Math.abs(totalDelta);
-      const dampedDistance = rawDistance * DAMPING_FACTOR;
-      const clampedDistance = Math.min(dampedDistance, MAX_PULL_DISTANCE);
-
-      const isAboveThreshold = clampedDistance >= PULL_THRESHOLD;
-      const isVisible = clampedDistance >= VISUAL_FEEDBACK_THRESHOLD;
-
-      setPullState(prev => ({
-        ...prev,
-        isPulling: isVisible,
-        pullDirection: 'up',
-        pullDistance: clampedDistance,
-        canNavigate: isAboveThreshold,
-        isAboveThreshold,
-        isAboveConfirmationThreshold: clampedDistance >= CONFIRMATION_THRESHOLD
-      }));
-
-      console.log('⬆️ Enhanced Pull Up:', {
-        rawDistance,
-        dampedDistance: clampedDistance,
-        isAboveThreshold,
-        isVisible
-      });
-    } else {
-      // Pull koşulları sağlanmıyorsa temizle
-      setPullState(prev => ({
-        ...prev,
-        isPulling: false,
-        pullDistance: 0,
-        pullDirection: null,
-        canNavigate: false,
-        isAboveThreshold: false,
-        isAboveConfirmationThreshold: false
-      }));
+        setPullState(prev => ({
+          ...prev,
+          isPulling: isVisible,
+          pullDirection: 'down',
+          pullDistance: clampedDistance,
+          canNavigate: clampedDistance >= 40,
+          isAboveThreshold: clampedDistance >= 40,
+          isAboveConfirmationThreshold: clampedDistance >= 35
+        }));
+      } else {
+        // Minimum mesafe aşılmadıysa temizle
+        setPullState(prev => ({
+          ...prev,
+          isPulling: false,
+          pullDistance: 0,
+          pullDirection: null,
+          canNavigate: false,
+          isAboveThreshold: false,
+          isAboveConfirmationThreshold: false
+        }));
+      }
     }
 
     lastTouchY.current = currentY;
-  }, [currentStepData?.type, pullState.isAtTop, pullState.isAtBottom, PULL_THRESHOLD, VISUAL_FEEDBACK_THRESHOLD, MAX_PULL_DISTANCE, DAMPING_FACTOR]);
+  }, [currentStepData?.type, pullState.isAtTop, pullState.isAtBottom, checkScrollPosition, PULL_THRESHOLD, VISUAL_FEEDBACK_THRESHOLD, CONFIRMATION_THRESHOLD, MAX_PULL_DISTANCE, DAMPING_FACTOR]);
 
   const handleTouchEnd = useCallback(() => {
-    if (currentStepData?.type !== 'news') return;
-
-    console.log('👋 Enhanced Touch End:', {
+    console.log('👋 Touch End - Step Type:', currentStepData?.type, {
       isPulling: pullState.isPulling,
       canNavigate: pullState.canNavigate,
       isAboveThreshold: pullState.isAboveThreshold,
@@ -350,22 +397,18 @@ const ReadingFlowPage = () => {
       pullDistance: pullState.pullDistance
     });
 
-    // İptal Mekanizması: Eşik değerinin üstündeyken bırakıldı mı?
+    // Tüm sayfa tipleri için navigation logic
     if (pullState.isPulling && pullState.isAboveThreshold) {
-      // Navigate based on pull direction
       if (pullState.pullDirection === 'down' && currentStep > 0) {
-        console.log('✅ Navigate to Previous (Above Threshold)');
+        console.log('✅ Navigate to Previous');
         handlePrevStep();
       } else if (pullState.pullDirection === 'up' && currentStep < steps.length - 1) {
-        console.log('✅ Navigate to Next (Above Threshold)');
+        console.log('✅ Navigate to Next');
         handleNextStep();
       }
-    } else if (pullState.isPulling) {
-      // Eşik altında bırakıldı - İptal
-      console.log('❌ Navigation Cancelled (Below Threshold)');
     }
 
-    // Yumuşak Reset - pull state'i temizle
+    // State'i temizle
     setPullState(prev => ({
       ...prev,
       isPulling: false,
@@ -496,7 +539,7 @@ const ReadingFlowPage = () => {
         overflow: 'hidden',
         position: 'relative',
         backgroundColor: '#000',
-        touchAction: currentStepData.type === 'news' ? 'pan-y' : 'none'
+        touchAction: 'pan-y' // Tüm sayfa tipleri için touch desteği
       }}
     >
       {/* Close Button */}
@@ -588,18 +631,107 @@ const ReadingFlowPage = () => {
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: currentStepData.type === 'news' ? 'flex-start' : 'flex-end',
+            justifyContent: currentStepData.type === 'news' ? 'flex-start' : 'flex-start', // intro için de flex-start
             alignItems: 'flex-start',
             padding: { xs: 3, md: 6 },
             paddingBottom: { xs: 12, md: 15 },
-            paddingTop: currentStepData.type === 'news' ? { xs: 8, md: 10 } : { xs: 3, md: 6 },
+            paddingTop: currentStepData.type === 'news' ? { xs: 8, md: 10 } : { xs: 8, md: 10 }, // intro için de padding-top
             textAlign: 'left',
-            overflow: 'hidden'
+            overflow: currentStepData.type === 'intro' ? 'auto' : 'hidden', // intro için kaydırma aktif
+            // Intro sayfası için özel scroll styling
+            ...(currentStepData.type === 'intro' && {
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              scrollBehavior: 'smooth',
+              // Modern scrollbar styling
+              '&::-webkit-scrollbar': {
+                width: '6px'
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+                borderRadius: '10px'
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(255, 255, 255, 0.3)',
+                borderRadius: '10px',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.5)'
+                }
+              }
+            })
           }}>
-            {/* Intro Page */}
+            {/* Intro Page - Pull feedback UI için relative container */}
             {currentStepData.type === 'intro' && (
-              <>
-                {/* Kategori Chip - Sol üstte */}
+              <Box sx={{
+                width: '100%',
+                minHeight: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                pb: { xs: 6, md: 8 }, // Alt kısımda boşluk bırak
+                position: 'relative' // Pull feedback için
+              }}>
+                {/* Pull feedback UI - Bottom - Intro için */}
+                {pullState.isPulling && pullState.pullDirection === 'up' && (
+                  <Box sx={{
+                    position: 'fixed',
+                    bottom: 60,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 100,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 1,
+                    opacity: Math.min(pullState.pullDistance / 30, 1),
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    borderRadius: 3,
+                    px: 3,
+                    py: 2,
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    minWidth: 160,
+                    scale: pullState.isAboveConfirmationThreshold ? 1.05 : 1,
+                  }}>
+                    {/* Message */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: pullState.isAboveConfirmationThreshold
+                          ? '#FFD700'
+                          : 'rgba(255, 255, 255, 0.9)',
+                        fontWeight: pullState.isAboveConfirmationThreshold ? 600 : 500,
+                        fontSize: '0.85rem',
+                        textAlign: 'center',
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {pullState.isAboveConfirmationThreshold
+                        ? 'Bırak ve Başla'
+                        : 'Kaydırmaya Devam Et'
+                      }
+                    </Typography>
+
+                    {/* Icon */}
+                    <KeyboardArrowDown
+                      sx={{
+                        color: pullState.isAboveConfirmationThreshold
+                          ? '#FFD700'
+                          : 'rgba(255, 255, 255, 0.8)',
+                        fontSize: 24,
+                        transform: `translateY(${pullState.isAboveConfirmationThreshold ? 2 : 0}px)`,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    />
+                  </Box>
+                )}
+
+                {/* Spacer - pushes content to bottom */}
+                <Box sx={{ flex: 1, minHeight: '20vh' }} />
+
+                {/* Kategori Chip */}
                 {currentStepData.stackData && (
                   <Chip
                     label={currentStepData.stackData.category?.charAt(0).toUpperCase() + currentStepData.stackData.category?.slice(1) || 'Genel'}
@@ -611,12 +743,13 @@ const ReadingFlowPage = () => {
                       height: { xs: 32, md: 36 },
                       borderRadius: 2,
                       mb: { xs: 2, md: 3 },
-                      px: { xs: 2, md: 3 }
+                      px: { xs: 2, md: 3 },
+                      alignSelf: 'flex-start'
                     }}
                   />
                 )}
 
-                {/* Ana Başlık - Daha geniş alan */}
+                {/* Ana Başlık */}
                 <Typography
                   variant={isMobile ? 'h3' : 'h1'}
                   sx={{
@@ -624,7 +757,7 @@ const ReadingFlowPage = () => {
                     fontWeight: 'bold',
                     mb: { xs: 2, md: 3 },
                     textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
-                    maxWidth: { xs: '100%', md: '95%' }, // Mobilde %100, desktop'ta %95
+                    maxWidth: { xs: '100%', md: '95%' },
                     lineHeight: 1.2,
                     fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' },
                     textAlign: 'left'
@@ -633,7 +766,7 @@ const ReadingFlowPage = () => {
                   {currentStepData.title}
                 </Typography>
 
-                {/* Metrikler - Tam genişlik kullanım */}
+                {/* Metrikler */}
                 {currentStepData.stackData && (
                   <Box sx={{
                     display: 'flex',
@@ -642,7 +775,7 @@ const ReadingFlowPage = () => {
                     mb: { xs: 2, md: 3 },
                     flexWrap: 'wrap',
                     justifyContent: 'flex-start',
-                    width: '100%' // Tam genişlik
+                    width: '100%'
                   }}>
                     {/* CP */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -691,23 +824,67 @@ const ReadingFlowPage = () => {
                   </Box>
                 )}
 
-                {/* Açıklama Metni - Çok daha geniş alan */}
+                {/* Açıklama Metni */}
                 <Typography
                   variant={isMobile ? 'body1' : 'h6'}
                   sx={{
                     color: 'rgba(255,255,255,0.9)',
-                    mb: { xs: 3, md: 4 },
+                    mb: { xs: 4, md: 6 },
                     textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
-                    maxWidth: { xs: '100%', sm: '95%', md: '90%' }, // Responsive genişlik
+                    maxWidth: { xs: '100%', sm: '95%', md: '90%' },
                     lineHeight: 1.6,
                     fontSize: { xs: '1rem', md: '1.2rem' },
                     textAlign: 'left',
-                    width: '100%' // Container'ın tam genişliğini kullan
+                    width: '100%'
                   }}
                 >
                   {currentStepData.content}
                 </Typography>
-              </>
+
+                {/* Mobil için kaydırma ipucu - daha prominent */}
+                {isMobile && (
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mt: { xs: 3, md: 4 },
+                    gap: 1,
+                    opacity: 0.9,
+                    animation: 'bounce 2s infinite'
+                  }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'rgba(255,255,255,0.9)',
+                        fontSize: '0.9rem',
+                        fontWeight: 500,
+                        textAlign: 'center'
+                      }}
+                    >
+                      Haberleri okumaya başlamak için
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: '#FFD700',
+                        fontSize: '0.95rem',
+                        fontWeight: 600,
+                        textAlign: 'center'
+                      }}
+                    >
+                      👆 Yukarı kaydır
+                    </Typography>
+                    <KeyboardArrowUp
+                      sx={{
+                        color: '#FFD700',
+                        fontSize: 28,
+                        mt: 0.5
+                      }}
+                    />
+                  </Box>
+                )}
+              </Box>
             )}
 
             {/* News Step - Yeni tasarım */}
@@ -1121,7 +1298,14 @@ const ReadingFlowPage = () => {
 
             {/* Completion Page */}
             {currentStepData.type === 'completion' && (
-              <>
+              <Box sx={{
+                width: '100%',
+                minHeight: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-start'
+              }}>
                 <EmojiEvents sx={{ fontSize: 80, color: 'white', mb: 3 }} />
                 
                 <Typography
@@ -1142,7 +1326,7 @@ const ReadingFlowPage = () => {
                     color: 'rgba(255,255,255,0.95)',
                     mb: 4,
                     textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
-                    maxWidth: { xs: '100%', md: '90%' } // Completion için de daha geniş
+                    maxWidth: { xs: '100%', md: '90%' }
                   }}
                 >
                   {currentStepData.content}
@@ -1164,7 +1348,7 @@ const ReadingFlowPage = () => {
                     </Typography>
                   </Box>
                 )}
-              </>
+              </Box>
             )}
           </Box>
 
