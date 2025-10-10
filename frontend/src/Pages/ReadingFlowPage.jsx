@@ -873,7 +873,7 @@ const ReadingFlowPage = () => {
                         textAlign: 'center'
                       }}
                     >
-                      👆 Yukarı kaydır
+                      Yukarı kaydır
                     </Typography>
                     <KeyboardArrowUp
                       sx={{
