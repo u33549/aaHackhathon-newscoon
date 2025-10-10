@@ -37,8 +37,11 @@ import {
   updateReadingProgress
 } from '../store/slices/userSlice';
 
+// Components - Header'ı ekle
+import Header from '../components/layout/Header';
+
 // Constants
-import { XP_CONSTANTS, allBadges, categoryColors } from '../constants/index.jsx';
+import { XP_CONSTANTS, allBadges } from '../constants/index.jsx';
 
 // Görüntülenme sayısını kısaltılmış formatta göstermek için yardımcı fonksiyon
 const formatViewCount = (count) => {
@@ -267,12 +270,19 @@ const ReadingFlowPage = () => {
     // Stack'i tamamla - sadece stack XP'si
     dispatch(completeStack({
       stackId: selectedStack._id,
-      stackXP: stackTotalXP // Sadece stack'in sahip olduğu XP
+      stackXP: stackTotalXP
     }));
 
     // Sadece console log - bildirim yok
     console.log(`Stack tamamlandı: "${selectedStack.title}" - +${stackTotalXP} XP kazanıldı`);
-  }, [selectedStack, dispatch]);
+    console.log(`Yeni XP: ${userXP + stackTotalXP}, Yeni Level: ${userLevel}`);
+  }, [selectedStack, dispatch, userXP, userLevel]);
+
+  // XP için gereken progress verisi
+  const cpForNextLevel = {
+    current: levelProgress?.currentLevelXP || 0,
+    max: levelProgress?.nextLevelXP - (levelProgress?.nextLevelXP - (levelProgress?.currentLevelXP || 0)) || 100
+  };
 
   // Scroll pozisyon kontrolü
   const checkScrollPosition = useCallback(() => {
@@ -656,15 +666,33 @@ const ReadingFlowPage = () => {
         overflow: 'hidden',
         position: 'relative',
         backgroundColor: '#000',
-        touchAction: 'pan-y' // Tüm sayfa tipleri için touch desteği
+        touchAction: 'pan-y'
       }}
     >
-      {/* Close Button */}
+      {/* Header - XP ve Level göstermek için ekle */}
+      <Box sx={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 999,
+        backgroundColor: 'rgba(18, 18, 18, 0.95)',
+        backdropFilter: 'blur(10px)'
+      }}>
+        <Header
+          totalCp={userXP}
+          level={userLevel}
+          cpForNextLevel={cpForNextLevel}
+          onOpenBadges={() => {}}
+        />
+      </Box>
+
+      {/* Close Button - Header'ın altında */}
       <IconButton
         onClick={handleClose}
         sx={{
           position: 'fixed',
-          top: 20,
+          top: { xs: 76, md: 84 },
           right: 20,
           zIndex: 1000,
           backgroundColor: 'rgba(0,0,0,0.5)',
@@ -678,11 +706,11 @@ const ReadingFlowPage = () => {
         <Close />
       </IconButton>
 
-      {/* Progress Indicator */}
+      {/* Progress Indicator - Header'ın altında */}
       {currentStepData.type !== 'intro' && currentStepData.type !== 'completion' && (
         <Box sx={{
           position: 'fixed',
-          top: 20,
+          top: { xs: 76, md: 84 },
           left: 20,
           zIndex: 1000,
           backgroundColor: 'rgba(0,0,0,0.5)',
@@ -697,14 +725,15 @@ const ReadingFlowPage = () => {
         </Box>
       )}
 
-      {/* Main Content */}
+      {/* Main Content - Header için padding ekle */}
       <Fade in={!isTransitioning} timeout={500}>
         <Box sx={{
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000'
+          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000',
+          paddingTop: { xs: '72px', md: '80px' } // Header için boşluk
         }}>
           {/* Background Image - Sadece intro ve completion için */}
           {currentStepData.image && currentStepData.type !== 'news' && (
