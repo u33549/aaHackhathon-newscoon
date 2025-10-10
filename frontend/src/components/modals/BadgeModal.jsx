@@ -83,53 +83,106 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
         overflowY: 'auto'
       }}>
         {/* Level and CP Section */}
+        <Box sx={{
+          display: 'flex',
+          gap: { xs: 2, md: 3 },
+          mb: { xs: 3, md: 4 },
+          mt: { xs: 3, md: 4 }
+        }}>
+          {/* Level Box */}
+          <Card sx={{
+            flex: 1,
+            bgcolor: 'background.paper',
+            border: '2px solid #FFD700'
+          }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 }, textAlign: 'center' }}>
+              <Avatar sx={{
+                bgcolor: '#FFD700',
+                color: '#000',
+                width: { xs: 48, md: 56 },
+                height: { xs: 48, md: 56 },
+                mx: 'auto',
+                mb: 1.5
+              }}>
+                <Star fontSize={isMobile ? "medium" : "large"} />
+              </Avatar>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.75rem', md: '0.875rem' },
+                  mb: 0.5
+                }}
+              >
+                Seviye
+              </Typography>
+              <Typography
+                variant={isSmall ? "h4" : "h3"}
+                fontWeight={700}
+                sx={{ color: '#FFD700' }}
+              >
+                {level}
+              </Typography>
+            </CardContent>
+          </Card>
+
+          {/* CP Box */}
+          <Card sx={{
+            flex: 1,
+            bgcolor: 'background.paper',
+            border: '2px solid #FFD700'
+          }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 }, textAlign: 'center' }}>
+              <Avatar sx={{
+                bgcolor: '#FFD700',
+                color: '#000',
+                width: { xs: 48, md: 56 },
+                height: { xs: 48, md: 56 },
+                mx: 'auto',
+                mb: 1.5
+              }}>
+                <EmojiEvents fontSize={isMobile ? "medium" : "large"} />
+              </Avatar>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.75rem', md: '0.875rem' },
+                  mb: 0.5
+                }}
+              >
+                Toplam CP
+              </Typography>
+              <Typography
+                variant={isSmall ? "h4" : "h3"}
+                fontWeight={700}
+                sx={{ color: '#FFD700' }}
+              >
+                {totalCp}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+
+        {/* Progress Bar - Ayrı bir box olarak */}
         <Card sx={{
           mb: { xs: 3, md: 4 },
           bgcolor: 'background.paper',
-          color: '#FFD700',
           border: '2px solid #FFD700'
         }}>
           <CardContent sx={{ p: { xs: 2, md: 3 } }}>
             <Box sx={{
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'space-between',
-              mb: { xs: 1.5, md: 2 },
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: { xs: 1, sm: 0 }
+              alignItems: 'center',
+              mb: 1.5
             }}>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: { xs: 1.5, md: 2 }
-              }}>
-                <Avatar sx={{
-                  bgcolor: '#FFD700',
-                  color: '#000',
-                  width: { xs: 40, md: 48 },
-                  height: { xs: 40, md: 48 }
-                }}>
-                  <Star fontSize={isMobile ? "medium" : "large"} />
-                </Avatar>
-                <Box sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-                  <Typography
-                    variant={isSmall ? "h6" : "h5"}
-                    fontWeight={600}
-                    sx={{ color: '#FFD700' }}
-                  >
-                    Seviye {level}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: '#FFD700',
-                      fontSize: { xs: '0.8rem', md: '0.875rem' }
-                    }}
-                  >
-                    {totalCp} CP
-                  </Typography>
-                </Box>
-              </Box>
+              <Typography
+                variant="body2"
+                sx={{ color: '#FFD700', fontWeight: 600 }}
+              >
+                Sonraki Seviye
+              </Typography>
               <Chip
                 label={`${totalCp - currentLevelCp}/${nextLevelCp - currentLevelCp} CP`}
                 sx={{
@@ -144,12 +197,12 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
               variant="determinate"
               value={progressPercentage}
               sx={{
-                height: { xs: 6, md: 8 },
-                borderRadius: 4,
+                height: { xs: 8, md: 10 },
+                borderRadius: 5,
                 bgcolor: 'rgba(50, 50, 50, 0.8)',
                 '& .MuiLinearProgress-bar': {
                   bgcolor: '#FFD700',
-                  borderRadius: 4
+                  borderRadius: 5
                 }
               }}
             />
