@@ -32,9 +32,7 @@ import {
 } from '../store/slices/stackSlice';
 import {
   setSearchQuery,
-  setActiveCategory,
-  addToast,
-  openBadgeModal
+  setActiveCategory
 } from '../store/slices/uiSlice';
 import {
   loadDemoData,
@@ -53,9 +51,6 @@ import NewsSection from '../components/sections/NewsSection';
 import NewsCard from '../components/cards/NewsCard';
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
-import BadgeModal from '../components/modals/BadgeModal';
-import AchievementToast from '../components/notifications/AchievementToast';
-import BadgeToast from '../components/notifications/BadgeToast';
 
 // Data and utilities
 import {
@@ -75,7 +70,7 @@ const MainPage = () => {
   const searchQuery = useSearchQuery();
   const selectedCategory = useActiveCategory();
 
-  // User Redux state - Yeni state yapısına göre güncelle
+  // User Redux state
   const userStats = useUserStats();
   const totalXP = useUserXP();
   const currentLevel = useUserLevel();
@@ -84,13 +79,6 @@ const MainPage = () => {
   const userAchievements = useUserAchievements();
   const earnedBadges = userAchievements?.badges || [];
   const streakData = userAchievements?.streakData || { current: 0 };
-
-  // Local state (UI only)
-  const [notificationToast, setNotificationToast] = useState(null);
-
-  // Refs for timers
-  const toastTimerRef = useRef(null);
-  const notificationTimerRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -148,7 +136,7 @@ const MainPage = () => {
     }
   }, [levelProgress.hasLeveledUp, dispatch]);
 
-  // Achievement kontrolü
+  // Achievement kontrolü - BİLDİRİM OLMADAN
   useEffect(() => {
     const checkAchievements = () => {
       const userData = {
@@ -163,12 +151,7 @@ const MainPage = () => {
         if (!alreadyEarned && achievement.isCompleted(userData)) {
           dispatch(addAchievement(achievement));
           dispatch(addXP(achievement.xpReward));
-          dispatch(addToast({
-            type: 'success',
-            title: '🏆 Yeni Başarım!',
-            message: `"${achievement.name}" başarımını kazandın! +${achievement.xpReward} XP`,
-            duration: 5000
-          }));
+          // Bildirim kaldırıldı
         }
       });
     };
@@ -192,16 +175,6 @@ const MainPage = () => {
 
   const handleCategoryChange = (categoryId) => {
     dispatch(setActiveCategory(categoryId));
-  };
-
-  const handleBadgeEarned = (badge) => {
-    dispatch(addToast({
-      type: 'success',
-      title: 'Yeni Rozet!',
-      message: `${badge.name} rozetini kazandınız!`,
-      duration: 5000
-    }));
-    dispatch(openBadgeModal(badge));
   };
 
   const handleStackClick = (stackId) => {
@@ -386,17 +359,6 @@ const MainPage = () => {
       bgcolor: 'background.default',
       color: 'text.primary'
     }}>
-      {/* Toast Notifications */}
-      <BadgeToast />
-      <AchievementToast data={notificationToast} />
-
-      {/* Badge Modal */}
-      <BadgeModal
-        badges={earnedBadges}
-        totalCp={totalXP}
-        earnedAchievements={new Set(userAchievements.achievements.map(a => a.id))}
-        level={currentLevel}
-      />
 
       <Box component="main">
         {/* Hero Section */}

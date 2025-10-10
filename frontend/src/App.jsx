@@ -6,7 +6,6 @@ import { newscoonTheme } from './theme/theme';
 // Layout Components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
-import ToastNotification from './components/notifications/ToastNotification';
 import ScrollToTop from './components/common/ScrollToTop';
 
 // Pages
@@ -79,9 +78,6 @@ function App() {
           {/* ReadingFlowPage - Header ve Footer olmadan */}
           <Route path="/stack/:id/read" element={<ReadingFlowPage />} />
         </Routes>
-
-        {/* Global Toast Notifications */}
-        <ToastNotification />
 
         {/* Scroll to top component */}
         <ScrollToTop />

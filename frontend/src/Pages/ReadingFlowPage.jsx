@@ -35,7 +35,6 @@ import {
   addXP,
   addBadge
 } from '../store/slices/userSlice';
-import { addToast } from '../store/slices/uiSlice';
 
 // Constants
 import { XP_CONSTANTS, allBadges, categoryColors } from '../constants/index.jsx';
@@ -210,38 +209,31 @@ const ReadingFlowPage = () => {
 
   const currentStepData = steps[currentStep];
 
-  // Haber okuma işlemi - XP vermeyi kaldır
+  // Haber okuma işlemi - BİLDİRİM OLMADAN
   const handleNewsRead = useCallback((stepIndex) => {
     if (!selectedStack || readNewsIndices.has(stepIndex)) return;
 
     const step = steps[stepIndex + 1]; // +1 çünkü intro step var
     if (step && step.type === 'news') {
-      // XP vermeyi kaldır - sadece progress takibi yap
-
       // Local state güncelle - sadece okunan haberleri işaretle
       setReadNewsIndices(prev => new Set([...prev, stepIndex]));
 
-      // Haber okundu bilgisi - XP olmadan
+      // Haber okundu bilgisi - sadece console log
       console.log(`Haber okundu: ${step.title}`);
 
-      // Kategori bazlı rozet kontrolü - sadece ilk haber ise
+      // Kategori bazlı rozet kontrolü - sadece ilk haber ise - BİLDİRİM OLMADAN
       const category = selectedStack.mainCategory;
       if (category && !readNewsIndices.has(0)) { // İlk haber ise
         const categoryBadge = allBadges.find(badge => badge.id === category);
         if (categoryBadge) {
           dispatch(addBadge(categoryBadge));
-          dispatch(addToast({
-            type: 'success',
-            title: '🏆 Yeni Rozet!',
-            message: `"${categoryBadge.name}" rozetini kazandın!`,
-            duration: 5000
-          }));
+          // Bildirim kaldırıldı
         }
       }
     }
   }, [selectedStack, steps, readNewsIndices, dispatch]);
 
-  // Stack tamamlama işlemi - Burada toplam XP ver
+  // Stack tamamlama işlemi - BİLDİRİM OLMADAN
   const handleStackCompletion = useCallback(() => {
     if (!selectedStack) return;
 
@@ -257,13 +249,8 @@ const ReadingFlowPage = () => {
       stackXP: totalXPReward // Toplam XP'yi gönder
     }));
 
-    // Tebrik mesajı - toplam XP ile
-    dispatch(addToast({
-      type: 'success',
-      title: '🎉 Stack Tamamlandı!',
-      message: `"${selectedStack.title}" yığınını tamamladın! +${totalXPReward} XP kazandın`,
-      duration: 5000
-    }));
+    // Sadece console log - bildirim yok
+    console.log(`Stack tamamlandı: "${selectedStack.title}" - +${totalXPReward} XP kazanıldı`);
   }, [selectedStack, dispatch]);
 
   // Scroll pozisyon kontrolü
