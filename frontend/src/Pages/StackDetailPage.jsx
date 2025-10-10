@@ -98,14 +98,19 @@ const StackDetailPage = () => {
     // Check if currently reading
     const currentStack = currentlyReading.find(s => s.stackId === selectedStack._id);
     if (currentStack) {
-      const progress = currentStack.totalNews > 0
-        ? Math.floor((currentStack.readNews / currentStack.totalNews) * 100)
+      // lastReadIndex kullanarak progress hesapla
+      const totalNews = currentStack.totalNews || selectedStack.news?.length || 0;
+      const readCount = currentStack.lastReadIndex || 0;
+
+      const progress = totalNews > 0
+        ? Math.floor((readCount / totalNews) * 100)
         : 0;
+
       return {
         status: 'reading',
-        progress,
-        readNews: currentStack.readNews,
-        totalNews: currentStack.totalNews
+        progress: Math.max(0, progress), // Negatif değerleri engelle
+        readNews: readCount,
+        totalNews: totalNews
       };
     }
 
