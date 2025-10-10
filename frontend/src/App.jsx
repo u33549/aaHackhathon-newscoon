@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { newscoonTheme } from './theme/theme';
@@ -20,10 +20,13 @@ import AdminDashboard from './Pages/admin/AdminDashboard';
 import TestPage from './Pages/TestPage';
 
 // Redux hooks
-import { useUserXP, useUserLevel, useXPForNextLevel, useUserAchievements, useUserBadges } from './hooks/redux';
+import { useAppDispatch, useUserXP, useUserLevel, useXPForNextLevel, useUserAchievements, useUserBadges } from './hooks/redux';
+import { loadDemoData } from './store/slices/userSlice';
 import { allAchievements } from './constants/index.jsx';
 
 function App() {
+  const dispatch = useAppDispatch();
+
   // User bilgilerini Redux'tan al
   const totalCp = useUserXP();
   const level = useUserLevel();
@@ -33,6 +36,12 @@ function App() {
 
   // Badge modal state
   const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
+
+  // Uygulama ilk yüklendiğinde user verilerini yükle
+  useEffect(() => {
+    // Demo verilerini yükle
+    dispatch(loadDemoData());
+  }, [dispatch]);
 
   const handleOpenBadges = () => {
     setIsBadgeModalOpen(true);
