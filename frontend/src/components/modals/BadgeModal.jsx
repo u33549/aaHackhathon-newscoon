@@ -85,8 +85,9 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
         {/* Level and CP Section */}
         <Card sx={{
           mb: { xs: 3, md: 4 },
-          bgcolor: 'primary.main',
-          color: 'primary.contrastText'
+          bgcolor: 'background.paper',
+          color: '#FFD700',
+          border: '2px solid #FFD700'
         }}>
           <CardContent sx={{ p: { xs: 2, md: 3 } }}>
             <Box sx={{
@@ -103,8 +104,8 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
                 gap: { xs: 1.5, md: 2 }
               }}>
                 <Avatar sx={{
-                  bgcolor: 'white',
-                  color: 'primary.main',
+                  bgcolor: '#FFD700',
+                  color: '#000',
                   width: { xs: 40, md: 48 },
                   height: { xs: 40, md: 48 }
                 }}>
@@ -114,13 +115,14 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
                   <Typography
                     variant={isSmall ? "h6" : "h5"}
                     fontWeight={600}
+                    sx={{ color: '#FFD700' }}
                   >
                     Seviye {level}
                   </Typography>
                   <Typography
                     variant="body2"
                     sx={{
-                      opacity: 0.9,
+                      color: '#FFD700',
                       fontSize: { xs: '0.8rem', md: '0.875rem' }
                     }}
                   >
@@ -131,8 +133,8 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
               <Chip
                 label={`${totalCp - currentLevelCp}/${nextLevelCp - currentLevelCp} CP`}
                 sx={{
-                  bgcolor: 'white',
-                  color: 'primary.main',
+                  bgcolor: '#FFD700',
+                  color: '#000',
                   fontWeight: 600,
                   fontSize: { xs: '0.75rem', md: '0.8rem' }
                 }}
@@ -144,9 +146,9 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
               sx={{
                 height: { xs: 6, md: 8 },
                 borderRadius: 4,
-                bgcolor: 'rgba(255, 255, 255, 0.3)',
+                bgcolor: 'rgba(50, 50, 50, 0.8)',
                 '& .MuiLinearProgress-bar': {
-                  bgcolor: 'white',
+                  bgcolor: '#FFD700',
                   borderRadius: 4
                 }
               }}
