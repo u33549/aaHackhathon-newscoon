@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +16,9 @@ import {
   LinearProgress,
   useTheme,
   useMediaQuery,
-  IconButton
+  IconButton,
+  Tabs,
+  Tab
 } from '@mui/material';
 import { Close, EmojiEvents, Star } from '@mui/icons-material';
 import { allAchievements, allBadges, checkBadgeEarned, checkAchievementCompleted, levelThresholds, getIconComponent } from '../../constants/index.jsx';
@@ -25,6 +27,9 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmall = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Tab state
+  const [currentTab, setCurrentTab] = useState(0);
 
   const currentLevelCp = levelThresholds[level - 1] ?? 0;
   const nextLevelCp = levelThresholds[level] ?? Infinity;
@@ -36,7 +41,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
   const userData = {
     achievements: { badges },
     readingProgress: {
-      totalNewsRead: 0, // Bu değerler App.jsx'ten gelmeli ama MVP için basitleştirdik
+      totalNewsRead: 0,
       totalStacksCompleted: 0
     },
     stats: {
@@ -47,6 +52,10 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
 
   // Kazanılan rozetleri filtrele
   const earnedBadgeIds = new Set(badges.map(b => b.id));
+
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue);
+  };
 
   return (
     <Dialog
@@ -226,180 +235,201 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
           </CardContent>
         </Card>
 
-        {/* Badges Section - Rozetler */}
-        <Typography
-          variant={isSmall ? "body1" : "h6"}
-          fontWeight={600}
-          sx={{ mb: { xs: 1.5, md: 2 } }}
-        >
-          Kazanılan Rozetler ({earnedBadgeIds.size}/{allBadges.length})
-        </Typography>
+        {/* Tab Bar */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
+            variant="fullWidth"
+            sx={{
+              '& .MuiTab-root': {
+                fontSize: { xs: '0.875rem', md: '1rem' },
+                fontWeight: 600,
+                textTransform: 'none',
+                minHeight: { xs: 48, md: 56 }
+              },
+              '& .Mui-selected': {
+                color: 'primary.main'
+              },
+              '& .MuiTabs-indicator': {
+                height: 3,
+                borderRadius: '3px 3px 0 0'
+              }
+            }}
+          >
+            <Tab
+              label={`Rozetler (${earnedBadgeIds.size}/${allBadges.length})`}
+              icon={<EmojiEvents />}
+              iconPosition="start"
+            />
+            <Tab
+              label={`Başarımlar (${earnedAchievements.size}/${allAchievements.length})`}
+              icon={<Star />}
+              iconPosition="start"
+            />
+          </Tabs>
+        </Box>
 
-        <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ mb: { xs: 3, md: 4 }, width: '100%', mx: 0 }}>
-          {allBadges.map((badge) => {
-            const isEarned = earnedBadgeIds.has(badge.id);
+        {/* Tab Content - Rozetler */}
+        {currentTab === 0 && (
+          <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ width: '100%', mx: 0 }}>
+            {allBadges.map((badge) => {
+              const isEarned = earnedBadgeIds.has(badge.id);
 
-            return (
-              <Grid item xs={12} key={badge.id} sx={{ width: '100%', px: 0 }}>
-                <Card sx={{
-                  opacity: isEarned ? 1 : 0.5,
-                  border: isEarned ? `2px solid ${badge.color}` : '1px solid',
-                  borderColor: isEarned ? badge.color : 'divider',
-                  bgcolor: 'background.paper',
-                  width: '100%',
-                  boxSizing: 'border-box'
-                }}>
-                  <CardContent sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: { xs: 2, md: 2.5 },
-                    p: { xs: 2, md: 2.5 },
-                    '&:last-child': { pb: { xs: 2, md: 2.5 } }
+              return (
+                <Grid item xs={12} key={badge.id} sx={{ width: '100%', px: 0 }}>
+                  <Card sx={{
+                    opacity: isEarned ? 1 : 0.5,
+                    border: isEarned ? `2px solid ${badge.color}` : '1px solid',
+                    borderColor: isEarned ? badge.color : 'divider',
+                    bgcolor: 'background.paper',
+                    width: '100%',
+                    boxSizing: 'border-box'
                   }}>
-                    <Avatar sx={{
-                      bgcolor: isEarned ? badge.color : 'grey.500',
-                      color: 'white',
-                      width: { xs: 50, md: 62 },
-                      height: { xs: 50, md: 62 },
-                      flexShrink: 0
-                    }}>
-                      {getIconComponent(badge.icon)}
-                    </Avatar>
-                    <Box sx={{
-                      flex: 1,
-                      minWidth: 0,
+                    <CardContent sx={{
                       display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center'
+                      alignItems: 'center',
+                      gap: { xs: 2, md: 2.5 },
+                      p: { xs: 2, md: 2.5 },
+                      '&:last-child': { pb: { xs: 2, md: 2.5 } }
                     }}>
-                      <Typography
-                        variant={isSmall ? "body1" : "h6"}
-                        fontWeight={600}
-                        fontSize={{ xs: '1.125rem', md: '1.25rem' }}
-                        sx={{
-                          lineHeight: 1.3,
-                          mb: 0.5
-                        }}
-                      >
-                        {badge.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        fontSize={{ xs: '0.9375rem', md: '1.09375rem' }}
-                        sx={{ lineHeight: 1.5 }}
-                      >
-                        {badge.description}
-                      </Typography>
-                    </Box>
-                    {isEarned && (
-                      <Chip
-                        label="✓"
-                        size="small"
-                        sx={{
-                          minWidth: 40,
-                          height: 30,
-                          fontSize: '0.875rem',
-                          flexShrink: 0,
-                          bgcolor: badge.color,
-                          color: 'white',
-                          fontWeight: 'bold'
-                        }}
-                      />
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            );
-          })}
-        </Grid>
+                      <Avatar sx={{
+                        bgcolor: isEarned ? badge.color : 'grey.500',
+                        color: 'white',
+                        width: { xs: 50, md: 62 },
+                        height: { xs: 50, md: 62 },
+                        flexShrink: 0
+                      }}>
+                        {getIconComponent(badge.icon)}
+                      </Avatar>
+                      <Box sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                      }}>
+                        <Typography
+                          variant={isSmall ? "body1" : "h6"}
+                          fontWeight={600}
+                          fontSize={{ xs: '1.125rem', md: '1.25rem' }}
+                          sx={{
+                            lineHeight: 1.3,
+                            mb: 0.5
+                          }}
+                        >
+                          {badge.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontSize={{ xs: '0.9375rem', md: '1.09375rem' }}
+                          sx={{ lineHeight: 1.5 }}
+                        >
+                          {badge.description}
+                        </Typography>
+                      </Box>
+                      {isEarned && (
+                        <Chip
+                          label="✓"
+                          size="small"
+                          sx={{
+                            minWidth: 40,
+                            height: 30,
+                            fontSize: '0.875rem',
+                            flexShrink: 0,
+                            bgcolor: badge.color,
+                            color: 'white',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        )}
 
-        <Divider sx={{ my: { xs: 2, md: 3 } }} />
+        {/* Tab Content - Başarımlar */}
+        {currentTab === 1 && (
+          <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ width: '100%', mx: 0 }}>
+            {allAchievements.map((achievement) => {
+              const isEarned = earnedAchievements.has(achievement.id);
 
-        {/* Achievements Section - Başarımlar */}
-        <Typography
-          variant={isSmall ? "body1" : "h6"}
-          fontWeight={600}
-          sx={{ mb: { xs: 1.5, md: 2 } }}
-        >
-          Başarımlar ({earnedAchievements.size}/{allAchievements.length})
-        </Typography>
-
-        <Grid container spacing={{ xs: 2, md: 2.5 }} sx={{ width: '100%', mx: 0 }}>
-          {allAchievements.map((achievement) => {
-            const isEarned = earnedAchievements.has(achievement.id);
-
-            return (
-              <Grid item xs={12} key={achievement.id} sx={{ width: '100%', px: 0 }}>
-                <Card sx={{
-                  opacity: isEarned ? 1 : 0.5,
-                  border: isEarned ? '2px solid' : '1px solid',
-                  borderColor: isEarned ? 'success.main' : 'divider',
-                  width: '100%',
-                  boxSizing: 'border-box'
-                }}>
-                  <CardContent sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: { xs: 2, md: 2.5 },
-                    p: { xs: 2, md: 2.5 },
-                    '&:last-child': { pb: { xs: 2, md: 2.5 } }
+              return (
+                <Grid item xs={12} key={achievement.id} sx={{ width: '100%', px: 0 }}>
+                  <Card sx={{
+                    opacity: isEarned ? 1 : 0.5,
+                    border: isEarned ? '2px solid' : '1px solid',
+                    borderColor: isEarned ? 'success.main' : 'divider',
+                    width: '100%',
+                    boxSizing: 'border-box'
                   }}>
-                    <Avatar sx={{
-                      bgcolor: isEarned ? 'success.main' : 'grey.500',
-                      color: 'white',
-                      width: { xs: 50, md: 62 },
-                      height: { xs: 50, md: 62 },
-                      flexShrink: 0
-                    }}>
-                      {getIconComponent(achievement.icon)}
-                    </Avatar>
-                    <Box sx={{
-                      flex: 1,
-                      minWidth: 0,
+                    <CardContent sx={{
                       display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center'
+                      alignItems: 'center',
+                      gap: { xs: 2, md: 2.5 },
+                      p: { xs: 2, md: 2.5 },
+                      '&:last-child': { pb: { xs: 2, md: 2.5 } }
                     }}>
-                      <Typography
-                        variant={isSmall ? "body1" : "h6"}
-                        fontWeight={600}
-                        fontSize={{ xs: '1.125rem', md: '1.25rem' }}
-                        sx={{
-                          lineHeight: 1.3,
-                          mb: 0.5
-                        }}
-                      >
-                        {achievement.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        fontSize={{ xs: '0.9375rem', md: '1.09375rem' }}
-                        sx={{ lineHeight: 1.5 }}
-                      >
-                        {achievement.description}
-                      </Typography>
-                    </Box>
-                    {isEarned && (
-                      <Chip
-                        label="✓"
-                        size="small"
-                        color="success"
-                        sx={{
-                          minWidth: 40,
-                          height: 30,
-                          fontSize: '0.875rem',
-                          flexShrink: 0
-                        }}
-                      />
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            );
-          })}
-        </Grid>
+                      <Avatar sx={{
+                        bgcolor: isEarned ? 'success.main' : 'grey.500',
+                        color: 'white',
+                        width: { xs: 50, md: 62 },
+                        height: { xs: 50, md: 62 },
+                        flexShrink: 0
+                      }}>
+                        {getIconComponent(achievement.icon)}
+                      </Avatar>
+                      <Box sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center'
+                      }}>
+                        <Typography
+                          variant={isSmall ? "body1" : "h6"}
+                          fontWeight={600}
+                          fontSize={{ xs: '1.125rem', md: '1.25rem' }}
+                          sx={{
+                            lineHeight: 1.3,
+                            mb: 0.5
+                          }}
+                        >
+                          {achievement.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontSize={{ xs: '0.9375rem', md: '1.09375rem' }}
+                          sx={{ lineHeight: 1.5 }}
+                        >
+                          {achievement.description}
+                        </Typography>
+                      </Box>
+                      {isEarned && (
+                        <Chip
+                          label="✓"
+                          size="small"
+                          color="success"
+                          sx={{
+                            minWidth: 40,
+                            height: 30,
+                            fontSize: '0.875rem',
+                            flexShrink: 0
+                          }}
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        )}
       </DialogContent>
 
       <DialogActions sx={{
