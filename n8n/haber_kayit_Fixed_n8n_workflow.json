@@ -1,0 +1,834 @@
+{
+  "name": "haberkayitFixed",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://46.36.201.132:3545/api/news/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "hackhathon-newscoon-2025"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $input.item.json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2208,
+        1232
+      ],
+      "id": "90faa811-75f1-4eba-8ed5-6e4dc61bb4d5",
+      "name": "HTTP Request1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "data",
+              "cssSelector": ".detay-icerik > h6 + div",
+              "returnValue": "html"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        912
+      ],
+      "id": "31bdb482-4a87-4959-a76e-d1afc06bd700",
+      "name": "HTML2"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "newstext",
+              "cssSelector": "*",
+              "skipSelectors": "div,span"
+            }
+          ]
+        },
+        "options": {
+          "cleanUpText": false
+        }
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        928,
+        912
+      ],
+      "id": "f8809e32-1a67-4163-8ddc-4214285d2183",
+      "name": "HTML3"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1488,
+        896
+      ],
+      "id": "0a92d843-07a2-45b9-83cf-fbf89fb8bb38",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"categories\":[\"gundem\",\"dunya\",\"ekonomi\",\"spor\",\"analiz\",\"kultur\"]\n}",
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1264,
+        896
+      ],
+      "id": "426e9f3a-d09a-4af4-a318-1c387e2ece89",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "categories",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        896
+      ],
+      "id": "fe37a480-920e-4ada-a6b8-32f637628206",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.aa.com.tr/tr/rss/default?cat={{ $json.categories}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -816,
+        896
+      ],
+      "id": "2d352da9-b548-4eef-b638-173541d6fe3c",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        896
+      ],
+      "id": "3f6046df-48cb-479a-b87b-4aa87274805c",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "jsCode": "function transformNews(input, category = \"gundem\") {\n  return {\n    guid: input.guid._,\n    isPermaLink: input.guid.isPermaLink,\n    link: input.link,\n    title: input.title,\n    description: input.description,\n    pubDate: input.pubDate,\n    image: input.image,\n    isInAnyStack: false,\n    isUsable: true,\n    category: category\n  };\n}\n\nlet categories = $input.all();\nlet allNews = [];\n\nfor (const category of categories) {\n  for (const rawNews of category.json.rss.channel.item) {\n    allNews.push(transformNews(rawNews, rawNews.link.split(\"/\")[4]));\n  }\n}\n\n\n\nreturn allNews;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        896
+      ],
+      "id": "749d579e-9ff4-457d-a95a-caa0f60fd02a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.link }}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        912
+      ],
+      "id": "ebd412f6-d600-473c-a0d4-bb36d401b2c6",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2000,
+        672
+      ],
+      "id": "9dacbe6c-8170-47d0-88cf-1899ececfeaa",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        80,
+        896
+      ],
+      "id": "7b106d67-f470-42b8-a256-b56baf48d19e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "guid, isPermaLink,link, description, pubDate, image, isInAnyStack, isUsable, category, title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        896
+      ],
+      "id": "d5e9ca9c-195c-418e-afba-1e52cf85d6c7",
+      "name": "Split Out4",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d93ab61f-e674-432d-9189-80d7a2ef2ee0",
+              "leftValue": "={{ $json.newstext.length }}",
+              "rightValue": 2000,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        912
+      ],
+      "id": "b7a00c3a-95cc-4ead-8450-d555c7becfa9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "Şunu özetle, kısa ve öz bir şekilde yaz ve çıktı olarak sadece özet metnini ver:\n\n\n\"{text}\"\n\n\n",
+              "prompt": "Şunu özetle, kısa ve öz bir şekilde yaz ve çıktı olarak sadece özet metnini ver:\n\n\n\"{text}\"\n"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        928
+      ],
+      "id": "ec0ceb6a-55e2-47dd-a7a1-3e46cca09eff",
+      "name": "Summarization Chain",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1376,
+        1152
+      ],
+      "id": "90ce77f0-38a0-4e8e-b8ef-1a53f51be0d9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "jthTwuWk5twKJxfE",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\n\nreturn {\"newstext\":$json.output.text};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        912
+      ],
+      "id": "aeab74ba-b857-44c9-a8c5-d20e8716c635",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "content": " saat başı tetikle",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1520,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "b879af22-a98e-46b2-8dca-37c4d910e089",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "çekilecek kategoriler belirlenir",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1296,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "35c9e207-647d-4aa1-bbae-16ee61da17c2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "her bir kategori için ayrı bir iş akışı başlat",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1072,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "afc882ff-6939-4cb2-b382-69106546a190",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "rss verisini çek",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -848,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "69912194-7a5d-4c00-b775-2039c3a6bf27",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "XML verisi JSON formatına dönüştür",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -624,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "fa8e0dee-a562-44ae-b716-2cb49c1e0b6e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "düzenli bir JSON yapısı oluştur",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -400,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "6642a46e-5be1-4de6-ad1d-807a34dc92a7",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "her bir haber öğesi için ayrı bir iş akışı başlat",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -176,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "32e36fcb-fdda-4597-8ee9-43ab6d8ad379",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "her haber için ayrı ayrı web sitesinden veri çekme döngüsü\n",
+        "height": 80,
+        "width": 166
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        48,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "a2dc4bfb-7619-4f6a-b261-8fbb4a3afe71",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "her bir haberin linkine giderek içeriğini çek",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        528,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "cec31df4-f857-4f37-9c26-64b249f3dd95",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "haberin gövdesini (içeriğini) çek",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "9e73555e-2ef5-4d6e-93c4-d520e4d03165",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "haberin sadece ana metnini elde et",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "0371e51b-4dee-4de4-9e9f-1438f7baf8b1",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "metninin uzunluğunu kontrol et",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "80692034-697f-44fc-8c80-5c490d8cdf09",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "metinleri özetle",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1456,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "eeda4091-5737-41dd-8364-a32d2f39b6ac",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "orijinal haber metni adıyla ekle",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1728,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "7f39ee3c-b66b-4307-8c8d-eac57b4a4f25",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "verileri  birleştir",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1744,
+        576
+      ],
+      "typeVersion": 1,
+      "id": "20974c76-a4a4-4ab1-a40d-2294316777a3",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "DB'ye gönder",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2176,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "a6c81527-0427-43ae-9402-ae5007ec3776",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "url": "=http://46.36.201.132:3545/api/news/guid/{{ $json.guid }}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        1056
+      ],
+      "id": "3d7dc5d6-3602-40c4-bb9e-10cd3ab11c41",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "boşa token harcamaması için ek kontrol",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        1104
+      ],
+      "typeVersion": 1,
+      "id": "6c1a4eab-1ab0-4c28-bd34-48b35d34a365",
+      "name": "Sticky Note16"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTML2": {
+      "main": [
+        [
+          {
+            "node": "HTML3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML3": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "HTML2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "a041856a-aba6-4988-aa4e-171a8aef8d3c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ff50666a1ee94106b993e5383a9b8796eea60ea9082928a800df44e1bc349f9"
+  },
+  "id": "KNYfTjnjvpf6OWo9",
+  "tags": []
+}

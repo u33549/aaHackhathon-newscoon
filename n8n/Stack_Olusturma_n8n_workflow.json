@@ -1,0 +1,278 @@
+{
+  "name": "Stack Oluşturma",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "http://46.36.201.132:3545/api/news",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -368,
+        64
+      ],
+      "id": "ef44d3b9-37b2-484a-8e5c-1296dfb03acc",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.newsData }}\nSen bir haber kategorilendirme ve seri oluşturma asistanısın.\n\nYukarıdaki haberleri analiz et ve birbirleriyle ilişkili haberleri gruplandırarak \"haber serileri\" oluştur.\n\nÖNEMLİ: Çıktı formatı MUTLAKA şu JSON yapısında olmalı:\n\n{\n  \"stacks\": [\n    {\n      \"title\": \"Seri başlığı (kısa ve öz)\",\n      \"description\": \"Seri hakkında 2-3 cümlelik açıklama\",\n      \"news\": [\n        {\n          \"_id\": \"3697443\",\n          \"guid\": \"3697443\",\n          \"title\": \"haber başlığı\",\n          \"description\": \"haber açıklaması\",\n          \"link\": \"haber linki\",\n          \"pubDate\": \"tarih\",\n          \"image\": \"resim url\",\n          \"category\": \"kategori\"\n        }\n      ],\n      \"status\": \"approved\",\n      \"viewCount\": 0,\n      \"tags\": [\"tag1\", \"tag2\"],\n      \"isFeatured\": false,\n      \"isPhotoUpToDate\": true\n    }\n  ]\n}\n\nKURALLAR:\n1. Her seri EN AZ 3 haber içermeli\n2. Seriler kronolojik sırada olmalı (pubDate'e göre)\n3. Aynı guid'e sahip haberleri tekrarlama\n4. İlgisiz haberleri hiçbir seriye ekleme\n5. Seri başlıkları belirli ve net olmalı\n6. tags dizisine haber içeriğine uygun etiketler ekle\n7. news dizisindeki her haber, yukarıdaki veriden gelen tüm alanları içermeli (_id, guid, title, description, link, pubDate, image, category)\n8. Sadece JSON çıktısı ver, başka hiçbir açıklama ekleme\n9. Her haberin category bilgisini koru (analiz, kultur vb.)\n\nÖRNEK SERİ:\nEğer 3+ haber BM ve Gazze ile ilgiliyse:\n{\n  \"title\": \"BM Gazze Krizi ve Türkiye'nin Duruşu\",\n  \"description\": \"Cumhurbaşkanı Erdoğan'ın BM konuşması ve Gazze krizi üzerine yapılan analizler\",\n  \"news\": [...ilgili haberler...],\n  \"tags\": [\"BM\", \"Gazze\", \"Dış Politika\"],\n  ...\n}\n\nŞimdi haberleri analiz et ve serileri oluştur.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        48,
+        64
+      ],
+      "id": "afd7d446-ed85-41ad-ab79-a194e71ede52",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        256
+      ],
+      "id": "46a0ae11-ed8c-4781-8a82-59d05c59ea65",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "jthTwuWk5twKJxfE",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://46.36.201.132:3545/api/stacks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "hackhathon-newscoon-2025"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        64
+      ],
+      "id": "89c6d57a-da78-48f7-ad5a-c02d2a7bef11",
+      "name": "HTTP Request1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = $input.first().json;\n\nconsole.log('AI Raw Response:', JSON.stringify(aiResponse, null, 2));\n\nlet parsedData;\n\ntry {\n  let outputText = aiResponse.output || aiResponse.text || aiResponse.content || JSON.stringify(aiResponse);\n  \n \n  outputText = outputText.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  \n  parsedData = typeof outputText === 'string' ? JSON.parse(outputText) : outputText;\n  \n  console.log('Parsed Data:', JSON.stringify(parsedData, null, 2));\n\n  \n  const stacks = parsedData.stacks || [parsedData];\n  \n  return stacks.map(stack => ({\n    json: {\n      title: stack.title || \"Başlık bulunamadı\",\n      description: stack.description || \"Açıklama bulunamadı\",\n      news: stack.news || [],\n      status: stack.status || \"approved\",\n      viewCount: stack.viewCount || 0,\n      tags: stack.tags || [],\n      isFeatured: stack.isFeatured || false,\n      isPhotoUpToDate: stack.isPhotoUpToDate || false\n    }\n  }));\n\n} catch (error) {\n  console.error('Transform Error:', error.message);\n  console.error('Raw Response:', JSON.stringify(aiResponse, null, 2));\n  \n  return [{\n    json: {\n      title: \"Hata: Parse Edilemedi\",\n      description: `AI response parse edilemedi: ${error.message}`,\n      news: [],\n      status: \"error\",\n      viewCount: 0,\n      tags: [\"error\"],\n      isFeatured: false,\n      isPhotoUpToDate: false\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        64
+      ],
+      "id": "07f15ef3-2086-4eb7-887c-a83d821e7c09",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        64
+      ],
+      "id": "03aa6431-ddf7-4909-a741-5d43cc3df13f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "Parse JSON",
+        "height": 80,
+        "width": 160
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "a4229aa4-1e9c-46e7-b5dc-020fc9816931",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": " AI yorumlama",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "cf9db56c-f6a3-46fc-8cce-0b3a76f1691e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "DB den veri çekme",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -400,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "f5c916ac-c912-4497-b135-96969bbbf0e0",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "DB'ye veri gönderme",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        560,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "460a778d-7d57-42aa-a407-c456d607ce03",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// İlk item'dan veriyi al\nconst items = $input.all();\nconst firstItem = items[0].json;\n\n// data array'ini al ve ilk 100'yi sınırla\nconst newsData = firstItem.data || [];\nconst limitedNews = newsData.slice(0, 100);\n\n// AI için JSON string oluştur\nconst jsonString = JSON.stringify(limitedNews, null, 2);\n\nconsole.log('Prepared news count:', limitedNews.length);\n\nreturn [{\n  json: {\n    newsData: jsonString,\n    count: limitedNews.length\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        64
+      ],
+      "id": "eb9151cf-8bd0-409a-8da0-41e69785d73e",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a2b042a0-0a6f-44ff-8ef3-2a5686a1ce9b",
+  "meta": {
+    "instanceId": "9ff50666a1ee94106b993e5383a9b8796eea60ea9082928a800df44e1bc349f9"
+  },
+  "id": "ceRCtE8f0uS8pyKg",
+  "tags": []
+}

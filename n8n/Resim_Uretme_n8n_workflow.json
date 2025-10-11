@@ -1,0 +1,297 @@
+{
+  "name": "Resim Üretme n8n workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "063a9d6c-9f59-4428-8d45-5f50dd15b5dc",
+      "name": "Her Saat Çalıştır2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://46.36.201.132:3545/api/stacks",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "40e153c6-7baf-480f-834a-438223aee593",
+      "name": "Tüm Stack'leri Çek2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -912,
+        208
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7er5gMCJMvOPx3H2",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// FİLTRELEME AKTİF - Sadece fotoğrafı güncellenmesi gereken stack'ler\nconst response = $input.item.json;\n\nconsole.log('=== FİLTRELEME AKTİF - isPhotoUpToDate: false ===');\n\nlet stacks = [];\nif (Array.isArray(response)) {\n    stacks = response;\n} else if (response.data && Array.isArray(response.data)) {\n    stacks = response.data;\n} else {\n    console.error('❌ Stack bulunamadı');\n    return [];\n}\n\nconsole.log('📊 Toplam stack:', stacks.length);\n\n// FİLTRELEME: Sadece isPhotoUpToDate === false olanları al\nconst filteredStacks = stacks.filter(stack => {\n    return stack.isPhotoUpToDate === false;\n});\n\nconsole.log('🎯 Fotoğraf üretilecek stack sayısı:', filteredStacks.length);\n\n// Eğer filtrelenecek stack yoksa boş array döndür\nif (filteredStacks.length === 0) {\n    console.log('ℹ️ Tüm stack\\'lerin fotoğrafları güncel. İşlem yapılmadı.');\n    return [];\n}\n\n// Filtrelenmiş stack'leri işle\nreturn filteredStacks.map(stack => {\n    console.log('✅ İşleniyor:', stack._id, '-', stack.title);\n    \n    return {\n        json: {\n            stackId: stack._id,\n            stackTitle: stack.title || 'Başlık Yok',\n            stackDescription: stack.description || '',\n            newsIds: stack.news || [],\n            isPhotoUpToDate: stack.isPhotoUpToDate\n        }\n    };\n});"
+      },
+      "id": "2580791c-0c67-4171-98a5-1df5e5ab46d1",
+      "name": "Aktif Stack'leri Filtrele2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        208
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Önceki düğümden stack verisini al\nconst stackData = $input.item.json;\n\nconsole.log('=== GERÇEKÇİLİK VURGULU AI PROMPT OLUŞTURUCU ===');\nconsole.log('Stack Data:', JSON.stringify(stackData, null, 2));\n\n// Stack bilgilerini al\nconst stackId = stackData.stackId;\nconst stackTitle = stackData.stackTitle || 'Haber Başlığı';\nconst stackDescription = stackData.stackDescription || '';\n\n// KRITIK: Stack ID kontrolü\nif (!stackId) {\n    console.error('❌ HATA: Stack ID bulunamadı!');\n    throw new Error('Stack ID bulunamadı! Lütfen önceki düğümü kontrol edin.');\n}\n\n// İçeriği temizle ve birleştir\nconst combinedText = (stackTitle + ' ' + stackDescription).toLowerCase();\nlet cleanContent = String(combinedText)\n    .replace(/<[^>]*>/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n\nconst contentSummary = cleanContent.length > 500 \n    ? cleanContent.substring(0, 500) + '...' \n    : cleanContent;\n\nconsole.log('Analiz edilecek metin:', contentSummary);\n\n// 1. ANALİZ: Haberin konusunu ve tonunu belirle\nconst getStoryElements = (text) => {\n    let elements = {\n        topic: 'General News',\n        tone: 'Neutral',\n        style: 'Hyperrealistic photojournalism, award-winning news photography, documentary style', // Gerçekçilik vurgusu\n        camera: 'Dynamic medium shot, eye-level perspective', // Daha dinamik\n        lighting: 'Natural, journalistic lighting, clear and sharp', // Daha keskin ve doğal\n        scene: 'A compelling scene that vividly represents the headline and story context, designed for news media.', // Daha güçlü bir ifade\n        negative_prompt: 'text, logos, watermarks, letters, typography, signatures, cartoon, illustration, painting, drawing, abstract, unrealistic, blurry, low resolution' // Gerçekçilik karşıtı tüm ifadeler\n    };\n\n    // YENİ: Hassas konuları en başa alarak önceliklendiriyoruz (sembolik yaklaşım devam ediyor)\n    if (text.match(/savaş|çatışma|saldırı|işgal|soykırım|katliam|kıtlık|insan hakları|mülteci|kriz|şiddet/)) {\n        elements.topic = 'Conflict & Human Tragedy';\n        elements.tone = 'Somber, reflective, solemn';\n        // Stil: Foto-realizmden uzaklaşıp sanatsal ve sembolik bir tarza geçiyoruz (burada gerçekçilikten feragat ediyoruz)\n        elements.style = 'Conceptual photography, symbolic art, fine art, minimalist composition, thought-provoking';\n        elements.camera = 'Still life, macro shot on a single significant object, wide shot of a desolate landscape';\n        elements.lighting = 'Soft, diffused light, dramatic single light source (chiaroscuro) or bleak overcast light';\n        elements.scene = `A powerful, symbolic, and metaphorical image representing the core theme of the news. Focus on objects and concepts like a torn flag on barren ground, a single lit candle in darkness, a broken peace dove statue, a withered plant growing from cracked earth, an empty chair in a desolate room, or silhouetted figures walking towards a distant horizon. The image should evoke feelings of loss, remembrance, resilience, or a fragile hope, avoiding any direct depiction of violence or suffering.`;\n        elements.negative_prompt = 'people, humans, faces, violence, gore, blood, weapons, suffering, direct depiction of events, cartoon, illustration, painting, drawing, text, logos, watermarks';\n    } else if (text.match(/ekonomi|borsa|dolar|enflasyon|finans|yatırım/)) {\n        elements.topic = 'Finance';\n        elements.style = 'Photojournalistic, corporate photography, clean and modern, high-contrast urban shots';\n        elements.scene = 'A dynamic image representing financial markets: stock tickers with blurred city lights, a graph ascending sharply, or a modern office building reflecting economic trends.';\n        elements.tone = 'Serious, professional, analytical';\n    } else if (text.match(/teknoloji|yapay zeka|bilim|uzay|girişim|inovasyon/)) {\n        elements.topic = 'Technology';\n        elements.style = 'Sleek, futuristic, high-tech product photography, sci-fi inspired realism, bright and clean visuals';\n        elements.scene = 'An innovative device, abstract data visualization, a scientist working in a cutting-edge lab, or a satellite orbiting Earth.';\n        elements.tone = 'Optimistic, innovative, visionary';\n    } else if (text.match(/deprem|sel|yangın|felaket|kaza/)) {\n        elements.topic = 'Disaster';\n        elements.style = 'Gritty photojournalism, documentary realism, impactful and raw emotion, high-contrast, dramatic shadows';\n        elements.camera = 'Wide shot showing scale of aftermath, or a close-up on an object symbolizing loss/hope';\n        elements.lighting = 'Overcast natural light, dramatic smoke/dust filtered light, or emergency vehicle lights';\n        elements.scene = 'A powerful and respectful image showing the aftermath of a disaster, focusing on resilience or loss through environmental details or symbolic objects. Examples: a child\\'s lost toy amidst carefully depicted debris, emergency personnel working in a blurred background, or a damaged landscape with a single sign of life/hope. No direct human suffering.';\n        elements.negative_prompt = 'graphic details, suffering, blood, gore, dead bodies, screaming, overt sadness in faces, text, logos';\n    } else if (text.match(/spor|futbol|maç|basketbol|şampiyon/)) {\n        elements.topic = 'Sports';\n        elements.style = 'High-speed sports action photography, dynamic motion blur, stadium lighting realism, telephoto lens perspective';\n        elements.camera = 'Low-angle action shot, mid-air freeze frame, close-up on an athlete\\'s focused expression';\n        elements.lighting = 'Bright stadium lighting, dramatic spotlighting, golden hour outdoor lighting';\n        elements.scene = 'A peak action moment in the sport, capturing intense effort, celebration, or a decisive play. Focus on dynamic movement and athlete emotion.';\n        elements.tone = 'Energetic, competitive, triumphant, passionate';\n    } else if (text.match(/siyaset|seçim|meclis|bakan/)) {\n        elements.topic = 'Politics';\n        elements.style = 'Candid political photojournalism, formal portraiture, sharp and professional, natural event lighting';\n        elements.scene = 'A symbolic image like a government building at dawn/dusk, a press conference with blurred microphones, or a crowd of diverse voters in a civic setting.';\n        elements.tone = 'Serious, formal, impactful';\n    } else if (text.match(/kültür|sanat|müzik|konser|sergi|festival|film|kitap/)) {\n        elements.topic = 'Culture & Art';\n        elements.style = 'Vibrant and evocative photography, artistic portraiture, stage lighting, candid event photography';\n        elements.scene = 'A dynamic scene capturing an artistic performance, a museum exhibit, a musician on stage, or a crowd enjoying a cultural event.';\n        elements.tone = 'Inspiring, creative, engaging';\n    } else if (text.match(/sağlık|hastane|doktor|ilaç|tedavi|pandemi/)) {\n        elements.topic = 'Health & Medicine';\n        elements.style = 'Clean, sterile, professional medical photography, empathetic portraiture, modern clinic aesthetic';\n        elements.scene = 'A symbolic image representing health, care, or medical research: a scientist in a lab, a patient holding hands with a doctor (back view), or medical equipment with soft focus.';\n        elements.tone = 'Hopeful, reassuring, scientific';\n    }\n\n    return elements;\n};\n\nconst storyElements = getStoryElements(cleanContent);\n\nconsole.log('Analiz Sonuçları:', storyElements);\n\n// 2. ve 3. AŞAMA: Sahne ve Stil ile Prompt'u Zenginleştir\nconst prompt = `\n**Primary Objective:** Generate a single, ultra-photorealistic and highly detailed image suitable for a prominent news publication. The image must embody the highest standards of journalistic photography.\n\n**News Story Context:**\n- **Headline:** \"${stackTitle}\"\n- **Summary:** \"${contentSummary}\"\n- **Identified Topic:** ${storyElements.topic}\n- **Implied Tone:** ${storyElements.tone}\n\n**Visual Brief - The Scene to Create:**\n- **Core Subject & Action:** ${storyElements.scene} The scene should be instantly recognizable as relevant to the news, visually compelling, and rich in detail.\n- **Setting:** The environment must be entirely authentic, believable, and directly tied to the story's context (literal or symbolic).\n\n**Art Direction - Photographic Style:**\n- **Photography Style:** ${storyElements.style}. Emphasize **hyperrealism, clarity, and exceptional detail**. It should look like an unedited, high-resolution photograph taken by an award-winning photojournalist.\n- **Composition & Shot:** ${storyElements.camera}. Employ expert photographic composition (e.g., rule of thirds, leading lines, depth of field) to create a strong focal point and visual impact.\n- **Lighting:** ${storyElements.lighting}. The lighting should be professional, natural, or dramatically purposeful, enhancing realism and mood.\n- **Color Palette:** Realistic, natural, and vibrant colors, reflecting true-to-life conditions, unless the specific tone dictates a more muted approach (e.g., for solemn subjects).\n- **Image Quality:** **Aspect Ratio 16:9**, **8K resolution**, **hyper-detailed**, **razor-sharp focus**, cinematic quality, professional grade.\n\n**CRITICAL INSTRUCTIONS & CONSTRAINTS (Negative Prompts):**\n- **STRICTLY EXCLUDE:** ${storyElements.negative_prompt}.\n- **No text, logos, watermarks, letters, or typography anywhere in the image.**\n- **Avoid any artificial, cartoonish, illustrative, abstract, or painterly aesthetics.** The image must be perceived as a genuine photograph.\n- **Avoid clichés and generic stock photo concepts.** Aim for originality and powerful visual storytelling.\n- **Focus on a single, clear narrative moment or symbolic representation.** Do not create a collage or multiple distinct scenes.\n`;\n\nconsole.log('Oluşturulan Dinamik Prompt, Uzunluk:', prompt.length);\n\n// Çıktı\nreturn {\n    json: {\n        prompt: prompt,\n        newsStackId: stackId,\n        newsTitle: stackTitle,\n        newsDescription: contentSummary || stackDescription,\n        analyzedTopic: storyElements.topic\n    }\n};"
+      },
+      "id": "543c934d-f8cb-4c0f-ac40-9e96f57d7eb2",
+      "name": "AI Prompt Oluştur2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.prompt }}",
+        "options": {
+          "size": "1792x1024",
+          "style": "natural"
+        }
+      },
+      "id": "a7111db4-ade0-4bd5-92a0-eb45f1fda996",
+      "name": "OpenAI Resim Üret2",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        32,
+        272
+      ],
+      "retryOnFail": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "jthTwuWk5twKJxfE",
+          "name": "OpenAi account 3"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "console.log('=== BASE64 ÇEVİR ===');\n\n// Binary veriyi al\nlet binaryData = null;\n\nif ($input.item.binary && Object.keys($input.item.binary).length > 0) {\n    const binaryKey = Object.keys($input.item.binary)[0];\n    binaryData = $input.item.binary[binaryKey];\n    console.log('✓ Binary bulundu:', binaryKey);\n} else if ($binary && Object.keys($binary).length > 0) {\n    const binaryKey = Object.keys($binary)[0];\n    binaryData = $binary[binaryKey];\n    console.log('✓ Binary bulundu (yöntem 2):', binaryKey);\n}\n\nif (!binaryData || !binaryData.data) {\n    console.error('❌ Binary veri bulunamadı!');\n    throw new Error('Binary veri bulunamadı!');\n}\n\n// Base64 string'i al\nconst base64String = binaryData.data;\nconst mimeType = binaryData.mimeType || 'image/png';\n\nconsole.log('Base64 uzunluğu:', base64String.length);\nconsole.log('Mime type:', mimeType);\n\n// Data URI oluştur\nconst dataUri = `data:${mimeType};base64,${base64String}`;\n\n// Önceki düğümden verileri al\nconst promptNode = $('AI Prompt Oluştur2');\nconst promptData = promptNode.item.json;\n\nconst stackId = promptData.newsStackId;\nconst newsTitle = promptData.newsTitle;\nconst newsDescription = promptData.newsDescription;\n\nif (!stackId) {\n    throw new Error('Stack ID bulunamadı!');\n}\n\n// Resim adı\nconst timestamp = Date.now();\nconst imageName = `newstack-${stackId}-${timestamp}.png`;\n\nconsole.log('✅ Base64 dönüşümü tamamlandı, Stack ID:', stackId);\n\n// Çıktı\nreturn {\n    json: {\n        newsStackId: stackId,\n        imageName: imageName,\n        photo: dataUri,\n        originalName: imageName,\n        newsTitle: newsTitle,\n        newsDescription: newsDescription\n    }\n};"
+      },
+      "id": "14fe9a91-5c5c-4383-8d49-1ff8082249b6",
+      "name": "Base64'e Çevir2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://46.36.201.132:3545/api/news-stack-images",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=newsStackId",
+              "value": "={{ $json.newsStackId }}"
+            },
+            {
+              "name": "photo",
+              "value": "={{ $json.photo }}"
+            },
+            {
+              "name": "originalName",
+              "value": "={{ $json.originalName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "68675215-e5eb-4e04-be85-c115d5fc93c7",
+      "name": "Backend'e Gönder2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        432,
+        352
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "7er5gMCJMvOPx3H2",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sonuçları logla\nconst result = $input.item.json;\n\nconsole.log('✅ Resim başarıyla oluşturuldu:', {\n  stackId: result.data?.newsStackId,\n  imageUrl: result.data?.photoUrl,\n  timestamp: new Date().toISOString()\n});\n\nreturn $input.all();"
+      },
+      "id": "52399c6c-ad10-4c41-8c99-e199bc1f237b",
+      "name": "Başarılı Log2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -448,
+        208
+      ],
+      "id": "8e5e9832-93d6-4707-a92e-4ed48d80bf04",
+      "name": "Loop Over Items1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Her Saat Çalıştır2": {
+      "main": [
+        [
+          {
+            "node": "Tüm Stack'leri Çek2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tüm Stack'leri Çek2": {
+      "main": [
+        [
+          {
+            "node": "Aktif Stack'leri Filtrele2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aktif Stack'leri Filtrele2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Prompt Oluştur2": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Resim Üret2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Resim Üret2": {
+      "main": [
+        [
+          {
+            "node": "Base64'e Çevir2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base64'e Çevir2": {
+      "main": [
+        [
+          {
+            "node": "Backend'e Gönder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backend'e Gönder2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Başarılı Log2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Prompt Oluştur2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3478f152-9589-469a-9d4a-826c74c2b720",
+  "meta": {
+    "instanceId": "9ff50666a1ee94106b993e5383a9b8796eea60ea9082928a800df44e1bc349f9"
+  },
+  "id": "ceRCtE8f0uS8pyKg",
+  "tags": []
+}
