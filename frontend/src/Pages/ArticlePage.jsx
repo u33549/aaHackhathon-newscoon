@@ -1,80 +1,178 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Container,
   Typography,
-  Button,
-  Paper,
-  Chip
+  IconButton,
+  CardMedia
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import {
+  Close
+} from '@mui/icons-material';
+
+// Layout Components
+import Header from '../components/layout/Header';
+
+// Redux hooks
+import { useUserXP, useUserLevel, useXPForNextLevel } from '../hooks/redux';
 
 const ArticlePage = () => {
-  const { id } = useParams();
+  const { stackId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleBack = () => {
-    navigate('/');
+  // Redux state for header
+  const totalCp = useUserXP();
+  const level = useUserLevel();
+  const cpForNextLevel = useXPForNextLevel();
+
+  // URL state'den haber verisini al
+  const newsData = location.state?.news;
+
+  // Tarih formatlama fonksiyonu
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Bilinmeyen tarih';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
+  // Geri git
+  const handleGoBack = () => {
+    navigate(`/stack/${stackId}`);
+  };
+
+  // Eğer haber verisi yoksa
+  if (!newsData) {
+    return (
+      <>
+        <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
+        <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
+          <Typography variant="h4" gutterBottom color="error">
+            Haber Bulunamadı
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            İstediğiniz haber bulunamadı veya erişilemez durumda.
+          </Typography>
+        </Container>
+      </>
+    );
+  }
+
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Button
-        startIcon={<ArrowBack />}
-        onClick={handleBack}
-        sx={{ mb: 3 }}
-      >
-        Geri Dön
-      </Button>
+    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+      {/* Header */}
+      <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} />
 
-      <Paper sx={{ p: 4 }}>
-        <Box sx={{ mb: 3 }}>
-          <Chip label="Teknoloji" color="primary" sx={{ mb: 2 }} />
-          <Typography variant="h4" component="h1" gutterBottom>
-            Makale Başlığı {id}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
-            7 Ocak 2025 • 5 dakika okuma süresi
-          </Typography>
-        </Box>
+      {/* Close Button */}
+      <Box sx={{
+        position: 'fixed',
+        top: 80,
+        right: 16,
+        zIndex: 1000
+      }}>
+        <IconButton
+          onClick={handleGoBack}
+          sx={{
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            color: 'white',
+            width: 44,
+            height: 44,
+            '&:hover': {
+              backgroundColor: 'rgba(0,0,0,0.9)'
+            }
+          }}
+        >
+          <Close />
+        </IconButton>
+      </Box>
 
-        <Box sx={{ mb: 4 }}>
-          <img
-            src={`https://picsum.photos/800/400?random=${id}`}
-            alt="Makale görseli"
-            style={{
-              width: '100%',
-              height: '400px',
-              objectFit: 'cover',
-              borderRadius: '8px'
+      {/* Main Content */}
+      <Container maxWidth="md" sx={{ pt: 4, pb: 6 }}>
+        <article>
+          {/* Title */}
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.75rem' },
+              fontWeight: 'bold',
+              lineHeight: 1.2,
+              mb: 2,
+              color: 'text.primary'
             }}
-          />
-        </Box>
-
-        <Typography variant="body1" paragraph>
-          Bu makale #{id} için örnek içeriktir. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </Typography>
-
-        <Typography variant="body1" paragraph>
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        </Typography>
-
-        <Typography variant="body1" paragraph>
-          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-          totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt.
-        </Typography>
-
-        <Box sx={{ mt: 4, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            Bu makaleyi okudunuz! Route yapısı başarıyla çalışıyor.
+          >
+            {newsData.title}
           </Typography>
-        </Box>
-      </Paper>
-    </Container>
+
+          {/* Date */}
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'text.secondary',
+              mb: 3,
+              fontSize: '1rem'
+            }}
+          >
+            {formatDate(newsData.pubDate)}
+          </Typography>
+
+          {/* Image */}
+          {newsData.image && (
+            <Box sx={{ mb: 4 }}>
+              <CardMedia
+                component="img"
+                image={newsData.image}
+                alt={newsData.title}
+                sx={{
+                  width: '100%',
+                  maxHeight: 500,
+                  objectFit: 'cover',
+                  borderRadius: 1
+                }}
+              />
+            </Box>
+          )}
+
+          {/* News Text */}
+          <Box sx={{ mb: 4 }}>
+            {newsData.content ? (
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: '1.125rem',
+                  lineHeight: 1.7,
+                  color: 'text.primary'
+                }}
+                dangerouslySetInnerHTML={{ __html: newsData.content }}
+              />
+            ) : newsData.description ? (
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: '1.125rem',
+                  lineHeight: 1.7,
+                  color: 'text.primary'
+                }}
+              >
+                {newsData.description}
+              </Typography>
+            ) : (
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                sx={{ fontStyle: 'italic' }}
+              >
+                Bu haber için detaylı içerik bulunmuyor.
+              </Typography>
+            )}
+          </Box>
+        </article>
+      </Container>
+    </Box>
   );
 };
 

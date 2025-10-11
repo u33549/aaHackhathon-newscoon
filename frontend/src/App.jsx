@@ -15,6 +15,7 @@ import BadgeModal from './components/modals/BadgeModal';
 import MainPage from './Pages/mainPage';
 import AllNewsPage from './Pages/AllNewsPage';
 import StackDetailPage from './Pages/StackDetailPage';
+import ArticlePage from './Pages/ArticlePage';
 import ReadingFlowPage from './Pages/ReadingFlowPage';
 import AdminDashboard from './Pages/admin/AdminDashboard';
 import TestPage from './Pages/TestPage';
@@ -107,6 +108,13 @@ function App() {
               <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <TestPage />
               <Footer />
+            </>
+          } />
+
+          {/* Article sayfası - Header ile birlikte */}
+          <Route path="/stack/:stackId/article/:newsIndex" element={
+            <>
+              <ArticlePage />
             </>
           } />
 

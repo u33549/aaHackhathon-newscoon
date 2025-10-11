@@ -173,6 +173,17 @@ const StackDetailPage = () => {
     navigate(`/stack/${id}/read`);
   };
 
+  // Handle news click - yeni eklendi
+  const handleNewsClick = (news, index) => {
+    navigate(`/stack/${id}/article/${index}`, {
+      state: {
+        news: news,
+        stackTitle: stack.title,
+        stackId: id
+      }
+    });
+  };
+
   if (loading) {
     return (
       <Box sx={{
@@ -615,6 +626,7 @@ const StackDetailPage = () => {
                         boxShadow: 4
                       }
                     }}
+                    onClick={() => handleNewsClick(news, index)} // Haber kartına tıklandığında
                   >
                     <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
                       <Box sx={{
