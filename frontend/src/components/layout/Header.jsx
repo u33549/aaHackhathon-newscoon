@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -20,6 +21,7 @@ import { levelThresholds } from '../../constants/index.jsx';
 const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 100 }, onOpenBadges = () => {} }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   // Mevcut levelin minimum CP'sini al
   const currentLevelMinCp = levelThresholds[level - 1] || 0;
@@ -30,6 +32,11 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
   const progressPercentage = cpForNextLevel.max > 0
     ? (cpForNextLevel.current / cpForNextLevel.max) * 100
     : 0;
+
+  // Ana sayfaya git
+  const handleLogoClick = () => {
+    navigate('/');
+  };
 
   return (
     <AppBar
@@ -51,8 +58,15 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: { xs: 1.5, md: 2 }
-          }}>
+            gap: { xs: 1.5, md: 2 },
+            cursor: 'pointer',
+            '&:hover': {
+              opacity: 0.8
+            },
+            transition: 'opacity 0.2s ease'
+          }}
+          onClick={handleLogoClick}
+          >
             {/* Gerçek Newscoon logosu */}
             <img
               src={LogoNewscoon}
