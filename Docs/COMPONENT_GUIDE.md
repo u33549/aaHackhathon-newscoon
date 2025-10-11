@@ -294,10 +294,10 @@ interface NewsSectionProps {
 **Açıklama:** Ana sayfa component'i. Hero section ve haber stack'lerini içerir.
 
 **Özellikler:**
-- Hero section with featured content
-- News stacks grid
-- Search and filter functionality
-- Infinite scroll loading
+- Öne çıkan içeriklerin yer aldığı hero bölümü
+- Haber stackleri ızgarası
+- Arama ve filtreleme işlevi
+- Sonsuz kaydırma 
 
 ### AllNewsPage.jsx
 
