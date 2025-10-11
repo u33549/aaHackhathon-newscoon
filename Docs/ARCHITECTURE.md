@@ -219,12 +219,12 @@ App
 
 ### API Endpoints
 
-Detaylı API endpoint dokümantasyonu için: [Backend API Dokümantasyonu](./backend/Docs/API-Endpoints.md)
+Detaylı API endpoint dokümantasyonu için: [Backend API Dokümantasyonu](../backend/Docs/API-Endpoints.md)
 
 **Ana API Grupları:**
-- **News API**: Haber CRUD işlemleri ([Detaylı Dokümantasyon](./backend/Docs/News-API.md))
-- **Stacks API**: Stack CRUD işlemleri ([Detaylı Dokümantasyon](./backend/Docs/News-Stacks-API.md))  
-- **Images API**: Stack resim yönetimi ([Detaylı Dokümantasyon](./backend/Docs/News-Stack-Images-API.md))
+- **News API**: Haber CRUD işlemleri ([Detaylı Dokümantasyon](../backend/Docs/News-API.md))
+- **Stacks API**: Stack CRUD işlemleri ([Detaylı Dokümantasyon](../backend/Docs/News-Stacks-API.md))  
+- **Images API**: Stack resim yönetimi ([Detaylı Dokümantasyon](../backend/Docs/News-Stack-Images-API.md))
 
 **Hızlı Referans:**
 ```
@@ -492,7 +492,7 @@ User Interface
 
 ### Data Models
 
-Detaylı veri modelleri ve field açıklamaları için: [Backend Veri Modelleri Dokümantasyonu](./backend/Docs/Data-Models.md)
+Detaylı veri modelleri ve field açıklamaları için: [Backend Veri Modelleri Dokümantasyonu](../backend/Docs/Data-Models.md)
 
 **Ana Koleksiyonlar:**
 - **RssNews**: Haber verilerini saklar (AI özeti, kategori, stack durumu)
