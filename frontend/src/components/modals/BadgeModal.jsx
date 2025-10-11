@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Button,
   Box,
   Typography,
@@ -15,11 +16,10 @@ import {
   LinearProgress,
   useTheme,
   useMediaQuery,
-  IconButton,
   Tabs,
   Tab
 } from '@mui/material';
-import { Close, EmojiEvents, Star, Leaderboard as LeaderboardIcon } from '@mui/icons-material';
+import { EmojiEvents, Star, Leaderboard as LeaderboardIcon } from '@mui/icons-material';
 import { allAchievements, allBadges, checkBadgeEarned, checkAchievementCompleted, levelThresholds, getIconComponent, getUpdatedLeaderboard } from '../../constants/index.jsx';
 
 const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, level }) => {
@@ -82,7 +82,7 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
     >
       <DialogTitle sx={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         pb: { xs: 1, md: 2 },
         px: { xs: 2, md: 3 },
@@ -97,14 +97,6 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
             Rozetler & Başarımlar
           </Typography>
         </Box>
-        <IconButton
-          onClick={onClose}
-          sx={{
-            p: { xs: 0.5, md: 1 }
-          }}
-        >
-          <Close fontSize={isMobile ? "medium" : "large"} />
-        </IconButton>
       </DialogTitle>
 
       <DialogContent sx={{
@@ -617,6 +609,24 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
           </Box>
         )}
       </DialogContent>
+
+      <DialogActions sx={{
+        px: { xs: 2, md: 3 },
+        pb: { xs: 2, md: 3 },
+        justifyContent: 'center'
+      }}>
+        <Button
+          onClick={onClose}
+          variant="contained"
+          color="primary"
+          sx={{
+            minWidth: 120,
+            py: 1
+          }}
+        >
+          Kapat
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };
