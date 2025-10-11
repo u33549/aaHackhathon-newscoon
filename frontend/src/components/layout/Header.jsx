@@ -94,53 +94,62 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
             <Box sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 3
+              gap: 2
             }}>
-              {/* Level */}
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
-                  Level
-                </Typography>
-                <Chip
-                  label={level}
-                  color="primary"
-                  size="small"
-                  sx={{
-                    minWidth: 45,
-                    fontWeight: 'bold'
-                  }}
-                />
-              </Box>
-
-              {/* CP Progress */}
-              <Box sx={{ minWidth: 150 }}>
-                <Typography variant="caption" color="text.secondary">
-                  CP: {effectiveCp}/{cpForNextLevel.max}
-                </Typography>
-                <LinearProgress
-                  variant="determinate"
-                  value={progressPercentage}
-                  sx={{
-                    mt: 0.5,
-                    height: 6,
-                    borderRadius: 3,
-                    bgcolor: 'action.hover',
-                    '& .MuiLinearProgress-bar': {
-                      borderRadius: 3
-                    }
-                  }}
-                />
-              </Box>
-
-              {/* Badges Button - Kupa ikonu sarı */}
+              {/* Level Button - Daha büyük tasarım */}
               <Button
-                startIcon={<EmojiEvents sx={{ color: '#FFD700' }} />}
                 onClick={onOpenBadges}
                 variant="outlined"
-                size="small"
                 sx={{
                   borderRadius: 2,
-                  textTransform: 'none'
+                  textTransform: 'none',
+                  border: '1.5px solid',
+                  borderColor: 'divider',
+                  backgroundColor: 'transparent',
+                  color: 'text.primary',
+                  fontWeight: 600,
+                  px: 2.5,
+                  py: 1.5,
+                  minWidth: 110,
+                  height: 48,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                    borderColor: 'primary.main',
+                    color: 'primary.main'
+                  }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Star sx={{ fontSize: 20, color: 'inherit' }} />
+                  <Typography variant="body1" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                    L{level}
+                  </Typography>
+                </Box>
+              </Button>
+
+              {/* Badges Button - Daha büyük altın rengi ama mat */}
+              <Button
+                startIcon={<EmojiEvents sx={{ fontSize: 20, color: '#FFD700' }} />}
+                onClick={onOpenBadges}
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  border: '1.5px solid #FFD700',
+                  backgroundColor: 'rgba(255, 215, 0, 0.05)',
+                  color: '#FFD700',
+                  fontWeight: 600,
+                  px: 2.5,
+                  py: 1.5,
+                  minWidth: 120,
+                  height: 48,
+                  fontSize: '1rem',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    borderColor: '#FFD700'
+                  }
                 }}
               >
                 Rozetler
@@ -148,46 +157,62 @@ const Header = ({ totalCp = 0, level = 1, cpForNextLevel = { current: 0, max: 10
             </Box>
           )}
 
-          {/* Mobile Layout - Logo, Level, CP ve Rozetler */}
+          {/* Mobile Layout - Logo, Level ve Rozetler */}
           {isMobile && (
             <Stack direction="row" alignItems="center" spacing={1.5}>
-              {/* Level Display */}
-              <Chip
-                icon={<Star />}
-                label={`L${level}`}
-                color="primary"
-                size="small"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '0.75rem'
-                }}
-              />
-
-              {/* CP Display */}
-              <Typography
-                variant="body2"
-                color="primary.main"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: '0.8rem'
-                }}
-              >
-                {effectiveCp} CP
-              </Typography>
-
-              {/* Badges Icon Button - Kupa ikonu sarı */}
-              <IconButton
+              {/* Level Button - Mobil için daha büyük tasarım */}
+              <Button
                 onClick={onOpenBadges}
+                variant="outlined"
                 size="small"
                 sx={{
-                  p: 1
+                  minWidth: 70,
+                  height: 38,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  backgroundColor: 'transparent',
+                  color: 'text.primary',
+                  fontWeight: 600,
+                  px: 2,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                    borderColor: 'primary.main',
+                    color: 'primary.main'
+                  }
                 }}
               >
-                <EmojiEvents
-                  fontSize="medium"
-                  sx={{ color: '#FFD700' }}
-                />
-              </IconButton>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Star sx={{ fontSize: 16 }} />
+                  <Typography variant="body2" sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                    L{level}
+                  </Typography>
+                </Box>
+              </Button>
+
+              {/* Badges Button - Mobil için daha büyük altın rengi ama mat */}
+              <Button
+                onClick={onOpenBadges}
+                variant="outlined"
+                size="small"
+                sx={{
+                  minWidth: 46,
+                  width: 46,
+                  height: 38,
+                  borderRadius: 2,
+                  border: '1px solid #FFD700',
+                  backgroundColor: 'rgba(255, 215, 0, 0.05)',
+                  color: '#FFD700',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                    borderColor: '#FFD700'
+                  }
+                }}
+              >
+                <EmojiEvents sx={{ fontSize: 18 }} />
+              </Button>
             </Stack>
           )}
         </Toolbar>
