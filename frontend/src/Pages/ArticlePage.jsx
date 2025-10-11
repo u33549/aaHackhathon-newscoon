@@ -17,6 +17,9 @@ import Header from '../components/layout/Header';
 // Redux hooks
 import { useUserXP, useUserLevel, useXPForNextLevel } from '../hooks/redux';
 
+// Utils
+import { formatNewsForJSX, richTextStyles } from '../utils/textFormatter';
+
 const ArticlePage = () => {
   const { stackId } = useParams();
   const navigate = useNavigate();
@@ -138,10 +141,15 @@ const ArticlePage = () => {
           )}
 
           {/* News Text */}
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ 
+            mb: 4,
+            '& .drop-cap': richTextStyles['.drop-cap'],
+            '& .quote-box': richTextStyles['.quote-box'],
+            '& .paragraph-divider': richTextStyles['.paragraph-divider'],
+            '& .news-paragraph': richTextStyles['.news-paragraph']
+          }}>
             {newsData.content ? (
-              <Typography
-                variant="body1"
+              <Box
                 sx={{
                   fontSize: '1.125rem',
                   lineHeight: 1.7,
@@ -150,27 +158,27 @@ const ArticlePage = () => {
                 dangerouslySetInnerHTML={{ __html: newsData.content }}
               />
             ) : newsData.newstext ? (
-              <Typography
-                variant="body1"
+              <Box
                 sx={{
                   fontSize: '1.125rem',
                   lineHeight: 1.7,
                   color: 'text.primary'
                 }}
-              >
-                {newsData.newstext}
-              </Typography>
+                dangerouslySetInnerHTML={{ 
+                  __html: formatNewsForJSX(newsData.newstext) 
+                }}
+              />
             ) : newsData.description ? (
-              <Typography
-                variant="body1"
+              <Box
                 sx={{
                   fontSize: '1.125rem',
                   lineHeight: 1.7,
                   color: 'text.primary'
                 }}
-              >
-                {newsData.description}
-              </Typography>
+                dangerouslySetInnerHTML={{ 
+                  __html: formatNewsForJSX(newsData.description) 
+                }}
+              />
             ) : (
               <Typography
                 variant="body1"
