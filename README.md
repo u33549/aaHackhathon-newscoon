@@ -118,6 +118,9 @@ Docker ile kurulum, tüm sistemi (Frontend + Backend + MongoDB) tek komutla çal
 # dockerSetup klasörüne geçin
 cd dockerSetup
 
+# ilgili kaynak kodu kurulum ortamına aktarın
+cp -r ../backend ../frontend .
+
 # .env dosyasını konfigüre edin (örnek konfigürasyon mevcuttur)
 cp .env.example .env  # Eğer yoksa
 nano .env  # veya favori editörünüzle düzenleyin
