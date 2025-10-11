@@ -24,9 +24,7 @@ import { useAppDispatch } from '../hooks/redux';
 import {
   useSelectedStack,
   useCurrentlyReading,
-  useUserXP,
-  useUserLevel,
-  useUserLevelProgress
+  useReadingProgress
 } from '../hooks/redux';
 import { fetchStackById } from '../store/slices/stackSlice';
 import {
@@ -39,8 +37,7 @@ import {
 } from '../store/slices/userSlice';
 import { addCelebrationToQueue } from '../store/slices/uiSlice';
 
-// Components - Header'ı ekle
-import Header from '../components/layout/Header';
+// Components - LoadingScreen'i koru, Header'ı kaldır
 import LoadingScreen from '../components/common/LoadingScreen';
 
 // Constants
@@ -144,9 +141,7 @@ const ReadingFlowPage = () => {
   
   const selectedStack = useSelectedStack();
   const currentlyReading = useCurrentlyReading();
-  const userXP = useUserXP();
-  const userLevel = useUserLevel();
-  const levelProgress = useUserLevelProgress();
+  const readingProgress = useReadingProgress();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -250,21 +245,6 @@ const ReadingFlowPage = () => {
     }
   }, [currentStep, currentStepData?.type]);
 
-  // Level up notification - Celebration queue'ya ekle (ReadingFlowPage'de)
-  useEffect(() => {
-    if (levelProgress.hasLeveledUp) {
-      // Celebration queue'ya ekle
-      dispatch(addCelebrationToQueue({
-        type: 'levelUp',
-        newLevel: levelProgress.levelUpTo,
-        oldLevel: levelProgress.levelUpFrom
-      }));
-
-      // Flag'i temizle
-      dispatch(clearLevelUpFlag());
-    }
-  }, [levelProgress.hasLeveledUp, levelProgress.levelUpTo, levelProgress.levelUpFrom, dispatch]);
-
   // Haber okuma işlemi - Celebration queue ile
   const handleNewsRead = useCallback((stepIndex) => {
     if (!selectedStack || readNewsIndices.has(stepIndex)) return;
@@ -309,14 +289,7 @@ const ReadingFlowPage = () => {
 
     // Sadece console log - bildirim yok
     console.log(`Stack tamamlandı: "${selectedStack.title}" - +${stackTotalXP} XP kazanıldı`);
-    console.log(`Yeni XP: ${userXP + stackTotalXP}, Yeni Level: ${userLevel}`);
-  }, [selectedStack, dispatch, userXP, userLevel]);
-
-  // XP için gereken progress verisi
-  const cpForNextLevel = {
-    current: levelProgress?.currentLevelXP || 0,
-    max: levelProgress?.nextLevelXP - (levelProgress?.nextLevelXP - (levelProgress?.currentLevelXP || 0)) || 100
-  };
+  }, [selectedStack, dispatch]);
 
   // Scroll pozisyon kontrolü
   const checkScrollPosition = useCallback(() => {
@@ -689,30 +662,12 @@ const ReadingFlowPage = () => {
         touchAction: 'pan-y'
       }}
     >
-      {/* Header - XP ve Level göstermek için ekle */}
-      <Box sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 999,
-        backgroundColor: 'rgba(18, 18, 18, 0.95)',
-        backdropFilter: 'blur(10px)'
-      }}>
-        <Header
-          totalCp={userXP}
-          level={userLevel}
-          cpForNextLevel={cpForNextLevel}
-          onOpenBadges={() => {}}
-        />
-      </Box>
-
-      {/* Close Button - Header'ın altında */}
+      {/* Close Button - Sayfanın üst köşesine yerleştir */}
       <IconButton
         onClick={handleClose}
         sx={{
           position: 'fixed',
-          top: { xs: 76, md: 84 },
+          top: 20,
           right: 20,
           zIndex: 1000,
           backgroundColor: 'rgba(0,0,0,0.5)',
@@ -726,11 +681,11 @@ const ReadingFlowPage = () => {
         <Close />
       </IconButton>
 
-      {/* Progress Indicator - Header'ın altında */}
+      {/* Progress Indicator - Sayfanın üst köşesine yerleştir */}
       {currentStepData.type !== 'intro' && currentStepData.type !== 'completion' && (
         <Box sx={{
           position: 'fixed',
-          top: { xs: 76, md: 84 },
+          top: 20,
           left: 20,
           zIndex: 1000,
           backgroundColor: 'rgba(0,0,0,0.5)',
@@ -745,15 +700,14 @@ const ReadingFlowPage = () => {
         </Box>
       )}
 
-      {/* Main Content - Header için padding ekle */}
+      {/* Main Content - Header padding'i kaldır */}
       <Fade in={!isTransitioning} timeout={500}>
         <Box sx={{
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000',
-          paddingTop: { xs: '72px', md: '80px' } // Header için boşluk
+          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000'
         }}>
           {/* Background Image - Sadece intro ve completion için */}
           {currentStepData.image && currentStepData.type !== 'news' && (
