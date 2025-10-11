@@ -67,6 +67,7 @@ const StackDetailPage = () => {
 
   const [playTrailer, setPlayTrailer] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
 
   // Component mount olduğunda stack verilerini getir
   useEffect(() => {
@@ -536,36 +537,74 @@ const StackDetailPage = () => {
                 {stack.tags && stack.tags.length > 0 && (
                   <Box sx={{
                     display: 'flex',
-                    flexWrap: 'wrap',
+                    flexWrap: showAllTags ? 'nowrap' : 'wrap',
                     gap: { xs: 0.25, sm: 0.5, md: 0.75 },
                     mt: { xs: 0.75, sm: 0.75, md: 0 },
                     alignItems: 'center',
                     width: { xs: '100%', sm: 'auto' },
-                    justifyContent: { xs: 'center', sm: 'flex-start' }
+                    justifyContent: { xs: 'flex-start', sm: 'flex-start' },
+                    ...(showAllTags && {
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      // Scrollbar'ı gizle
+                      '&::-webkit-scrollbar': {
+                        display: 'none',
+                      },
+                      // Firefox için scrollbar gizle
+                      scrollbarWidth: 'none',
+                      // IE ve Edge için scrollbar gizle
+                      msOverflowStyle: 'none',
+                    })
                   }}>
-                    {stack.tags.slice(0, isMobile ? 2 : 3).map((tag, index) => (
-                      <Chip
-                        key={index}
-                        label={tag}
-                        size="small"
-                        sx={{
-                          backgroundColor: 'rgba(255,255,255,0.15)',
-                          color: 'white',
-                          border: '1px solid rgba(255,255,255,0.4)',
-                          fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
-                          fontWeight: 500,
-                          height: { xs: 20, sm: 22, md: 26 },
-                          backdropFilter: 'blur(10px)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(255,255,255,0.25)',
-                            borderColor: 'rgba(255,255,255,0.6)',
-                            transform: 'translateY(-1px)'
-                          },
-                          transition: 'all 0.2s ease'
-                        }}
-                      />
-                    ))}
-                    {stack.tags.length > (isMobile ? 2 : 3) && (
+                    {showAllTags
+                      ? stack.tags.map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          sx={{
+                            backgroundColor: 'rgba(255,255,255,0.15)',
+                            color: 'white',
+                            border: '1px solid rgba(255,255,255,0.4)',
+                            fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
+                            fontWeight: 500,
+                            height: { xs: 20, sm: 22, md: 26 },
+                            backdropFilter: 'blur(10px)',
+                            flexShrink: 0,
+                            whiteSpace: 'nowrap',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255,255,255,0.25)',
+                              borderColor: 'rgba(255,255,255,0.6)',
+                              transform: 'translateY(-1px)'
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                        />
+                      ))
+                      : stack.tags.slice(0, isMobile ? 2 : 3).map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          sx={{
+                            backgroundColor: 'rgba(255,255,255,0.15)',
+                            color: 'white',
+                            border: '1px solid rgba(255,255,255,0.4)',
+                            fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
+                            fontWeight: 500,
+                            height: { xs: 20, sm: 22, md: 26 },
+                            backdropFilter: 'blur(10px)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255,255,255,0.25)',
+                              borderColor: 'rgba(255,255,255,0.6)',
+                              transform: 'translateY(-1px)'
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                        />
+                      ))
+                    }
+                    {!showAllTags && stack.tags.length > (isMobile ? 2 : 3) && (
                       <Chip
                         label={`+${stack.tags.length - (isMobile ? 2 : 3)} daha`}
                         size="small"
@@ -577,12 +616,14 @@ const StackDetailPage = () => {
                           fontWeight: 400,
                           height: { xs: 20, sm: 22, md: 26 },
                           backdropFilter: 'blur(10px)',
+                          cursor: 'pointer',
                           '&:hover': {
                             backgroundColor: 'rgba(255,255,255,0.2)',
                             color: 'white'
                           },
                           transition: 'all 0.2s ease'
                         }}
+                        onClick={() => setShowAllTags(true)}
                       />
                     )}
                   </Box>

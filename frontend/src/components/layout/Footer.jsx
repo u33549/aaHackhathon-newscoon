@@ -55,10 +55,10 @@ const Footer = () => {
               <Typography
                 variant="body2"
                 component={Link}
-                to="/admin"
+                to="/all-news"
                 sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
               >
-                Admin Panel
+                Tüm Haberler
               </Typography>
             </Box>
           </Grid>
@@ -69,10 +69,54 @@ const Footer = () => {
               Kategoriler
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Typography variant="body2" color="text.secondary">Teknoloji</Typography>
-              <Typography variant="body2" color="text.secondary">Spor</Typography>
-              <Typography variant="body2" color="text.secondary">Sağlık</Typography>
-              <Typography variant="body2" color="text.secondary">Bilim</Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/all-news"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}
+              >
+                Gündem
+              </Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/all-news"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}
+              >
+                Dünya
+              </Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/all-news"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}
+              >
+                Ekonomi
+              </Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/all-news"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}
+              >
+                Spor
+              </Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/all-news"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}
+              >
+                Analiz
+              </Typography>
+              <Typography
+                variant="body2"
+                component={Link}
+                to="/all-news"
+                sx={{ textDecoration: 'none', color: 'text.secondary', '&:hover': { color: 'primary.main' }, cursor: 'pointer' }}
+              >
+                Kültür
+              </Typography>
             </Box>
           </Grid>
 
