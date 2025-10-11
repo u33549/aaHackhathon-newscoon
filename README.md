@@ -1,4 +1,4 @@
-# NEWSCOON - Gamified Haber Okuma Platformu
+# NEWSCOON 
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/u33549/aaHackhathon-newscoon)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
