@@ -63,28 +63,16 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
             position: 'absolute',
             width: 120,
             height: 120,
-            bottom: 20,
-            animation: 'raccoonRun 3s ease-in-out infinite',
+            bottom: -5,
+            animation: 'raccoonRun 3s linear infinite',
             '@keyframes raccoonRun': {
               '0%': {
                 left: '-60px',
-                transform: 'scaleX(1) translateY(0px) rotate(-5deg)'
-              },
-              '25%': {
-                left: '25%',
-                transform: 'scaleX(1) translateY(-15px) rotate(0deg)'
-              },
-              '50%': {
-                left: '50%',
-                transform: 'scaleX(1) translateY(-5px) rotate(5deg)'
-              },
-              '75%': {
-                left: '75%',
-                transform: 'scaleX(1) translateY(-20px) rotate(0deg)'
+                transform: 'scaleX(1) translateY(0px) rotate(0deg)'
               },
               '100%': {
                 left: 'calc(100% + 60px)',
-                transform: 'scaleX(1) translateY(0px) rotate(-5deg)'
+                transform: 'scaleX(1) translateY(0px) rotate(0deg)'
               }
             }
           }}
@@ -128,7 +116,8 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
               backgroundSize: 'contain',
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center',
-              animation: 'raccoonSprite 0.2s steps(1) infinite',
+              // Hareket animasyonuyla senkronize: 3s koşu -> 0.375s sprite değişimi (8 adım/koşu)
+              animation: 'raccoonSprite 0.650s steps(1) infinite',
               filter: theme.palette.mode === 'dark'
                 ? 'contrast(1.2) brightness(1.1) drop-shadow(0 0 12px rgba(255, 215, 0, 0.6)) drop-shadow(0 0 24px rgba(255, 255, 255, 0.3))'
                 : 'contrast(1.3) brightness(0.9) drop-shadow(0 0 8px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.8))',
