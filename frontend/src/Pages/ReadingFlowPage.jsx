@@ -693,10 +693,10 @@ const ReadingFlowPage = () => {
             alignItems: 'center',
             px: 2
           }}>
-            {/* Yol Çizgisi */}
+            {/* Yol Çizgisi - Rakun ayak seviyesinde */}
             <Box sx={{
               position: 'absolute',
-              top: '50%',
+              top: 'calc(50% + 20px)', // Rakun ayağının altında
               left: 60,
               right: 60,
               height: 4,
@@ -716,7 +716,7 @@ const ReadingFlowPage = () => {
               }
             }} />
 
-            {/* Bayraklar */}
+            {/* Bayraklar - Yolun üstünde */}
             {steps.slice(1, -1).map((step, index) => {
               const isCompleted = currentStep > index + 1;
               const isCurrent = currentStep === index + 1;
@@ -727,51 +727,53 @@ const ReadingFlowPage = () => {
                   key={step.id}
                   sx={{
                     position: 'absolute',
-                    left: `calc(60px + ${progressPercent}% - 20px)`,
-                    top: '50%',
+                    left: `calc(60px + ${progressPercent}% - 14px)`, // Bayrak genişliği için offset
+                    top: 'calc(50% - 10px)', // Yolun üstünde
                     transform: 'translateY(-50%)',
-                    zIndex: 2
+                    zIndex: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
                   }}
                 >
-                  {/* Bayrak Direği */}
+                  {/* Bayrak Görseli */}
                   <Box sx={{
-                    width: 3,
-                    height: 30,
-                    backgroundColor: isCompleted ? '#FFD700' : isCurrent ? '#FF9800' : 'rgba(255, 255, 255, 0.3)',
-                    borderRadius: 1.5,
-                    mx: 'auto',
-                    mb: 1,
-                    transition: 'all 0.4s ease'
-                  }} />
-
-                  {/* Bayrak */}
-                  <Box sx={{
-                    width: 24,
-                    height: 16,
-                    backgroundColor: isCompleted ? '#4CAF50' : isCurrent ? '#FFD700' : 'rgba(255, 255, 255, 0.2)',
-                    borderRadius: '0 4px 4px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '8px',
-                    color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.6)',
-                    fontWeight: 'bold',
+                    width: 28,
+                    height: 32,
+                    backgroundImage: `url(${bayrak})`,
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    filter: isCompleted
+                      ? 'hue-rotate(90deg) saturate(1.2) brightness(1.1)' // Yeşil ton
+                      : isCurrent
+                        ? 'hue-rotate(45deg) saturate(1.3) brightness(1.2)' // Altın ton
+                        : 'grayscale(0.7) opacity(0.5)', // Gri ton
                     transform: isCurrent ? 'scale(1.2)' : 'scale(1)',
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     animation: isCurrent ? 'flagWave 2s ease-in-out infinite' : 'none',
-                    clipPath: 'polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)',
-                    '&::before': isCompleted ? {
-                      content: '"✓"',
-                      fontSize: '10px'
-                    } : {
-                      content: `"${index + 1}"`
-                    }
-                  }} />
+                    position: 'relative'
+                  }}>
+                    {/* Bayrak üzerindeki sayı */}
+                    <Box sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      fontSize: '10px',
+                      color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.8)',
+                      fontWeight: 'bold',
+                      textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                      zIndex: 1
+                    }}>
+                      {isCompleted ? '✓' : index + 1}
+                    </Box>
+                  </Box>
                 </Box>
               );
             })}
 
-            {/* Rakun Karakteri */}
+            {/* Rakun Karakteri - Merkezi pozisyon */}
             <Box sx={{
               position: 'absolute',
               left: `calc(60px + ${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}% - 25px)`,
