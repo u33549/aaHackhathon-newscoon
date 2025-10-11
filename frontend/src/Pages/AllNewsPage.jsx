@@ -247,14 +247,21 @@ const AllNewsPage = () => {
 
                   {/* Tags */}
                   {stack.tags && stack.tags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
+                    <Box sx={{
+                      mb: 2,
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                    }}>
                       {stack.tags.slice(0, 3).map((tag, index) => (
                         <Chip
                           key={index}
                           label={tag}
                           size="small"
                           variant="outlined"
-                          sx={{ mr: 0.5, mb: 0.5, fontSize: '0.7rem' }}
+                          sx={{
+                            fontSize: '0.7rem'
+                          }}
                         />
                       ))}
                     </Box>

@@ -537,12 +537,33 @@ const StackDetailPage = () => {
                 {stack.tags && stack.tags.length > 0 && (
                   <Box sx={{
                     display: 'flex',
-                    flexWrap: 'wrap',
+                    flexWrap: showAllTags ? 'nowrap' : 'wrap',
                     gap: { xs: 0.25, sm: 0.5, md: 0.75 },
                     mt: { xs: 0.75, sm: 0.75, md: 0 },
                     alignItems: 'center',
                     width: { xs: '100%', sm: 'auto' },
-                    justifyContent: { xs: 'center', sm: 'flex-start' }
+                    justifyContent: { xs: 'flex-start', sm: 'flex-start' },
+                    ...(showAllTags && {
+                      overflowX: 'auto',
+                      overflowY: 'hidden',
+                      '&::-webkit-scrollbar': {
+                        height: '4px',
+                      },
+                      '&::-webkit-scrollbar-track': {
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        borderRadius: '2px',
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(255,255,255,0.3)',
+                        borderRadius: '2px',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.5)',
+                        },
+                      },
+                      // Firefox scrollbar styling
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: 'rgba(255,255,255,0.3) rgba(255,255,255,0.1)',
+                    })
                   }}>
                     {showAllTags
                       ? stack.tags.map((tag, index) => (
@@ -558,6 +579,8 @@ const StackDetailPage = () => {
                             fontWeight: 500,
                             height: { xs: 20, sm: 22, md: 26 },
                             backdropFilter: 'blur(10px)',
+                            flexShrink: 0,
+                            whiteSpace: 'nowrap',
                             '&:hover': {
                               backgroundColor: 'rgba(255,255,255,0.25)',
                               borderColor: 'rgba(255,255,255,0.6)',
@@ -602,6 +625,7 @@ const StackDetailPage = () => {
                           fontWeight: 400,
                           height: { xs: 20, sm: 22, md: 26 },
                           backdropFilter: 'blur(10px)',
+                          cursor: 'pointer',
                           '&:hover': {
                             backgroundColor: 'rgba(255,255,255,0.2)',
                             color: 'white'
