@@ -35,6 +35,7 @@ NEWSCOON, haber okuma deneyimini oyunlaştırarak kullanıcıların bilgilenme s
 
 ### 📁 **Dokümantasyon**
 - [Platform Mimarisi](./Docs/ARCHITECTURE.md)
+- [N8N Workflow'ları](./Docs/N8N_WORKFLOWS.md)
 - [Backend API](./backend/README.md)
 - [MIT Lisansı](./LICENSE)
 
