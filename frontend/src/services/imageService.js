@@ -7,7 +7,7 @@ import api from './api';
 /**
  * Tüm resimleri getir - filtreleme destekli
  * @param {Object} params - Query parametreleri
- * @param {string} params.newsStackId - Belirli bir yığının resmini filtrelemek için
+ * @param {string} params.newsStackId - Belirli bir seriın resmini filtrelemek için
  * @param {number} params.limit - Maksimum sonuç sayısı
  */
 export const getAllStackImages = async (params = {}) => {
@@ -24,7 +24,7 @@ export const getStackImageById = async (imageId) => {
 
 /**
  * NewsStack ID'ye göre resim getir
- * @param {string} newsStackId - Haber yığınının MongoDB ObjectId değeri
+ * @param {string} newsStackId - Haber seriının MongoDB ObjectId değeri
  */
 export const getStackImageByStackId = async (newsStackId) => {
   return await api.get(`/api/news-stack-images/news/${newsStackId}`);
@@ -33,7 +33,7 @@ export const getStackImageByStackId = async (newsStackId) => {
 /**
  * Base64 resim yükle veya güncelle
  * @param {Object} imageData - Resim verisi
- * @param {string} imageData.newsStackId - İlgili haber yığınının ObjectId değeri (zorunlu)
+ * @param {string} imageData.newsStackId - İlgili haber seriının ObjectId değeri (zorunlu)
  * @param {string} imageData.photo - Base64 görsel verisi (data URI ile) (zorunlu)
  * @param {string} imageData.originalName - Dosya adı (opsiyonel)
  */
@@ -54,7 +54,7 @@ export const updateStackImageById = async (imageId, updateData) => {
 
 /**
  * NewsStack ID'ye göre resim güncelle
- * @param {string} newsStackId - Haber yığınının MongoDB ObjectId değeri
+ * @param {string} newsStackId - Haber seriının MongoDB ObjectId değeri
  * @param {Object} updateData - Güncellenecek veriler
  * @param {string} updateData.photo - Yeni Base64 görsel (data URI)
  * @param {string} updateData.originalName - Yeni dosya adı
@@ -73,7 +73,7 @@ export const deleteStackImageById = async (imageId) => {
 
 /**
  * NewsStack ID'ye göre resim sil
- * @param {string} newsStackId - Haber yığınının MongoDB ObjectId değeri
+ * @param {string} newsStackId - Haber seriının MongoDB ObjectId değeri
  */
 export const deleteStackImageByStackId = async (newsStackId) => {
   return await api.delete(`/api/news-stack-images/news/${newsStackId}`);
@@ -96,8 +96,8 @@ export const fileToBase64 = (file) => {
 };
 
 /**
- * Resim dosyasını yükle ve haber yığınına ata
- * @param {string} newsStackId - Haber yığınının ID'si
+ * Resim dosyasını yükle ve haber seriına ata
+ * @param {string} newsStackId - Haber seriının ID'si
  * @param {File} imageFile - Yüklenecek resim dosyası
  * @param {string} originalName - Orijinal dosya adı (opsiyonel)
  */
@@ -111,8 +111,8 @@ export const uploadImageFile = async (newsStackId, imageFile, originalName = nul
 };
 
 /**
- * Haber yığınının kapak resmini güncelle
- * @param {string} newsStackId - Haber yığınının ID'si
+ * Haber seriının kapak resmini güncelle
+ * @param {string} newsStackId - Haber seriının ID'si
  * @param {File} imageFile - Yeni resim dosyası
  * @param {string} originalName - Orijinal dosya adı (opsiyonel)
  */

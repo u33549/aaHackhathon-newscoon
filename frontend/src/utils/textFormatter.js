@@ -88,7 +88,9 @@ const applyAdvancedEmphasis = (content) => {
   
   // Tüm kategorilerdeki kelimeleri vurgula
   Object.values(emphasisCategories).flat().forEach(word => {
-    const regex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    // Türkçe karakterler için gelişmiş kelime sınırı regex'i
+    const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(?<![a-zA-ZçğıöşüÇĞIİÖŞÜ])${escapedWord}(?![a-zA-ZçğıöşüÇĞIİÖŞÜ])`, 'gi');
     emphasizedContent = emphasizedContent.replace(regex, `<b>${word}</b>`);
   });
   
@@ -111,7 +113,9 @@ const applyEmphasis = (content) => {
   let emphasizedContent = content;
   
   emphasisWords.forEach(word => {
-    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+    // Türkçe karakterler için gelişmiş kelime sınırı regex'i
+    const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(?<![a-zA-ZçğıöşüÇĞIİÖŞÜ])${escapedWord}(?![a-zA-ZçğıöşüÇĞIİÖŞÜ])`, 'gi');
     emphasizedContent = emphasizedContent.replace(regex, `<b>${word}</b>`);
   });
   

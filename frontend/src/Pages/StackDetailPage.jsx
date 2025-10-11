@@ -187,7 +187,7 @@ const StackDetailPage = () => {
 
   if (loading) {
     return (
-      <LoadingScreen message="Haber yığını yükleniyor..." />
+      <LoadingScreen message="Haber seriı yükleniyor..." />
     );
   }
 
@@ -198,7 +198,7 @@ const StackDetailPage = () => {
           Haber Yığını Bulunamadı
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {error || 'İstediğiniz haber yığını bulunamadı veya erişilemez durumda.'}
+          {error || 'İstediğiniz haber seriı bulunamadı veya erişilemez durumda.'}
         </Typography>
         <Button
           variant="contained"
@@ -436,7 +436,7 @@ const StackDetailPage = () => {
                   overflow: { xs: 'hidden', md: 'visible' }
                 }}
               >
-                {stack.description || 'Bu haber yığını için açıklama bulunmuyor.'}
+                {stack.description || 'Bu haber seriı için açıklama bulunmuyor.'}
               </Typography>
 
               {/* Action Buttons */}
@@ -747,7 +747,7 @@ const StackDetailPage = () => {
                   fontSize: { xs: '0.875rem', md: '1rem' }
                 }}
               >
-                Bu yığında henüz haber bulunmuyor.
+                Bu serida henüz haber bulunmuyor.
               </Typography>
             )}
           </Grid>
@@ -876,7 +876,7 @@ const StackDetailPage = () => {
                 </Grid>
               ) : (
                 <Typography variant="body1" color="text.secondary">
-                  Bu yığında henüz haber bulunmuyor.
+                  Bu serida henüz haber bulunmuyor.
                 </Typography>
               )}
             </Box>

@@ -74,12 +74,12 @@ export const exampleCreateNews = async () => {
 // ====================================
 
 /**
- * CP'ye göre sıralanmış yığınları getir - örnek kullanım
+ * CP'ye göre sıralanmış seriları getir - örnek kullanım
  */
 export const exampleGetStacksByCP = async () => {
   try {
     const response = await stacksAPI.getByCP(10);
-    console.log('En yüksek CP\'li yığınlar:', response.data);
+    console.log('En yüksek CP\'li serilar:', response.data);
     return response.data;
   } catch (error) {
     console.error('CP sıralaması hatası:', error.message);
@@ -88,21 +88,21 @@ export const exampleGetStacksByCP = async () => {
 };
 
 /**
- * Öne çıkan yığınları getir - örnek kullanım
+ * Öne çıkan seriları getir - örnek kullanım
  */
 export const exampleGetFeaturedStacks = async () => {
   try {
     const response = await stacksAPI.getFeatured(5);
-    console.log('Öne çıkan yığınlar:', response.data);
+    console.log('Öne çıkan serilar:', response.data);
     return response;
   } catch (error) {
-    console.error('Öne çıkan yığınlar hatası:', error.message);
+    console.error('Öne çıkan serilar hatası:', error.message);
     throw error;
   }
 };
 
 /**
- * Yeni haber yığını oluştur - örnek kullanım
+ * Yeni haber seriı oluştur - örnek kullanım
  * ÖNEMLI: En az 3 haber GUID'i gereklidir
  */
 export const exampleCreateStack = async () => {
@@ -117,7 +117,7 @@ export const exampleCreateStack = async () => {
 
     const stackData = {
       title: 'Örnek Haber Yığını',
-      description: 'Bu bir örnek haber yığını açıklamasıdır.',
+      description: 'Bu bir örnek haber seriı açıklamasıdır.',
       news: newsGuids, // En az 3 haber GUID'i
       tags: ['örnek', 'test'],
       status: 'pending',
@@ -125,7 +125,7 @@ export const exampleCreateStack = async () => {
     };
 
     const response = await stacksAPI.create(stackData);
-    console.log('Yeni yığın oluşturuldu:', response.data);
+    console.log('Yeni seri oluşturuldu:', response.data);
     return response;
   } catch (error) {
     console.error('Yığın oluşturma hatası:', error.message);
@@ -139,7 +139,7 @@ export const exampleCreateStack = async () => {
 export const exampleAddNewsToStack = async (stackId, newsGuid) => {
   try {
     const response = await stacksAPI.addNews(stackId, newsGuid);
-    console.log('Haber yığına eklendi:', response.data);
+    console.log('Haber seria eklendi:', response.data);
     return response;
   } catch (error) {
     console.error('Haber ekleme hatası:', error.message);
@@ -153,7 +153,7 @@ export const exampleAddNewsToStack = async (stackId, newsGuid) => {
  */
 export const exampleRemoveNewsFromStack = async (stackId, newsGuid) => {
   try {
-    // Önce yığının durumunu kontrol et
+    // Önce seriın durumunu kontrol et
     const stackResponse = await stacksAPI.getById(stackId);
     const currentNewsCount = stackResponse.data.news.length;
 
@@ -162,7 +162,7 @@ export const exampleRemoveNewsFromStack = async (stackId, newsGuid) => {
     }
 
     const response = await stacksAPI.removeNews(stackId, newsGuid);
-    console.log('Haber yığından çıkarıldı:', response.data);
+    console.log('Haber seridan çıkarıldı:', response.data);
     return response;
   } catch (error) {
     console.error('Haber çıkarma hatası:', error.message);
@@ -222,7 +222,7 @@ export const exampleUpdateStackCover = async (stackId, fileInput) => {
 // =======================================
 
 /**
- * Tam haber yığını workflow'u - örnek senaryo
+ * Tam haber seriı workflow'u - örnek senaryo
  * 1. En az 3 haber GUID'i kontrol et
  * 2. Yığın oluştur
  * 3. Kapak resmi yükle

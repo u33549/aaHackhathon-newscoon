@@ -173,7 +173,7 @@ const Hero = ({ onStackClick }) => {
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       }}>
         <Typography variant="h4" color="white" fontWeight="bold">
-          Henüz haber yığını bulunmuyor
+          Henüz haber seriı bulunmuyor
         </Typography>
       </Box>
     );
