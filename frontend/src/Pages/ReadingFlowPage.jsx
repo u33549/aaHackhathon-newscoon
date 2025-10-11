@@ -691,171 +691,200 @@ const ReadingFlowPage = () => {
             height: '100%',
             display: 'flex',
             alignItems: 'center',
-            px: 2
+            px: 2,
+            overflow: 'hidden'
           }}>
-            {/* Yol Çizgisi - Rakun ayak seviyesinde */}
+            {/* Kaydırılabilir Progress Container */}
             <Box sx={{
               position: 'absolute',
-              top: 'calc(50% + 20px)', // Rakun ayağının altında
-              left: 60,
-              right: 60,
-              height: 4,
-              backgroundColor: 'rgba(255, 215, 0, 0.3)',
-              borderRadius: 2,
+              top: '50%',
               transform: 'translateY(-50%)',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                height: '100%',
-                backgroundColor: '#FFD700',
-                borderRadius: 2,
-                width: `${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}%`,
-                transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-              }
-            }} />
-
-            {/* Bayraklar - Yolun üstünde */}
-            {steps.slice(1, -1).map((step, index) => {
-              const isCompleted = currentStep > index + 1;
-              const isCurrent = currentStep === index + 1;
-              const progressPercent = (index + 1) / Math.max(1, steps.length - 1) * 100;
-
-              return (
-                <Box
-                  key={step.id}
-                  sx={{
+              left: 20,
+              right: 120,
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              overflow: 'hidden'
+            }}>
+              {/* Progress Road Container - Kaydırılabilir */}
+              <Box sx={{
+                position: 'relative',
+                height: 60,
+                width: `${Math.max(300, steps.length * 80)}px`, // Minimum genişlik + bayraklar için alan
+                display: 'flex',
+                alignItems: 'center',
+                // Progress bar kaydırma animasyonu
+                transform: steps.length > 5 && currentStep > 2
+                  ? `translateX(-${Math.min((currentStep - 2) * 70, (steps.length - 5) * 70)}px)`
+                  : 'translateX(0px)',
+                transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}>
+                {/* Yol Çizgisi */}
+                <Box sx={{
+                  position: 'absolute',
+                  top: 'calc(50% + 20px)',
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                  borderRadius: 2,
+                  transform: 'translateY(-50%)',
+                  '&::before': {
+                    content: '""',
                     position: 'absolute',
-                    left: `calc(60px + ${progressPercent}% - 14px)`, // Bayrak genişliği için offset
-                    top: 'calc(50% + 2px)', // Progress bar ile aynı seviyede
-                    transform: 'translateY(-50%)',
-                    zIndex: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center'
-                  }}
-                >
-                  {/* Bayrak Görseli */}
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    backgroundColor: '#FFD700',
+                    borderRadius: 2,
+                    width: `${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}%`,
+                    transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }
+                }} />
+
+                {/* Bayraklar - Daha geniş yerleşim */}
+                {steps.slice(1, -1).map((step, index) => {
+                  const isCompleted = currentStep > index + 1;
+                  const isCurrent = currentStep === index + 1;
+                  const flagPosition = (index + 1) * 70; // Sabit mesafe ile yerleştir
+
+                  return (
+                    <Box
+                      key={step.id}
+                      sx={{
+                        position: 'absolute',
+                        left: `${flagPosition}px`,
+                        top: 'calc(50% + 2px)',
+                        transform: 'translateY(-50%)',
+                        zIndex: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {/* Bayrak Görseli */}
+                      <Box sx={{
+                        width: 28,
+                        height: 32,
+                        backgroundImage: `url(${bayrak})`,
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        filter: isCompleted
+                          ? 'hue-rotate(90deg) saturate(1.2) brightness(1.1)' // Yeşil ton
+                          : isCurrent
+                            ? 'hue-rotate(45deg) saturate(1.3) brightness(1.2)' // Altın ton
+                            : 'grayscale(0.7) opacity(0.5)', // Gri ton
+                        transform: isCurrent ? 'scale(1.2)' : 'scale(1)',
+                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                        animation: isCurrent ? 'flagWave 2s ease-in-out infinite' : 'none',
+                        position: 'relative'
+                      }}>
+                        {/* Bayrak üzerindeki sayı */}
+                        <Box sx={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          fontSize: '10px',
+                          color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.8)',
+                          fontWeight: 'bold',
+                          textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                          zIndex: 1
+                        }}>
+                          {isCompleted ? '✓' : index + 1}
+                        </Box>
+                      </Box>
+                    </Box>
+                  );
+                })}
+
+                {/* Rakun Karakteri */}
+                <Box sx={{
+                  position: 'absolute',
+                  left: `${currentStep * 70 - 25}px`, // Bayraklarla aynı mesafede
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                  width: 50,
+                  height: 50
+                }}>
+                  {/* Rakun Sprite */}
                   <Box sx={{
-                    width: 28,
-                    height: 32,
-                    backgroundImage: `url(${bayrak})`,
+                    width: '100%',
+                    height: '100%',
+                    backgroundImage: isTransitioning
+                      ? `url(${rakun1})`
+                      : `url(${bekle1})`,
                     backgroundSize: 'contain',
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
-                    filter: isCompleted
-                      ? 'hue-rotate(90deg) saturate(1.2) brightness(1.1)' // Yeşil ton
-                      : isCurrent
-                        ? 'hue-rotate(45deg) saturate(1.3) brightness(1.2)' // Altın ton
-                        : 'grayscale(0.7) opacity(0.5)', // Gri ton
-                    transform: isCurrent ? 'scale(1.2)' : 'scale(1)',
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    animation: isCurrent ? 'flagWave 2s ease-in-out infinite' : 'none',
-                    position: 'relative'
-                  }}>
-                    {/* Bayrak üzerindeki sayı */}
+                    filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))',
+                    animation: isTransitioning
+                      ? 'raccoonRun 0.6s steps(2) infinite'
+                      : 'raccoonIdle 2s steps(2) infinite',
+                    transform: currentStep === 0 ? 'scaleX(-1)' : 'scaleX(1)', // İlk pozisyonda sola baksın
+                    transition: 'transform 0.3s ease'
+                  }} />
+
+                  {/* Koşu toz efekti - sadece koşarken */}
+                  {isTransitioning && (
                     <Box sx={{
                       position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)',
-                      fontSize: '10px',
-                      color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.8)',
-                      fontWeight: 'bold',
-                      textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                      zIndex: 1
+                      bottom: -5,
+                      left: -10,
+                      width: 30,
+                      height: 10,
+                      opacity: 0.6,
+                      pointerEvents: 'none'
                     }}>
-                      {isCompleted ? '✓' : index + 1}
+                      {[0, 1, 2].map((i) => (
+                        <Box
+                          key={i}
+                          sx={{
+                            position: 'absolute',
+                            width: 3,
+                            height: 3,
+                            borderRadius: '50%',
+                            backgroundColor: '#FFD700',
+                            left: `${i * 8}px`,
+                            animation: `dustParticle 0.8s ease-out infinite`,
+                            animationDelay: `${i * 0.1}s`,
+                            '@keyframes dustParticle': {
+                              '0%': {
+                                opacity: 0,
+                                transform: 'scale(0) translateY(0px)'
+                              },
+                              '30%': {
+                                opacity: 1,
+                                transform: 'scale(1) translateY(-5px)'
+                              },
+                              '100%': {
+                                opacity: 0,
+                                transform: 'scale(0.5) translateY(-10px)'
+                              }
+                            }
+                          }}
+                        />
+                      ))}
                     </Box>
-                  </Box>
+                  )}
                 </Box>
-              );
-            })}
-
-            {/* Rakun Karakteri - Merkezi pozisyon */}
-            <Box sx={{
-              position: 'absolute',
-              left: `calc(60px + ${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}% - 25px)`,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-              width: 50,
-              height: 50
-            }}>
-              {/* Rakun Sprite */}
-              <Box sx={{
-                width: '100%',
-                height: '100%',
-                backgroundImage: isTransitioning
-                  ? `url(${rakun1})`
-                  : `url(${bekle1})`,
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))',
-                animation: isTransitioning
-                  ? 'raccoonRun 0.6s steps(2) infinite'
-                  : 'raccoonIdle 2s steps(2) infinite',
-                transform: currentStep === 0 ? 'scaleX(-1)' : 'scaleX(1)', // İlk pozisyonda sola baksın
-                transition: 'transform 0.3s ease'
-              }} />
-
-              {/* Koşu toz efekti - sadece koşarken */}
-              {isTransitioning && (
-                <Box sx={{
-                  position: 'absolute',
-                  bottom: -5,
-                  left: -10,
-                  width: 30,
-                  height: 10,
-                  opacity: 0.6,
-                  pointerEvents: 'none'
-                }}>
-                  {[0, 1, 2].map((i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        position: 'absolute',
-                        width: 3,
-                        height: 3,
-                        borderRadius: '50%',
-                        backgroundColor: '#FFD700',
-                        left: `${i * 8}px`,
-                        animation: `dustParticle 0.8s ease-out infinite`,
-                        animationDelay: `${i * 0.1}s`,
-                        '@keyframes dustParticle': {
-                          '0%': {
-                            opacity: 0,
-                            transform: 'scale(0) translateY(0px)'
-                          },
-                          '30%': {
-                            opacity: 1,
-                            transform: 'scale(1) translateY(-5px)'
-                          },
-                          '100%': {
-                            opacity: 0,
-                            transform: 'scale(0.5) translateY(-10px)'
-                          }
-                        }
-                      }}
-                    />
-                  ))}
-                </Box>
-              )}
+              </Box>
             </Box>
 
-            {/* Progress Text */}
+            {/* Progress Text - Sabit konumda */}
             <Box sx={{
               position: 'absolute',
-              right: 20,
+              right: 80,
               top: '50%',
               transform: 'translateY(-50%)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 0.5
+              gap: 0.5,
+              zIndex: 11
             }}>
               <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.7rem' }}>
                 İlerleme
