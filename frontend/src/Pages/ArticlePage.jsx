@@ -149,6 +149,17 @@ const ArticlePage = () => {
                 }}
                 dangerouslySetInnerHTML={{ __html: newsData.content }}
               />
+            ) : newsData.newstext ? (
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: '1.125rem',
+                  lineHeight: 1.7,
+                  color: 'text.primary'
+                }}
+              >
+                {newsData.newstext}
+              </Typography>
             ) : newsData.description ? (
               <Typography
                 variant="body1"
