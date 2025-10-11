@@ -19,6 +19,13 @@ import {
   KeyboardArrowUp
 } from '@mui/icons-material';
 
+// Asset imports
+import rakun1 from '../assets/rakun1.png';
+import rakun2 from '../assets/rakun2.png';
+import bekle1 from '../assets/bekle1.png';
+import bekle2 from '../assets/bekle2.png';
+import bayrak from '../assets/bayrak.png';
+
 // Redux hooks
 import { useAppDispatch } from '../hooks/redux';
 import {
@@ -662,14 +669,211 @@ const ReadingFlowPage = () => {
         touchAction: 'pan-y'
       }}
     >
-      {/* Close Button - Sayfanın üst köşesine yerleştir */}
+      {/* Progress Road - Header yerine */}
+      {selectedStack && steps.length > 1 && (
+        <Box sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 80,
+          zIndex: 1001,
+          backgroundColor: 'rgba(18, 18, 18, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          overflow: 'hidden'
+        }}>
+          <Box sx={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            px: 2
+          }}>
+            {/* Yol Çizgisi */}
+            <Box sx={{
+              position: 'absolute',
+              top: '50%',
+              left: 60,
+              right: 60,
+              height: 4,
+              backgroundColor: 'rgba(255, 215, 0, 0.3)',
+              borderRadius: 2,
+              transform: 'translateY(-50%)',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                height: '100%',
+                backgroundColor: '#FFD700',
+                borderRadius: 2,
+                width: `${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}%`,
+                transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+              }
+            }} />
+
+            {/* Bayraklar */}
+            {steps.slice(1, -1).map((step, index) => {
+              const isCompleted = currentStep > index + 1;
+              const isCurrent = currentStep === index + 1;
+              const progressPercent = (index + 1) / Math.max(1, steps.length - 1) * 100;
+
+              return (
+                <Box
+                  key={step.id}
+                  sx={{
+                    position: 'absolute',
+                    left: `calc(60px + ${progressPercent}% - 20px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 2
+                  }}
+                >
+                  {/* Bayrak Direği */}
+                  <Box sx={{
+                    width: 3,
+                    height: 30,
+                    backgroundColor: isCompleted ? '#FFD700' : isCurrent ? '#FF9800' : 'rgba(255, 255, 255, 0.3)',
+                    borderRadius: 1.5,
+                    mx: 'auto',
+                    mb: 1,
+                    transition: 'all 0.4s ease'
+                  }} />
+
+                  {/* Bayrak */}
+                  <Box sx={{
+                    width: 24,
+                    height: 16,
+                    backgroundColor: isCompleted ? '#4CAF50' : isCurrent ? '#FFD700' : 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '0 4px 4px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '8px',
+                    color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.6)',
+                    fontWeight: 'bold',
+                    transform: isCurrent ? 'scale(1.2)' : 'scale(1)',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                    animation: isCurrent ? 'flagWave 2s ease-in-out infinite' : 'none',
+                    clipPath: 'polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%)',
+                    '&::before': isCompleted ? {
+                      content: '"✓"',
+                      fontSize: '10px'
+                    } : {
+                      content: `"${index + 1}"`
+                    }
+                  }} />
+                </Box>
+              );
+            })}
+
+            {/* Rakun Karakteri */}
+            <Box sx={{
+              position: 'absolute',
+              left: `calc(60px + ${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}% - 25px)`,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 10,
+              transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+              width: 50,
+              height: 50
+            }}>
+              {/* Rakun Sprite */}
+              <Box sx={{
+                width: '100%',
+                height: '100%',
+                backgroundImage: isTransitioning
+                  ? `url(${rakun1})`
+                  : `url(${bekle1})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))',
+                animation: isTransitioning
+                  ? 'raccoonRun 0.6s steps(2) infinite'
+                  : 'raccoonIdle 2s steps(2) infinite',
+                transform: currentStep === 0 ? 'scaleX(-1)' : 'scaleX(1)', // İlk pozisyonda sola baksın
+                transition: 'transform 0.3s ease'
+              }} />
+
+              {/* Koşu toz efekti - sadece koşarken */}
+              {isTransitioning && (
+                <Box sx={{
+                  position: 'absolute',
+                  bottom: -5,
+                  left: -10,
+                  width: 30,
+                  height: 10,
+                  opacity: 0.6,
+                  pointerEvents: 'none'
+                }}>
+                  {[0, 1, 2].map((i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        position: 'absolute',
+                        width: 3,
+                        height: 3,
+                        borderRadius: '50%',
+                        backgroundColor: '#FFD700',
+                        left: `${i * 8}px`,
+                        animation: `dustParticle 0.8s ease-out infinite`,
+                        animationDelay: `${i * 0.1}s`,
+                        '@keyframes dustParticle': {
+                          '0%': {
+                            opacity: 0,
+                            transform: 'scale(0) translateY(0px)'
+                          },
+                          '30%': {
+                            opacity: 1,
+                            transform: 'scale(1) translateY(-5px)'
+                          },
+                          '100%': {
+                            opacity: 0,
+                            transform: 'scale(0.5) translateY(-10px)'
+                          }
+                        }
+                      }}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Box>
+
+            {/* Progress Text */}
+            <Box sx={{
+              position: 'absolute',
+              right: 20,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 0.5
+            }}>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.7rem' }}>
+                İlerleme
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#FFD700', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                {currentStep}/{steps.length - 1}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      {/* Close Button - Progress road'un üstünde */}
       <IconButton
         onClick={handleClose}
         sx={{
           position: 'fixed',
           top: 20,
           right: 20,
-          zIndex: 1000,
+          zIndex: 1002,
           backgroundColor: 'rgba(0,0,0,0.5)',
           color: 'white',
           backdropFilter: 'blur(10px)',
@@ -681,33 +885,15 @@ const ReadingFlowPage = () => {
         <Close />
       </IconButton>
 
-      {/* Progress Indicator - Sayfanın üst köşesine yerleştir */}
-      {currentStepData.type !== 'intro' && currentStepData.type !== 'completion' && (
-        <Box sx={{
-          position: 'fixed',
-          top: 20,
-          left: 20,
-          zIndex: 1000,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: 2,
-          backdropFilter: 'blur(10px)'
-        }}>
-          <Typography variant="caption">
-            {currentStepData.stepNumber}/{currentStepData.totalSteps}
-          </Typography>
-        </Box>
-      )}
-
-      {/* Main Content - Header padding'i kaldır */}
+      {/* Main Content - Progress road için padding */}
       <Fade in={!isTransitioning} timeout={500}>
         <Box sx={{
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000'
+          backgroundColor: currentStepData.type === 'news' ? 'background.default' : '#000',
+          paddingTop: selectedStack && steps.length > 1 ? '80px' : 0 // Progress road için padding
         }}>
           {/* Background Image - Sadece intro ve completion için */}
           {currentStepData.image && currentStepData.type !== 'news' && (
@@ -1405,6 +1591,36 @@ const ReadingFlowPage = () => {
           0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
           40% { transform: translateY(-10px); }
           60% { transform: translateY(-5px); }
+        }
+
+        @keyframes raccoonRun {
+          0%, 50% { 
+            background-image: url(${rakun1}); 
+          }
+          50.1%, 100% { 
+            background-image: url(${rakun2}); 
+          }
+        }
+
+        @keyframes raccoonIdle {
+          0%, 50% { 
+            background-image: url(${bekle1}); 
+          }
+          50.1%, 100% { 
+            background-image: url(${bekle2}); 
+          }
+        }
+
+        @keyframes flagWave {
+          0%, 100% { 
+            transform: scale(1.2) rotateZ(0deg);
+          }
+          25% { 
+            transform: scale(1.25) rotateZ(2deg);
+          }
+          75% { 
+            transform: scale(1.25) rotateZ(-2deg);
+          }
         }
       `}</style>
     </Box>
