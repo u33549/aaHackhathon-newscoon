@@ -32,6 +32,7 @@ import {
 // Components
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 const AllNewsPage = () => {
   const navigate = useNavigate();
@@ -117,13 +118,7 @@ const AllNewsPage = () => {
 
   if (isLoading && stacks.length === 0) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-          <Typography variant="h6" color="text.secondary">
-            Haber yığınları yükleniyor...
-          </Typography>
-        </Box>
-      </Container>
+      <LoadingScreen message="Haber yığınları yükleniyor..." />
     );
   }
 

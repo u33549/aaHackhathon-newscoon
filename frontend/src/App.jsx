@@ -19,6 +19,7 @@ import ArticlePage from './Pages/ArticlePage';
 import ReadingFlowPage from './Pages/ReadingFlowPage';
 import AdminDashboard from './Pages/admin/AdminDashboard';
 import TestPage from './Pages/TestPage';
+import LoaderTestPage from './Pages/LoaderTestPage';
 
 // Redux hooks
 import { useAppDispatch, useUserXP, useUserLevel, useXPForNextLevel, useUserAchievements, useUserBadges, useCelebrationQueue } from './hooks/redux';
@@ -107,6 +108,13 @@ function App() {
             <>
               <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
               <TestPage />
+              <Footer />
+            </>
+          } />
+          <Route path="/loader-test" element={
+            <>
+              <Header totalCp={totalCp} level={level} cpForNextLevel={cpForNextLevel} onOpenBadges={handleOpenBadges} />
+              <LoaderTestPage />
               <Footer />
             </>
           } />

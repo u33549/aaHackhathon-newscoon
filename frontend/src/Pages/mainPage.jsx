@@ -48,6 +48,7 @@ import NewsSection from '../components/sections/NewsSection';
 import NewsCard from '../components/cards/NewsCard';
 import CategoryPills from '../components/navigation/CategoryPills';
 import SearchBar from '../components/navigation/SearchBar';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 // Data and utilities
 import {
@@ -329,14 +330,9 @@ const MainPage = () => {
 
   if (isLoading || stacksLoading) {
     return (
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh'
-      }}>
-        {isLoading ? 'Haberler' : 'Haber yığınları'} yükleniyor...
-      </Box>
+      <LoadingScreen
+        message={isLoading ? 'Haberler yükleniyor...' : 'Haber yığınları yükleniyor...'}
+      />
     );
   }
 

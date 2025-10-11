@@ -41,6 +41,7 @@ import { addCelebrationToQueue } from '../store/slices/uiSlice';
 
 // Components - Header'ı ekle
 import Header from '../components/layout/Header';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 // Constants
 import { XP_CONSTANTS, allBadges } from '../constants/index.jsx';
@@ -665,29 +666,13 @@ const ReadingFlowPage = () => {
   // Loading states ve render logic
   if (!selectedStack || steps.length === 0) {
     return (
-      <Box sx={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default'
-      }}>
-        <Typography variant="h6">Haber yükleniyor...</Typography>
-      </Box>
+      <LoadingScreen message="Haber yükleniyor..." />
     );
   }
 
   if (!currentStepData) {
     return (
-      <Box sx={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default'
-      }}>
-        <Typography variant="h6">Haber verisi yükleniyor...</Typography>
-      </Box>
+      <LoadingScreen message="Haber verisi yükleniyor..." />
     );
   }
 

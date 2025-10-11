@@ -49,6 +49,7 @@ import {
 
 // Components
 import ShareModal from '../components/modals/ShareModal';
+import LoadingScreen from '../components/common/LoadingScreen';
 
 // Netflix benzeri tanıtım sayfası
 const StackDetailPage = () => {
@@ -186,20 +187,7 @@ const StackDetailPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default'
-      }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <LinearProgress sx={{ mb: 2, width: 300 }} />
-          <Typography variant="h6" color="text.secondary">
-            Haber yığını yükleniyor...
-          </Typography>
-        </Box>
-      </Box>
+      <LoadingScreen message="Haber yığını yükleniyor..." />
     );
   }
 
