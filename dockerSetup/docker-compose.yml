@@ -12,8 +12,10 @@ services:
     restart: unless-stopped
     networks: 
       - app-network
-    env_file:
-      - .env
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      - VITE_API_KEY=${VITE_API_KEY}
+      - VITE_PROXY_TARGET=${VITE_PROXY_TARGET}
 
   backend:
     build:
@@ -27,6 +29,9 @@ services:
       - NODE_ENV=${NODE_ENV}
       - MONGO_URI=${MONGO_URI}
       - API_KEY=${API_KEY}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
     depends_on:
       - mongodb
     restart: unless-stopped
@@ -46,7 +51,8 @@ services:
     volumes:
       - ./mongo_data:/data/db
     restart: unless-stopped
-
+    networks:
+      - app-network
 
 networks:
   app-network:
