@@ -1,6 +1,20 @@
 version: '3'
 
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" 
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks: 
+      - app-network
+    env_file:
+      - .env
+
   backend:
     build:
       context: ./backend
@@ -16,6 +30,8 @@ services:
     depends_on:
       - mongodb
     restart: unless-stopped
+    networks: 
+      - app-network
 
   mongodb:
     image: mongo:6.0
@@ -30,3 +46,8 @@ services:
     volumes:
       - ./mongo_data:/data/db
     restart: unless-stopped
+
+
+networks:
+  app-network:
+    driver: bridge

@@ -12,7 +12,7 @@ import ScrollToTop from './components/common/ScrollToTop';
 import BadgeModal from './components/modals/BadgeModal';
 
 // Pages
-import MainPage from './Pages/MainPage';
+import MainPage from './Pages/mainPage';
 import AllNewsPage from './Pages/AllNewsPage';
 import StackDetailPage from './Pages/StackDetailPage';
 import ReadingFlowPage from './Pages/ReadingFlowPage';
