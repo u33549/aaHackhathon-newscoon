@@ -101,16 +101,77 @@ npm run dev
 
 ### Docker ile Kurulum
 
+Docker ile kurulum, tüm sistemi (Frontend + Backend + MongoDB) tek komutla çalıştırmanızı sağlar.
+
+#### 1. Docker Kurulumu Hazırlığı
+
 ```bash
-# Docker Compose ile tüm sistemi başlatın
+# dockerSetup klasörüne geçin
 cd dockerSetup
+
+# .env dosyasını konfigüre edin (örnek konfigürasyon mevcuttur)
+cp .env.example .env  # Eğer yoksa
+nano .env  # veya favori editörünüzle düzenleyin
+```
+
+#### 2. Docker Environment (.env) Konfigürasyonu
+
+`dockerSetup/.env` dosyasında aşağıdaki ayarları yapılandırın:
+
+```env
+# Server Ayarları
+NODE_ENV=development
+API_KEY=your-secure-api-key-here
+
+# MongoDB Ayarları
+MONGO_URI=your-mongodb-uri
+MONGO_ADMIN_USERNAME=your-username
+MONGO_ADMIN_PASSWORD=your-password
+
+# Cloudinary Ayarları
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Frontend Ayarları
+VITE_API_BASE_URL=/api/
+VITE_API_KEY=your-secure-api-key-here
+VITE_PROXY_TARGET=http://localhost:3545
+```
+
+#### 3. Docker Compose ile Sistem Başlatma
+
+```bash
+# Tüm servisleri arka planda başlatın
 docker-compose up -d
 
 # Servislerin durumunu kontrol edin
 docker-compose ps
+
+# Logları takip edin (opsiyonel)
+docker-compose logs -f
+
+# Belirli bir servisin loglarını takip edin
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f mongodb
 ```
 
-**Detaylı kurulum rehberi için:** [Kurulum Kılavuzu](#kurulum-ve-konfigürasyon-kılavuzu)
+#### 4. Docker Servisleri
+
+Docker Compose aşağıdaki servisleri çalıştırır:
+
+| Servis | Port | Açıklama |
+|--------|------|----------|
+| **Frontend** | `80` | React uygulaması (Nginx ile serve ediliyor) |
+| **Backend** | `3545` | Express.js API servisi |
+| **MongoDB** | `27017` | MongoDB veritabanı (authentication aktif) |
+
+**Önemli Notlar:**
+- Docker build process sırasında frontend ve backend klasörleri build context olarak kullanılır
+- Her servis için ayrı Dockerfile'lar mevcuttur (`frontend/Dockerfile`, `backend/Dockerfile`)
+- MongoDB authentication aktif olduğu için doğru credentials kullanılmalıdır
+- Volume'lar MongoDB verilerini persist eder
 
 ---
 
