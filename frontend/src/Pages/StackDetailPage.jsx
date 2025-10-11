@@ -546,23 +546,14 @@ const StackDetailPage = () => {
                     ...(showAllTags && {
                       overflowX: 'auto',
                       overflowY: 'hidden',
+                      // Scrollbar'ı gizle
                       '&::-webkit-scrollbar': {
-                        height: '4px',
+                        display: 'none',
                       },
-                      '&::-webkit-scrollbar-track': {
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: '2px',
-                      },
-                      '&::-webkit-scrollbar-thumb': {
-                        backgroundColor: 'rgba(255,255,255,0.3)',
-                        borderRadius: '2px',
-                        '&:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.5)',
-                        },
-                      },
-                      // Firefox scrollbar styling
-                      scrollbarWidth: 'thin',
-                      scrollbarColor: 'rgba(255,255,255,0.3) rgba(255,255,255,0.1)',
+                      // Firefox için scrollbar gizle
+                      scrollbarWidth: 'none',
+                      // IE ve Edge için scrollbar gizle
+                      msOverflowStyle: 'none',
                     })
                   }}>
                     {showAllTags
