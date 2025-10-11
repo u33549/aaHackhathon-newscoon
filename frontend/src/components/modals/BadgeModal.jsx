@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Button,
   Box,
   Typography,
@@ -618,23 +617,6 @@ const BadgeModal = ({ isOpen, onClose, badges, totalCp, earnedAchievements, leve
           </Box>
         )}
       </DialogContent>
-
-      <DialogActions sx={{
-        p: { xs: 2, md: 3 },
-        pt: { xs: 1, md: 0 }
-      }}>
-        <Button
-          onClick={onClose}
-          variant="contained"
-          fullWidth
-          sx={{
-            py: { xs: 1.2, md: 1.5 },
-            fontSize: { xs: '0.9rem', md: '1rem' }
-          }}
-        >
-          Kapat
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
