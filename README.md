@@ -24,12 +24,20 @@ NEWSCOON, haber okuma deneyimini oyunlaştırarak kullanıcıların bilgilenme s
 - Kronolojik ve organize haber okuma deneyimi arayanlar
 - Sosyal rekabet unsurlarından hoşlanan okuyucular
 
-**İçindekiler** *(Tüm dokümantasyon zamanla güncellenecek)*
-- [Kurulum ve Konfigürasyon](#kurulum)
-- [API Dokümantasyonu](./backend/Docs/) - Backend API referansları
-- [Frontend Bileşenleri](./frontend/src/components/) - React bileşen yapısı
-- [Veritabanı Modelleri](./backend/Docs/Data-Models.md) - MongoDB şemaları
-- [Docker Kurulumu](./dockerSetup/) - Container tabanlı deploy
+## 📋 İçindekiler
+
+### 📖 **Ana Bölümler**
+- [Genel Bakış](#-genel-bakış)
+- [Özellikler](#-özellikler) 
+- [Kurulum](#-kurulum)
+- [Proje Yapısı](#-proje-yapısı)
+- [Kullanılan Teknolojiler](#️-kullanılan-teknolojiler)
+
+### 📁 **Dokümantasyon**
+- [Platform Mimarisi](./Docs/ARCHITECTURE.md)
+- [Backend API](./backend/README.md)
+- [MIT Lisansı](./LICENSE)
+
 
 ---
 
