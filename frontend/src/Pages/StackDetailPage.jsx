@@ -22,7 +22,6 @@ import {
 import {
   ArrowBack,
   PlayArrow,
-  Add,
   Share,
   AccessTime,
   Visibility,
@@ -463,44 +462,52 @@ const StackDetailPage = () => {
                 {stackStatus.status === 'not_started' && (
                   <Button
                     variant="contained"
-                    size={isMobile ? 'medium' : 'large'}
+                    size={isMobile ? 'large' : 'large'}
                     startIcon={<PlayArrow />}
                     onClick={handleStartReading}
                     sx={{
-                      backgroundColor: 'white',
-                      color: 'black',
+                      backgroundColor: '#FFD700',
+                      color: '#000',
                       fontWeight: 'bold',
-                      px: { xs: 1.5, sm: 2, md: 3 },
-                      py: { xs: 0.75, sm: 1, md: 1.25 },
-                      fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
+                      px: { xs: 2, sm: 3, md: 4 },
+                      py: { xs: 1, sm: 1.2, md: 1.5 },
+                      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                       flex: { xs: '1 1 auto', sm: '0 0 auto' },
                       minWidth: { xs: 'auto', sm: 'auto' },
+                      height: { xs: 44, sm: 48, md: 52 },
+                      borderRadius: 1,
+                      boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)',
                       '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.8)'
+                        backgroundColor: '#FFA500',
+                        boxShadow: '0 6px 16px rgba(255, 215, 0, 0.4)'
                       }
                     }}
                   >
-                    Okumaya Başla
+                    Kaydırmaya Başla
                   </Button>
                 )}
 
                 {stackStatus.status === 'reading' && (
                   <Button
                     variant="contained"
-                    size={isMobile ? 'medium' : 'large'}
+                    size={isMobile ? 'large' : 'large'}
                     startIcon={<PlayArrow />}
                     onClick={handleContinueReading}
                     sx={{
-                      backgroundColor: '#FFD700',
-                      color: 'black',
+                      backgroundColor: '#FF9800',
+                      color: '#000',
                       fontWeight: 'bold',
-                      px: { xs: 1.5, sm: 2, md: 3 },
-                      py: { xs: 0.75, sm: 1, md: 1.25 },
-                      fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
+                      px: { xs: 2, sm: 3, md: 4 },
+                      py: { xs: 1, sm: 1.2, md: 1.5 },
+                      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                       flex: { xs: '1 1 auto', sm: '0 0 auto' },
                       minWidth: { xs: 'auto', sm: 'auto' },
+                      height: { xs: 44, sm: 48, md: 52 },
+                      borderRadius: 1,
+                      boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)',
                       '&:hover': {
-                        backgroundColor: 'rgba(255, 215, 0, 0.8)'
+                        backgroundColor: '#F57C00',
+                        boxShadow: '0 6px 16px rgba(255, 152, 0, 0.4)'
                       }
                     }}
                   >
@@ -511,20 +518,24 @@ const StackDetailPage = () => {
                 {stackStatus.status === 'completed' && (
                   <Button
                     variant="contained"
-                    size={isMobile ? 'medium' : 'large'}
+                    size={isMobile ? 'large' : 'large'}
                     startIcon={<PlayArrow />}
                     onClick={handleContinueReading}
                     sx={{
                       backgroundColor: '#4CAF50',
                       color: 'white',
                       fontWeight: 'bold',
-                      px: { xs: 1.5, sm: 2, md: 3 },
-                      py: { xs: 0.75, sm: 1, md: 1.25 },
-                      fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.9rem' },
+                      px: { xs: 2, sm: 3, md: 4 },
+                      py: { xs: 1, sm: 1.2, md: 1.5 },
+                      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                       flex: { xs: '1 1 auto', sm: '0 0 auto' },
                       minWidth: { xs: 'auto', sm: 'auto' },
+                      height: { xs: 44, sm: 48, md: 52 },
+                      borderRadius: 1,
+                      boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
                       '&:hover': {
-                        backgroundColor: 'rgba(76, 175, 80, 0.8)'
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                        boxShadow: '0 6px 16px rgba(76, 175, 80, 0.4)'
                       }
                     }}
                   >
