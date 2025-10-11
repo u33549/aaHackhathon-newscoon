@@ -5,9 +5,7 @@
 1. [Genel Bakış](#genel-bakış)
 2. [Workflow'ların Listesi](#workflowların-listesi)
 3. [Detaylı Workflow Açıklamaları](#detaylı-workflow-açıklamaları)
-4. [Kurulum ve Konfigürasyon](#kurulum-ve-konfigürasyon)
-5. [API Endpoint'leri](#api-endpointleri)
-6. [Hata Yönetimi](#hata-yönetimi)
+4. [Hata Yönetimi](#hata-yönetimi)
 
 ---
 
