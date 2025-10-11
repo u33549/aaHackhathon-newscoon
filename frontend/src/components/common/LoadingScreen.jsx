@@ -14,131 +14,112 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '50vh',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
-      {/* Circular Track */}
+      {/* Ana Container */}
       <Box
         sx={{
           position: 'relative',
-          width: 250, // 200'den 250'ye artırıldı
-          height: 250, // 200'den 250'ye artırıldı
-          borderRadius: '50%',
-          border: `3px dashed ${theme.palette.primary.main}`, // Border kalınlığı artırıldı
-          opacity: 0.4,
-          mb: 3,
-          // Çember için glow efekti
-          boxShadow: theme.palette.mode === 'dark'
-            ? `0 0 20px ${theme.palette.primary.main}40`
-            : `0 0 10px ${theme.palette.primary.main}20`,
+          width: 300,
+          height: 200,
+          mb: 4,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        {/* Running Raccoon Animation */}
+        {/* Zemin Çizgisi */}
         <Box
           sx={{
             position: 'absolute',
-            width: 100, // 80'den 100'e artırıldı
-            height: 100, // 80'den 100'e artırıldı
-            top: -50, // -40'tan -50'ye artırıldı
-            left: '50%',
-            transformOrigin: '50px 175px', // 40px 140px'den 50px 175px'e artırıldı
-            animation: 'runAroundCircle 2s linear infinite',
-            '@keyframes runAroundCircle': {
+            bottom: 20,
+            left: '10%',
+            right: '10%',
+            height: 4,
+            borderRadius: 2,
+            background: `linear-gradient(90deg, 
+              ${theme.palette.primary.main}40 0%, 
+              ${theme.palette.primary.main} 50%, 
+              ${theme.palette.primary.main}40 100%)`,
+            animation: 'groundPulse 2s ease-in-out infinite',
+            '@keyframes groundPulse': {
+              '0%, 100%': {
+                opacity: 0.3,
+                transform: 'scaleX(1)'
+              },
+              '50%': {
+                opacity: 0.8,
+                transform: 'scaleX(1.1)'
+              }
+            }
+          }}
+        />
+
+        {/* Koşan Rakun */}
+        <Box
+          sx={{
+            position: 'absolute',
+            width: 120,
+            height: 120,
+            bottom: 20,
+            animation: 'raccoonRun 3s ease-in-out infinite',
+            '@keyframes raccoonRun': {
               '0%': {
-                transform: 'translateX(-50%) rotate(0deg)',
+                left: '-60px',
+                transform: 'scaleX(1) translateY(0px) rotate(-5deg)'
+              },
+              '25%': {
+                left: '25%',
+                transform: 'scaleX(1) translateY(-15px) rotate(0deg)'
+              },
+              '50%': {
+                left: '50%',
+                transform: 'scaleX(1) translateY(-5px) rotate(5deg)'
+              },
+              '75%': {
+                left: '75%',
+                transform: 'scaleX(1) translateY(-20px) rotate(0deg)'
               },
               '100%': {
-                transform: 'translateX(-50%) rotate(360deg)',
+                left: 'calc(100% + 60px)',
+                transform: 'scaleX(1) translateY(0px) rotate(-5deg)'
               }
             }
           }}
         >
-          {/* Outer Glow Ring - Dış halo */}
+          {/* Rakun Gölgesi */}
           <Box
             sx={{
               position: 'absolute',
-              top: -15,
-              left: -15,
-              right: -15,
               bottom: -15,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 80,
+              height: 20,
               borderRadius: '50%',
-              background: theme.palette.mode === 'dark'
-                ? 'radial-gradient(circle, rgba(255, 215, 0, 0.6) 0%, rgba(255, 255, 255, 0.4) 30%, rgba(138, 43, 226, 0.3) 60%, transparent 80%)'
-                : 'radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 80%)',
-              zIndex: -2,
-              animation: 'pulse 1.5s ease-in-out infinite alternate',
-              '@keyframes pulse': {
-                '0%': {
-                  opacity: 0.6,
-                  transform: 'scale(0.9)'
+              background: 'rgba(0, 0, 0, 0.2)',
+              filter: 'blur(8px)',
+              animation: 'shadowMove 3s ease-in-out infinite',
+              '@keyframes shadowMove': {
+                '0%, 100%': {
+                  transform: 'translateX(-50%) scaleX(1)',
+                  opacity: 0.3
                 },
-                '100%': {
-                  opacity: 1,
-                  transform: 'scale(1.1)'
-                }
-              }
-            }}
-          />
-
-          {/* Sarımsı Arka Plan - Yeni eklendi */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: -12,
-              left: -12,
-              right: -12,
-              bottom: -12,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FF8C00 50%, #FFD700 75%, #FFFF99 100%)',
-              zIndex: -1,
-              opacity: 0.8,
-              animation: 'rotateBackground 2s linear infinite',
-              '@keyframes rotateBackground': {
-                '0%': {
-                  transform: 'rotate(0deg)',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FF8C00 50%, #FFD700 75%, #FFFF99 100%)'
-                },
-                '25%': {
-                  background: 'linear-gradient(225deg, #FFA500 0%, #FF8C00 25%, #FFD700 50%, #FFFF99 75%, #FFD700 100%)'
+                '25%, 75%': {
+                  transform: 'translateX(-50%) scaleX(0.7)',
+                  opacity: 0.2
                 },
                 '50%': {
-                  transform: 'rotate(180deg)',
-                  background: 'linear-gradient(315deg, #FF8C00 0%, #FFD700 25%, #FFFF99 50%, #FFD700 75%, #FFA500 100%)'
-                },
-                '75%': {
-                  background: 'linear-gradient(45deg, #FFD700 0%, #FFFF99 25%, #FFD700 50%, #FFA500 75%, #FF8C00 100%)'
-                },
-                '100%': {
-                  transform: 'rotate(360deg)',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FF8C00 50%, #FFD700 75%, #FFFF99 100%)'
+                  transform: 'translateX(-50%) scaleX(0.8)',
+                  opacity: 0.25
                 }
               }
             }}
           />
 
-          {/* Inner Background Circle - Güncellendi */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: -8,
-              left: -8,
-              right: -8,
-              bottom: -8,
-              borderRadius: '50%',
-              background: theme.palette.mode === 'dark'
-                ? 'radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 215, 0, 0.8) 100%)'
-                : 'radial-gradient(circle, rgba(255, 255, 255, 0.98) 0%, rgba(255, 215, 0, 0.9) 100%)',
-              zIndex: 0,
-              border: theme.palette.mode === 'dark'
-                ? '2px solid rgba(255, 255, 255, 0.9)'
-                : '2px solid rgba(255, 215, 0, 0.6)',
-              boxShadow: theme.palette.mode === 'dark'
-                ? '0 0 25px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.3)'
-                : '0 0 15px rgba(255, 215, 0, 0.6), inset 0 0 10px rgba(255, 215, 0, 0.4)'
-            }}
-          />
-
-          {/* Raccoon Image with enhanced effects - Hız ayarlandı */}
+          {/* Rakun Sprite */}
           <Box
             sx={{
               width: '100%',
@@ -147,18 +128,11 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
               backgroundSize: 'contain',
               backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center',
-              // Dönme hızına göre ayarlandı: 2s dönme -> 0.25s resim değişimi (8 kare/dönüş)
-              animation: 'alternateRaccoon 0.25s steps(1) infinite',
-              // Güçlü kontrast ve glow efektleri
+              animation: 'raccoonSprite 0.2s steps(1) infinite',
               filter: theme.palette.mode === 'dark'
-                ? 'contrast(1.4) brightness(1.2) saturate(1.3) drop-shadow(0 0 8px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 24px rgba(138, 43, 226, 0.6))'
-                : 'contrast(1.5) brightness(0.8) saturate(1.4) drop-shadow(0 0 6px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 12px rgba(255, 215, 0, 1))',
-              // Kenar yumuşatma
-              borderRadius: '50%',
-              // Ek z-index
-              position: 'relative',
-              zIndex: 1,
-              '@keyframes alternateRaccoon': {
+                ? 'contrast(1.2) brightness(1.1) drop-shadow(0 0 12px rgba(255, 215, 0, 0.6)) drop-shadow(0 0 24px rgba(255, 255, 255, 0.3))'
+                : 'contrast(1.3) brightness(0.9) drop-shadow(0 0 8px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.8))',
+              '@keyframes raccoonSprite': {
                 '0%, 50%': {
                   backgroundImage: `url(${rakun1})`,
                 },
@@ -169,57 +143,156 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
             }}
           />
 
-          {/* Moving Sparkle Effects - Güncellendi */}
+          {/* Koşu Toz Efekti */}
           <Box
             sx={{
               position: 'absolute',
-              top: '10%',
-              left: '80%',
+              bottom: 0,
+              left: -20,
+              width: 40,
+              height: 20,
+              opacity: 0.6,
+              animation: 'dustCloud 0.6s ease-out infinite',
+              '@keyframes dustCloud': {
+                '0%': {
+                  opacity: 0,
+                  transform: 'scale(0) translateY(0px)'
+                },
+                '50%': {
+                  opacity: 0.6,
+                  transform: 'scale(1) translateY(-10px)'
+                },
+                '100%': {
+                  opacity: 0,
+                  transform: 'scale(1.5) translateY(-20px)'
+                }
+              }
+            }}
+          >
+            {/* Toz Parçacıkları */}
+            {[0, 1, 2].map((i) => (
+              <Box
+                key={i}
+                sx={{
+                  position: 'absolute',
+                  width: 4,
+                  height: 4,
+                  borderRadius: '50%',
+                  backgroundColor: theme.palette.mode === 'dark' ? '#FFD700' : '#8B4513',
+                  left: `${20 + i * 8}px`,
+                  top: `${10 + i * 2}px`,
+                  animation: `dustParticle${i} 0.8s ease-out infinite`,
+                  animationDelay: `${i * 0.1}s`,
+                  [`@keyframes dustParticle${i}`]: {
+                    '0%': {
+                      opacity: 0,
+                      transform: 'scale(0) translateY(0px)'
+                    },
+                    '30%': {
+                      opacity: 1,
+                      transform: 'scale(1) translateY(-5px)'
+                    },
+                    '100%': {
+                      opacity: 0,
+                      transform: 'scale(0.5) translateY(-15px)'
+                    }
+                  }
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
+
+        {/* Arka Plan Dekoratif Elementler */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 10,
+            left: 20,
+            width: 30,
+            height: 30,
+            opacity: 0.4,
+            animation: 'float1 4s ease-in-out infinite',
+            '@keyframes float1': {
+              '0%, 100%': {
+                transform: 'translateY(0px) rotate(0deg)',
+                opacity: 0.4
+              },
+              '50%': {
+                transform: 'translateY(-20px) rotate(180deg)',
+                opacity: 0.8
+              }
+            }
+          }}
+        >
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 30,
+            right: 30,
+            width: 20,
+            height: 20,
+            opacity: 0.5,
+            animation: 'float2 3s ease-in-out infinite 1s',
+            '@keyframes float2': {
+              '0%, 100%': {
+                transform: 'translateY(0px) scale(1)',
+                opacity: 0.5
+              },
+              '50%': {
+                transform: 'translateY(-15px) scale(1.2)',
+                opacity: 0.9
+              }
+            }
+          }}
+        >
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              background: theme.palette.warning.main,
+              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
+            }}
+          />
+        </Box>
+
+        {/* Işık Parıltıları */}
+        {[0, 1, 2, 3].map((i) => (
+          <Box
+            key={i}
+            sx={{
+              position: 'absolute',
               width: 6,
               height: 6,
               borderRadius: '50%',
               background: theme.palette.mode === 'dark' ? '#FFD700' : '#FF6B35',
-              animation: 'sparkle 2s ease-in-out infinite',
-              zIndex: 2,
-              '@keyframes sparkle': {
+              top: `${20 + i * 30}px`,
+              left: `${50 + i * 60}px`,
+              animation: `sparkle${i} 2s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`,
+              [`@keyframes sparkle${i}`]: {
                 '0%, 100%': {
                   opacity: 0,
                   transform: 'scale(0) rotate(0deg)'
                 },
                 '50%': {
                   opacity: 1,
-                  transform: 'scale(1) rotate(180deg)'
+                  transform: 'scale(1.5) rotate(180deg)'
                 }
               }
             }}
           />
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '70%',
-              left: '20%',
-              width: 4,
-              height: 4,
-              borderRadius: '50%',
-              background: theme.palette.mode === 'dark' ? '#FF69B4' : '#4CAF50',
-              animation: 'sparkle 2s ease-in-out infinite 0.7s',
-              zIndex: 2,
-            }}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              top: '30%',
-              left: '15%',
-              width: 5,
-              height: 5,
-              borderRadius: '50%',
-              background: theme.palette.mode === 'dark' ? '#00FFFF' : '#9C27B0',
-              animation: 'sparkle 2s ease-in-out infinite 1.4s',
-              zIndex: 2,
-            }}
-          />
-        </Box>
+        ))}
       </Box>
 
       {/* Loading Text */}
@@ -228,14 +301,16 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
         color="text.secondary"
         sx={{
           textAlign: 'center',
-          fontWeight: 500,
-          animation: 'pulse 1.5s ease-in-out infinite',
-          '@keyframes pulse': {
+          fontWeight: 600,
+          animation: 'textBounce 2s ease-in-out infinite',
+          '@keyframes textBounce': {
             '0%, 100%': {
-              opacity: 0.7,
+              transform: 'translateY(0px)',
+              opacity: 0.8
             },
             '50%': {
-              opacity: 1,
+              transform: 'translateY(-5px)',
+              opacity: 1
             }
           }
         }}
@@ -243,37 +318,44 @@ const LoadingScreen = ({ message = "Yükleniyor..." }) => {
         {message}
       </Typography>
 
-      {/* Decorative dots */}
+      {/* Progress Dots */}
       <Box
         sx={{
           display: 'flex',
           gap: 1,
-          mt: 2,
+          mt: 3,
           '& .dot': {
-            width: 8,
-            height: 8,
+            width: 12,
+            height: 12,
             borderRadius: '50%',
-            backgroundColor: theme.palette.primary.main,
-            animation: 'bounce 1.4s ease-in-out infinite both',
+            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+            animation: 'dotWave 1.8s ease-in-out infinite both',
           },
           '& .dot:nth-of-type(1)': {
-            animationDelay: '-0.32s',
+            animationDelay: '0s',
           },
           '& .dot:nth-of-type(2)': {
-            animationDelay: '-0.16s',
+            animationDelay: '0.2s',
           },
-          '@keyframes bounce': {
+          '& .dot:nth-of-type(3)': {
+            animationDelay: '0.4s',
+          },
+          '& .dot:nth-of-type(4)': {
+            animationDelay: '0.6s',
+          },
+          '@keyframes dotWave': {
             '0%, 80%, 100%': {
-              transform: 'scale(0)',
-              opacity: 0.5,
+              transform: 'scale(0.8) translateY(0px)',
+              opacity: 0.6,
             },
             '40%': {
-              transform: 'scale(1)',
+              transform: 'scale(1.2) translateY(-8px)',
               opacity: 1,
             }
           }
         }}
       >
+        <Box className="dot" />
         <Box className="dot" />
         <Box className="dot" />
         <Box className="dot" />
