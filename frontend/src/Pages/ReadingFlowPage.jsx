@@ -704,31 +704,33 @@ const ReadingFlowPage = () => {
               display: 'flex',
               alignItems: 'center',
               overflow: 'hidden', // Progress road taşmaması için
-              minWidth: 0 // Grid item shrinking için
+              minWidth: 0, // Grid item shrinking için
+              paddingLeft: 2 // Sol başlangıçta boşluk ekle
             }}>
               {/* Progress Road Container - Kaydırılabilir */}
               <Box sx={{
                 position: 'relative',
                 height: 60,
-                // Tutarlı genişlik hesaplama - son step dahil
-                width: `${Math.max(400, (steps.length - 1) * 70 + 100)}px`, // +100 son step için extra boşluk
+                // Düzeltilmiş genişlik hesaplama - daha fazla alan + padding
+                width: `${Math.max(450, (steps.length - 1) * 80 + 160)}px`, // Daha fazla alan
                 display: 'flex',
                 alignItems: 'center',
-                // Geliştirilmiş kaydırma animasyonu
-                transform: steps.length > 4 && currentStep > 1
-                  ? `translateX(-${Math.min((currentStep - 1) * 60, (steps.length - 4) * 60)}px)`
+                // Geliştirilmiş kaydırma animasyonu - daha yumuşak
+                transform: steps.length > 3 && currentStep > 1
+                  ? `translateX(-${Math.min((currentStep - 1) * 70, (steps.length - 3) * 70)}px)`
                   : 'translateX(0px)',
                 transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                 // Container sınırlarını genişlet
-                minWidth: '100%'
+                minWidth: '100%',
+                paddingLeft: 40 // İç padding - rakun ve bayraklar için
               }}>
                 {/* Yol Çizgisi */}
                 <Box sx={{
                   position: 'absolute',
                   top: 'calc(50% + 20px)',
-                  left: 0,
-                  // Progress barın tam uzunluğu - son step dahil
-                  width: `${(steps.length - 1) * 70}px`,
+                  left: 40, // Sol padding ile hizala
+                  // Progress barın tam uzunluğu - daha uzun
+                  width: `${(steps.length - 1) * 80}px`, // 80px aralık
                   height: 4,
                   backgroundColor: 'rgba(255, 215, 0, 0.3)',
                   borderRadius: 2,
@@ -747,12 +749,12 @@ const ReadingFlowPage = () => {
                   }
                 }} />
 
-                {/* Bayraklar - Tutarlı mesafe */}
+                {/* Bayraklar - Düzeltilmiş pozisyonlar */}
                 {steps.slice(1, -1).map((step, index) => {
                   const isCompleted = currentStep > index + 1;
                   const isCurrent = currentStep === index + 1;
-                  // Tutarlı pozisyon hesaplama
-                  const flagPosition = (index + 1) * 70;
+                  // Düzeltilmiş pozisyon hesaplama - 80px aralık + padding
+                  const flagPosition = 40 + (index + 1) * 80;
 
                   return (
                     <Box
@@ -770,8 +772,8 @@ const ReadingFlowPage = () => {
                     >
                       {/* Bayrak Görseli */}
                       <Box sx={{
-                        width: 28,
-                        height: 32,
+                        width: 32, // Biraz daha büyük
+                        height: 36, // Biraz daha büyük
                         backgroundImage: `url(${bayrak})`,
                         backgroundSize: 'contain',
                         backgroundRepeat: 'no-repeat',
@@ -792,7 +794,7 @@ const ReadingFlowPage = () => {
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)',
-                          fontSize: '10px',
+                          fontSize: '11px', // Biraz daha büyük
                           color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.8)',
                           fontWeight: 'bold',
                           textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
@@ -808,14 +810,14 @@ const ReadingFlowPage = () => {
                 {/* Rakun Karakteri */}
                 <Box sx={{
                   position: 'absolute',
-                  // Tutarlı pozisyon hesaplama - 70px intervals
-                  left: `${currentStep * 70 - 25}px`,
+                  // Düzeltilmiş pozisyon hesaplama - 80px aralık + padding - rakun merkezleme
+                  left: `${40 + currentStep * 80 - 28}px`, // 28px rakun genişliğinin yarısı + offset
                   top: '50%',
                   transform: 'translateY(-50%)',
                   zIndex: 10,
                   transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-                  width: 50,
-                  height: 50
+                  width: 56, // Biraz daha büyük
+                  height: 56 // Biraz daha büyük
                 }}>
                   {/* Rakun Sprite */}
                   <Box sx={{
