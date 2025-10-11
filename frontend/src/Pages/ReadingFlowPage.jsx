@@ -704,27 +704,31 @@ const ReadingFlowPage = () => {
               height: '100%',
               display: 'flex',
               alignItems: 'center',
-              overflow: 'hidden'
+              overflow: 'visible' // hidden yerine visible
             }}>
               {/* Progress Road Container - Kaydırılabilir */}
               <Box sx={{
                 position: 'relative',
                 height: 60,
-                width: `${Math.max(300, steps.length * 80)}px`, // Minimum genişlik + bayraklar için alan
+                // Tutarlı genişlik hesaplama - son step dahil
+                width: `${Math.max(400, (steps.length - 1) * 70 + 100)}px`, // +100 son step için extra boşluk
                 display: 'flex',
                 alignItems: 'center',
-                // Progress bar kaydırma animasyonu
-                transform: steps.length > 5 && currentStep > 2
-                  ? `translateX(-${Math.min((currentStep - 2) * 70, (steps.length - 5) * 70)}px)`
+                // Geliştirilmiş kaydırma animasyonu
+                transform: steps.length > 4 && currentStep > 1
+                  ? `translateX(-${Math.min((currentStep - 1) * 60, (steps.length - 4) * 60)}px)`
                   : 'translateX(0px)',
                 transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                // Container sınırlarını genişlet
+                minWidth: '100%'
               }}>
                 {/* Yol Çizgisi */}
                 <Box sx={{
                   position: 'absolute',
                   top: 'calc(50% + 20px)',
                   left: 0,
-                  right: 0,
+                  // Progress barın tam uzunluğu - son step dahil
+                  width: `${(steps.length - 1) * 70}px`,
                   height: 4,
                   backgroundColor: 'rgba(255, 215, 0, 0.3)',
                   borderRadius: 2,
@@ -737,16 +741,18 @@ const ReadingFlowPage = () => {
                     height: '100%',
                     backgroundColor: '#FFD700',
                     borderRadius: 2,
-                    width: `${Math.max(0, ((currentStep) / Math.max(1, steps.length - 1)) * 100)}%`,
+                    // Progress hesaplama düzeltme - son step dahil
+                    width: `${Math.min(100, (currentStep / Math.max(1, steps.length - 1)) * 100)}%`,
                     transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
                   }
                 }} />
 
-                {/* Bayraklar - Daha geniş yerleşim */}
+                {/* Bayraklar - Tutarlı mesafe */}
                 {steps.slice(1, -1).map((step, index) => {
                   const isCompleted = currentStep > index + 1;
                   const isCurrent = currentStep === index + 1;
-                  const flagPosition = (index + 1) * 70; // Sabit mesafe ile yerleştir
+                  // Tutarlı pozisyon hesaplama
+                  const flagPosition = (index + 1) * 70;
 
                   return (
                     <Box
@@ -802,7 +808,8 @@ const ReadingFlowPage = () => {
                 {/* Rakun Karakteri */}
                 <Box sx={{
                   position: 'absolute',
-                  left: `${currentStep * 70 - 25}px`, // Bayraklarla aynı mesafede
+                  // Tutarlı pozisyon hesaplama - 70px intervals
+                  left: `${currentStep * 70 - 25}px`,
                   top: '50%',
                   transform: 'translateY(-50%)',
                   zIndex: 10,
