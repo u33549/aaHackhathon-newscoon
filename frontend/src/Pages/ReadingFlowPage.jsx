@@ -685,26 +685,26 @@ const ReadingFlowPage = () => {
           alignItems: 'center',
           overflow: 'hidden'
         }}>
+          {/* Grid Container */}
           <Box sx={{
             position: 'relative',
             width: '100%',
             height: '100%',
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: '1fr auto auto', // Progress area, text area, button area
             alignItems: 'center',
             px: 2,
-            overflow: 'hidden'
+            gap: 2
           }}>
-            {/* Kaydırılabilir Progress Container */}
+
+            {/* Progress Road Area - Sol Grid */}
             <Box sx={{
-              position: 'absolute',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              left: 20,
-              right: 120,
+              position: 'relative',
               height: '100%',
               display: 'flex',
               alignItems: 'center',
-              overflow: 'visible' // hidden yerine visible
+              overflow: 'hidden', // Progress road taşmaması için
+              minWidth: 0 // Grid item shrinking için
             }}>
               {/* Progress Road Container - Kaydırılabilir */}
               <Box sx={{
@@ -881,17 +881,13 @@ const ReadingFlowPage = () => {
               </Box>
             </Box>
 
-            {/* Progress Text - Sabit konumda */}
+            {/* Progress Text - Orta Grid */}
             <Box sx={{
-              position: 'absolute',
-              right: 80,
-              top: '50%',
-              transform: 'translateY(-50%)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: 0.5,
-              zIndex: 11
+              minWidth: 'fit-content'
             }}>
               <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.7rem' }}>
                 İlerleme
@@ -900,12 +896,35 @@ const ReadingFlowPage = () => {
                 {currentStep}/{steps.length - 1}
               </Typography>
             </Box>
+
+            {/* Close Button Area - Sağ Grid */}
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              minWidth: 'fit-content'
+            }}>
+              <IconButton
+                onClick={handleClose}
+                sx={{
+                  backgroundColor: 'rgba(0,0,0,0.5)',
+                  color: 'white',
+                  backdropFilter: 'blur(10px)',
+                  width: 40,
+                  height: 40,
+                  '&:hover': {
+                    backgroundColor: 'rgba(0,0,0,0.7)'
+                  }
+                }}
+              >
+                <Close />
+              </IconButton>
+            </Box>
           </Box>
         </Box>
       )}
 
-      {/* Close Button - Progress road'un üstünde */}
-      <IconButton
+      {/* Ana Close Button'ı kaldırıyoruz çünkü artık grid içinde */}
+      {/* <IconButton
         onClick={handleClose}
         sx={{
           position: 'fixed',
@@ -921,7 +940,7 @@ const ReadingFlowPage = () => {
         }}
       >
         <Close />
-      </IconButton>
+      </IconButton> */}
 
       {/* Main Content - Progress road için padding */}
       <Fade in={!isTransitioning} timeout={500}>
