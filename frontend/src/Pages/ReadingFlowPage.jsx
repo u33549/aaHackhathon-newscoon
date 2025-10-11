@@ -728,7 +728,7 @@ const ReadingFlowPage = () => {
                   sx={{
                     position: 'absolute',
                     left: `calc(60px + ${progressPercent}% - 14px)`, // Bayrak genişliği için offset
-                    top: 'calc(50% - 10px)', // Yolun üstünde
+                    top: 'calc(50% + 2px)', // Progress bar ile aynı seviyede
                     transform: 'translateY(-50%)',
                     zIndex: 2,
                     display: 'flex',
