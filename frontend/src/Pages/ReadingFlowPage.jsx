@@ -331,15 +331,18 @@ const ReadingFlowPage = () => {
         handleNewsRead(currentStepData.stepNumber - 1);
       }
 
+      // DÜZELTME: Önce currentStep'i güncelle (progress bar kayacak)
+      setCurrentStep(prev => prev + 1);
+
+      // Sonra rakun koşacak (600ms sonra koşma bitecek)
       setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
         setIsTransitioning(false);
 
         // Eğer completion step'ine geçtiyse, stack'i tamamla
         if (currentStep + 1 === steps.length - 1) {
           handleStackCompletion();
         }
-      }, 300);
+      }, 1500); // Rakun koşma süresine eşit (1.5s)
     }
   }, [currentStep, steps.length, isTransitioning, currentStepData, handleNewsRead, handleStackCompletion]);
 
@@ -347,10 +350,13 @@ const ReadingFlowPage = () => {
     if (currentStep > 0 && !isTransitioning) {
       setIsTransitioning(true);
 
+      // DÜZELTME: Önce currentStep'i güncelle (progress bar kayacak)
+      setCurrentStep(prev => prev - 1);
+
+      // Sonra rakun koşacak (600ms sonra koşma bitecek)
       setTimeout(() => {
-        setCurrentStep(prev => prev - 1);
         setIsTransitioning(false);
-      }, 300);
+      }, 1500); // Rakun koşma süresine eşit (1.5s)
     }
   }, [currentStep, isTransitioning]);
 
@@ -810,14 +816,15 @@ const ReadingFlowPage = () => {
                 {/* Rakun Karakteri */}
                 <Box sx={{
                   position: 'absolute',
-                  // Düzeltilmiş pozisyon hesaplama - 80px aralık + padding - rakun merkezleme
-                  left: `${40 + currentStep * 80 - 28}px`, // 28px rakun genişliğinin yarısı + offset
+                  // DÜZELTME: Bayrakların hesaplama sistemi ile uyumlu pozisyonlama
+                  // currentStep 0 = başlangıç (0px), currentStep 1 = ilk bayrak (120px), vs.
+                  left: `${40 + currentStep * 80 - 28}px`, // Pozisyon hesaplaması sabit kalsın ama mantığı düzeltelim
                   top: '50%',
                   transform: 'translateY(-50%)',
                   zIndex: 10,
-                  transition: 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-                  width: 56, // Biraz daha büyük
-                  height: 56 // Biraz daha büyük
+                  transition: 'left 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Daha uzun ve yumuşak geçiş
+                  width: 56,
+                  height: 56
                 }}>
                   {/* Rakun Sprite */}
                   <Box sx={{
@@ -831,7 +838,7 @@ const ReadingFlowPage = () => {
                     backgroundPosition: 'center',
                     filter: 'drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3))',
                     animation: isTransitioning
-                      ? 'raccoonRun 0.6s steps(2) infinite'
+                      ? 'raccoonRun 0.3s steps(2) infinite' // Daha hızlı koşma
                       : 'raccoonIdle 2s steps(2) infinite',
                     transform: currentStep === 0 ? 'scaleX(-1)' : 'scaleX(1)', // İlk pozisyonda sola baksın
                     transition: 'transform 0.3s ease'
@@ -841,37 +848,37 @@ const ReadingFlowPage = () => {
                   {isTransitioning && (
                     <Box sx={{
                       position: 'absolute',
-                      bottom: -5,
-                      left: -10,
-                      width: 30,
-                      height: 10,
-                      opacity: 0.6,
+                      bottom: -8,
+                      left: -15,
+                      width: 40,
+                      height: 15,
+                      opacity: 0.7,
                       pointerEvents: 'none'
                     }}>
-                      {[0, 1, 2].map((i) => (
+                      {[0, 1, 2, 3].map((i) => (
                         <Box
                           key={i}
                           sx={{
                             position: 'absolute',
-                            width: 3,
-                            height: 3,
+                            width: 4,
+                            height: 4,
                             borderRadius: '50%',
                             backgroundColor: '#FFD700',
-                            left: `${i * 8}px`,
-                            animation: `dustParticle 0.8s ease-out infinite`,
-                            animationDelay: `${i * 0.1}s`,
+                            left: `${i * 6}px`,
+                            animation: `dustParticle 0.5s ease-out infinite`,
+                            animationDelay: `${i * 0.08}s`,
                             '@keyframes dustParticle': {
                               '0%': {
                                 opacity: 0,
                                 transform: 'scale(0) translateY(0px)'
                               },
-                              '30%': {
+                              '40%': {
                                 opacity: 1,
-                                transform: 'scale(1) translateY(-5px)'
+                                transform: 'scale(1.2) translateY(-8px)'
                               },
                               '100%': {
                                 opacity: 0,
-                                transform: 'scale(0.5) translateY(-10px)'
+                                transform: 'scale(0.3) translateY(-18px)'
                               }
                             }
                           }}
