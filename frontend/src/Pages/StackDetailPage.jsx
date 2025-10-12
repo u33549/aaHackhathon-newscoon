@@ -195,7 +195,7 @@ const StackDetailPage = () => {
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
         <Typography variant="h4" gutterBottom color="error">
-          Haber Yığını Bulunamadı
+          Haber Serisi Bulunamadı
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           {error || 'İstediğiniz haber serisi bulunamadı veya erişilemez durumda.'}
@@ -649,7 +649,7 @@ const StackDetailPage = () => {
                 px: { xs: 2, sm: 0 }
               }}
             >
-              Bu Yığındaki Haberler
+              Bu Serideki Haberler
             </Typography>
 
             {stack.news && stack.news.length > 0 ? (
