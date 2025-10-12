@@ -268,7 +268,7 @@ const ReadingFlowPage = () => {
           const alreadyHasBadge = earnedBadges.some(badge => badge.id === categoryBadge.id);
           
           if (!alreadyHasBadge) {
-            dispatch(addBadge(categoryBadge));
+          dispatch(addBadge(categoryBadge));
 
             // Celebration queue'ya ekle
             dispatch(addCelebrationToQueue({
@@ -332,7 +332,7 @@ const ReadingFlowPage = () => {
       }
 
       // DÜZELTME: Önce currentStep'i güncelle (progress bar kayacak)
-      setCurrentStep(prev => prev + 1);
+        setCurrentStep(prev => prev + 1);
 
       // Sonra rakun koşacak (600ms sonra koşma bitecek)
       setTimeout(() => {
@@ -352,7 +352,7 @@ const ReadingFlowPage = () => {
       setLastDirection('backward'); // Geri gittiğimizi kaydet
 
       // DÜZELTME: Önce currentStep'i güncelle (progress bar kayacak)
-      setCurrentStep(prev => prev - 1);
+        setCurrentStep(prev => prev - 1);
 
       // Sonra rakun koşacak (600ms sonra koşma bitecek)
       setTimeout(() => {
@@ -951,21 +951,21 @@ const ReadingFlowPage = () => {
               justifyContent: 'flex-end',
               minWidth: 'fit-content'
             }}>
-              <IconButton
-                onClick={handleClose}
-                sx={{
-                  backgroundColor: 'rgba(0,0,0,0.5)',
-                  color: 'white',
-                  backdropFilter: 'blur(10px)',
+      <IconButton
+        onClick={handleClose}
+        sx={{
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          color: 'white',
+          backdropFilter: 'blur(10px)',
                   width: 40,
                   height: 40,
-                  '&:hover': {
-                    backgroundColor: 'rgba(0,0,0,0.7)'
-                  }
-                }}
-              >
-                <Close />
-              </IconButton>
+          '&:hover': {
+            backgroundColor: 'rgba(0,0,0,0.7)'
+          }
+        }}
+      >
+        <Close />
+      </IconButton>
             </Box>
           </Box>
         </Box>
@@ -1246,24 +1246,32 @@ const ReadingFlowPage = () => {
                   }}
                 />
 
-                {/* Mobil için kaydırma ipucu - daha prominent */}
+                {/* Mobil için kaydırma ipucu - Tıklanabilir */}
                 {isMobile && (
-                  <Box sx={{
+                  <Box 
+                    onClick={handleNextStep}
+                    sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
                     mt: { xs: 3, md: 4 },
                     gap: 1,
-                    opacity: 0.9,
-                    animation: 'bounce 2s infinite'
+                      opacity: 0.8,
+                      animation: 'bounce 2s infinite',
+                      cursor: 'pointer',
+                      p: 1.5,
+                      transition: 'opacity 0.3s ease',
+                      '&:active': {
+                        opacity: 1
+                      }
                   }}>
                     <Typography
                       variant="body2"
                       sx={{
-                        color: 'rgba(255,255,255,0.9)',
-                        fontSize: '0.9rem',
-                        fontWeight: 500,
+                        color: 'rgba(255,255,255,0.8)',
+                        fontSize: '0.85rem',
+                        fontWeight: 400,
                         textAlign: 'center'
                       }}
                     >
@@ -1273,7 +1281,7 @@ const ReadingFlowPage = () => {
                       variant="body2"
                       sx={{
                         color: '#FFD700',
-                        fontSize: '0.95rem',
+                        fontSize: '0.9rem',
                         fontWeight: 600,
                         textAlign: 'center'
                       }}
@@ -1283,8 +1291,9 @@ const ReadingFlowPage = () => {
                     <KeyboardArrowUp
                       sx={{
                         color: '#FFD700',
-                        fontSize: 28,
-                        mt: 0.5
+                        fontSize: 32,
+                        mt: 0.5,
+                        opacity: 0.9
                       }}
                     />
                   </Box>
@@ -1617,14 +1626,14 @@ const ReadingFlowPage = () => {
 
                   {/* News Content */}
                 <Box
-                  sx={{
-                    color: 'text.primary',
-                    lineHeight: 1.8,
-                    fontSize: { xs: '1rem', md: '1.1rem' },
-                    fontWeight: 400,
-                    mb: { xs: 4, md: 6 },
-                    flex: 1,
-                    minHeight: 'fit-content',
+                    sx={{
+                      color: 'text.primary',
+                      lineHeight: 1.8,
+                      fontSize: { xs: '1rem', md: '1.1rem' },
+                      fontWeight: 400,
+                      mb: { xs: 4, md: 6 },
+                      flex: 1,
+                      minHeight: 'fit-content',
                     letterSpacing: '0.01em',
                     '& .drop-cap': richTextStyles['.drop-cap'],
                     '& .quote-box': richTextStyles['.quote-box'],
@@ -1635,6 +1644,47 @@ const ReadingFlowPage = () => {
                     __html: formatNewsForJSX(currentStepData.content) 
                   }}
                 />
+
+                  {/* Devam Et İpucu - Mobil için sadece sonraki haber varsa */}
+                  {isMobile && currentStep < steps.length - 1 && (
+                    <Box 
+                      onClick={handleNextStep}
+                      sx={{
+                    display: 'flex',
+                        flexDirection: 'column',
+                    alignItems: 'center',
+                        gap: 0.5,
+                    mt: 4,
+                        mb: 2,
+                        cursor: 'pointer',
+                        py: 2,
+                        opacity: 0.7,
+                        transition: 'opacity 0.3s ease',
+                        '&:active': {
+                          opacity: 1
+                        }
+                      }}
+                    >
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: '#FFD700', 
+                          fontWeight: 600, 
+                          fontSize: '0.8rem',
+                          mb: 0.5
+                        }}
+                      >
+                        Devam etmek için aşağı kaydır
+                      </Typography>
+                      <KeyboardArrowDown 
+                        sx={{ 
+                          fontSize: 28, 
+                          color: '#FFD700',
+                          animation: 'bounce 2s infinite'
+                        }} 
+                      />
+                      </Box>
+                    )}
 
                 </Box>
               </Box>
