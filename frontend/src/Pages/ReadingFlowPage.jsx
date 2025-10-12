@@ -154,7 +154,7 @@ const ReadingFlowPage = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [steps, setSteps] = useState([]);
   const [readNewsIndices, setReadNewsIndices] = useState(new Set()); // Okunan haberleri takip et
-
+  const [lastDirection, setLastDirection] = useState('forward'); // 'forward' veya 'backward' - rakun yön kontrolü için
   // Hibrit scroll sistemi için state'ler
   const [pullState, setPullState] = useState({
     isAtTop: true,
@@ -325,8 +325,8 @@ const ReadingFlowPage = () => {
   const handleNextStep = useCallback(() => {
     if (currentStep < steps.length - 1 && !isTransitioning) {
       setIsTransitioning(true);
+      setLastDirection('forward'); // İleri gittiğimizi kaydet
 
-      // Eğer news step'inden çıkıyorsak, haber okundu olarak işaretle
       if (currentStepData?.type === 'news' && currentStepData?.stepNumber) {
         handleNewsRead(currentStepData.stepNumber - 1);
       }
@@ -349,6 +349,7 @@ const ReadingFlowPage = () => {
   const handlePrevStep = useCallback(() => {
     if (currentStep > 0 && !isTransitioning) {
       setIsTransitioning(true);
+      setLastDirection('backward'); // Geri gittiğimizi kaydet
 
       // DÜZELTME: Önce currentStep'i güncelle (progress bar kayacak)
       setCurrentStep(prev => prev - 1);
@@ -845,57 +846,76 @@ const ReadingFlowPage = () => {
                     animation: isTransitioning
                       ? 'raccoonRun 0.3s steps(2) infinite' // Daha hızlı koşma
                       : 'raccoonIdle 2s steps(2) infinite',
-                    // Yön kontrolü: başlangıçta sola bak, son step'te sağa bak (dışarı koşarken)
-                    transform: currentStep === 0
-                      ? 'scaleX(-1)' // Sol tarafa bak
-                      : currentStep >= steps.length - 1
-                        ? 'scaleX(1)' // Sağa bak (dışarı koşarken)
-                        : 'scaleX(1)', // Normal yön (sağa)
-                    transition: 'transform 0.3s ease'
-                  }} />
+                    // Yön kontrolü düzeltildi:
+                    // - Başlangıçta (step 0) sağa bak (normal yön)
+                    // - Geri giderken (önceki step'e) sola bak (scaleX(-1))
+                    // - İleri giderken sağa bak (normal yön)
+                    // - Son step'te sağa bak (dışarı koşarken)
+                    transform: (() => {
+                      // Eğer transition sırasında hangi yöne gittiğimizi kontrol et
+                      if (isTransitioning) {
+                        // lastDirection state'ini kullanarak yön belirle
+                        if (lastDirection === 'backward') {
+                          return 'scaleX(-1)'; // Geri giderken sola bak
+                        } else {
+                          return 'scaleX(1)'; // İleri giderken sağa bak
+                        }
+                      }
 
-                  {/* Koşu toz efekti - sadece koşarken */}
-                  {isTransitioning && (
-                    <Box sx={{
-                      position: 'absolute',
-                      bottom: -8,
-                      left: -15,
-                      width: 40,
-                      height: 15,
-                      opacity: 0.7,
-                      pointerEvents: 'none'
-                    }}>
-                      {[0, 1, 2, 3].map((i) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            position: 'absolute',
-                            width: 4,
-                            height: 4,
-                            borderRadius: '50%',
-                            backgroundColor: '#FFD700',
-                            left: `${i * 6}px`,
-                            animation: `dustParticle 0.5s ease-out infinite`,
-                            animationDelay: `${i * 0.08}s`,
-                            '@keyframes dustParticle': {
-                              '0%': {
-                                opacity: 0,
-                                transform: 'scale(0) translateY(0px)'
-                              },
-                              '40%': {
-                                opacity: 1,
-                                transform: 'scale(1.2) translateY(-8px)'
-                              },
-                              '100%': {
-                                opacity: 0,
-                                transform: 'scale(0.3) translateY(-18px)'
+                      // Durgun haldeyken pozisyona göre yön belirle
+                      if (currentStep === 0) {
+                        return 'scaleX(1)'; // Başlangıçta sağa bak
+                      } else if (currentStep >= steps.length - 1) {
+                        return 'scaleX(1)'; // Son step'te sağa bak (dışarı koşarken)
+                      } else {
+                        return 'scaleX(1)'; // Ortada sağa bak
+                      }
+                    })(),
+                    transition: 'transform 0.3s ease-in-out'
+                  }}>
+                    {/* Koşu toz efekti - sadece transition sırasında */}
+                    {isTransitioning && (
+                      <Box sx={{
+                        position: 'absolute',
+                        bottom: -10,
+                        left: -15,
+                        width: 40,
+                        height: 15,
+                        opacity: 0.7,
+                        pointerEvents: 'none'
+                      }}>
+                        {[0, 1, 2, 3].map((i) => (
+                          <Box
+                            key={i}
+                            sx={{
+                              position: 'absolute',
+                              width: 4,
+                              height: 4,
+                              borderRadius: '50%',
+                              backgroundColor: '#FFD700',
+                              left: `${i * 6}px`,
+                              animation: `dustParticle 0.5s ease-out infinite`,
+                              animationDelay: `${i * 0.08}s`,
+                              '@keyframes dustParticle': {
+                                '0%': {
+                                  opacity: 0,
+                                  transform: 'scale(0) translateY(0px)'
+                                },
+                                '40%': {
+                                  opacity: 1,
+                                  transform: 'scale(1.2) translateY(-8px)'
+                                },
+                                '100%': {
+                                  opacity: 0,
+                                  transform: 'scale(0.3) translateY(-18px)'
+                                }
                               }
-                            }
-                          }}
-                        />
-                      ))}
-                    </Box>
-                  )}
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
               </Box>
             </Box>
