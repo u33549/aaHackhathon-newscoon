@@ -856,19 +856,19 @@ const ReadingFlowPage = () => {
                       if (isTransitioning) {
                         // lastDirection state'ini kullanarak yön belirle
                         if (lastDirection === 'backward') {
-                          return 'scaleX(-1)'; // Geri giderken sola bak
+                          return 'scaleX(-1) rotateY(0deg)'; // Geri giderken sadece yatay çevir (180°)
                         } else {
-                          return 'scaleX(1)'; // İleri giderken sağa bak
+                          return 'scaleX(1) rotateY(0deg)'; // İleri giderken normal yön
                         }
                       }
 
                       // Durgun haldeyken pozisyona göre yön belirle
                       if (currentStep === 0) {
-                        return 'scaleX(1)'; // Başlangıçta sağa bak
+                        return 'scaleX(1) rotateY(0deg)'; // Başlangıçta sağa bak
                       } else if (currentStep >= steps.length - 1) {
-                        return 'scaleX(1)'; // Son step'te sağa bak (dışarı koşarken)
+                        return 'scaleX(1) rotateY(0deg)'; // Son step'te sağa bak (dışarı koşarken)
                       } else {
-                        return 'scaleX(1)'; // Ortada sağa bak
+                        return 'scaleX(1) rotateY(0deg)'; // Ortada sağa bak
                       }
                     })(),
                     transition: 'transform 0.3s ease-in-out'
