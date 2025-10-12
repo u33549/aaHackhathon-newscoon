@@ -32,6 +32,10 @@ import {
   useSelectedStack,
   useCurrentlyReading,
   useReadingProgress
+  useUserXP,
+  useUserLevel,
+  useUserLevelProgress,
+  useUserAchievements
 } from '../hooks/redux';
 import { fetchStackById } from '../store/slices/stackSlice';
 import {
@@ -148,7 +152,14 @@ const ReadingFlowPage = () => {
   
   const selectedStack = useSelectedStack();
   const currentlyReading = useCurrentlyReading();
+<<<<<<< HEAD
   const readingProgress = useReadingProgress();
+=======
+  const userXP = useUserXP();
+  const userLevel = useUserLevel();
+  const levelProgress = useUserLevelProgress();
+  const userAchievements = useUserAchievements();
+>>>>>>> 5841ec102fedfaac60276cbc81f7b6cf6119c4c6
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -264,22 +275,28 @@ const ReadingFlowPage = () => {
       // Haber okundu bilgisi - sadece console log
       console.log(`Haber okundu: ${step.title}`);
 
-      // Kategori bazlı rozet kontrolü - sadece ilk haber ise
+      // Kategori bazlı rozet kontrolü - sadece ilk haber ise ve daha önce alınmamışsa
       const category = selectedStack.mainCategory;
       if (category && !readNewsIndices.has(0)) { // İlk haber ise
         const categoryBadge = allBadges.find(badge => badge.id === category);
         if (categoryBadge) {
-          dispatch(addBadge(categoryBadge));
+          // Kullanıcının zaten bu rozete sahip olup olmadığını kontrol et
+          const earnedBadges = userAchievements?.badges || [];
+          const alreadyHasBadge = earnedBadges.some(badge => badge.id === categoryBadge.id);
+          
+          if (!alreadyHasBadge) {
+            dispatch(addBadge(categoryBadge));
 
-          // Celebration queue'ya ekle
-          dispatch(addCelebrationToQueue({
-            type: 'badge',
-            badge: categoryBadge
-          }));
+            // Celebration queue'ya ekle
+            dispatch(addCelebrationToQueue({
+              type: 'badge',
+              badge: categoryBadge
+            }));
+          }
         }
       }
     }
-  }, [selectedStack, steps, readNewsIndices, dispatch]);
+  }, [selectedStack, steps, readNewsIndices, dispatch, userAchievements]);
 
   // Stack tamamlama işlemi - BİLDİRİM OLMADAN
   const handleStackCompletion = useCallback(() => {
