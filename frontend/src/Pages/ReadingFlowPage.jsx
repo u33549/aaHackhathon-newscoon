@@ -63,10 +63,6 @@ const formatViewCount = (count) => {
   return num.toString();
 };
 
-// Her haber için XP hesaplama
-const generateNewsXP = () => {
-  return Math.floor(Math.random() * (XP_CONSTANTS.NEWS_XP_MAX - XP_CONSTANTS.NEWS_XP_MIN + 1)) + XP_CONSTANTS.NEWS_XP_MIN;
-};
 
 // Kronolojik haber parçalarını simüle eden data
 const generateChronologicalSteps = (stack) => {
@@ -98,7 +94,6 @@ const generateChronologicalSteps = (stack) => {
     stackData: {
       newsCount: stack.news?.length || 0,
       viewCount: stack.viewCount || 0,
-      cp: stack.xp || 0,
       category: stack.mainCategory || 'genel',
       createdAt: stack.createdAt,
       tags: stack.tags || []
@@ -118,7 +113,6 @@ const generateChronologicalSteps = (stack) => {
       timestamp: newsItem.pubDate || new Date().toISOString(),
       stepNumber: index + 1,
       totalSteps: stack.news.length,
-      newsXP: generateNewsXP() // Her haber için XP
     });
   });
 
@@ -312,7 +306,7 @@ const ReadingFlowPage = () => {
     const { scrollTop, scrollHeight, clientHeight } = container;
     const isAtTop = scrollTop <= 1;
     const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
-
+    console.log('📍 Scroll Position:', { scrollTop, isAtTop, isAtBottom, scrollHeight, clientHeight });
     setPullState(prev => ({
       ...prev,
       isAtTop,
