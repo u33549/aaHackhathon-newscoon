@@ -17,9 +17,6 @@ import Header from '../components/layout/Header';
 // Redux hooks
 import { useUserXP, useUserLevel, useXPForNextLevel } from '../hooks/redux';
 
-// Utils
-import { formatNewsForJSX, richTextStyles } from '../utils/textFormatter';
-
 const ArticlePage = () => {
   const { stackId } = useParams();
   const navigate = useNavigate();
@@ -141,15 +138,10 @@ const ArticlePage = () => {
           )}
 
           {/* News Text */}
-          <Box sx={{ 
-            mb: 4,
-            '& .drop-cap': richTextStyles['.drop-cap'],
-            '& .quote-box': richTextStyles['.quote-box'],
-            '& .paragraph-divider': richTextStyles['.paragraph-divider'],
-            '& .news-paragraph': richTextStyles['.news-paragraph']
-          }}>
+          <Box sx={{ mb: 4 }}>
             {newsData.content ? (
-              <Box
+              <Typography
+                variant="body1"
                 sx={{
                   fontSize: '1.125rem',
                   lineHeight: 1.7,
@@ -158,27 +150,27 @@ const ArticlePage = () => {
                 dangerouslySetInnerHTML={{ __html: newsData.content }}
               />
             ) : newsData.newstext ? (
-              <Box
+              <Typography
+                variant="body1"
                 sx={{
                   fontSize: '1.125rem',
                   lineHeight: 1.7,
                   color: 'text.primary'
                 }}
-                dangerouslySetInnerHTML={{ 
-                  __html: formatNewsForJSX(newsData.newstext) 
-                }}
-              />
+              >
+                {newsData.newstext}
+              </Typography>
             ) : newsData.description ? (
-              <Box
+              <Typography
+                variant="body1"
                 sx={{
                   fontSize: '1.125rem',
                   lineHeight: 1.7,
                   color: 'text.primary'
                 }}
-                dangerouslySetInnerHTML={{ 
-                  __html: formatNewsForJSX(newsData.description) 
-                }}
-              />
+              >
+                {newsData.description}
+              </Typography>
             ) : (
               <Typography
                 variant="body1"

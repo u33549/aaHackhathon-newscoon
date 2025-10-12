@@ -275,7 +275,7 @@ const TestPage = () => {
       </Typography>
 
       <Grid container spacing={2}>
-        {/* Tüm seriları getir */}
+        {/* Tüm yığınları getir */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
@@ -333,7 +333,7 @@ const TestPage = () => {
               />
               <TextField
                 label="Açıklama"
-                value={formData.stackDescription || 'Test seri açıklaması'}
+                value={formData.stackDescription || 'Test yığın açıklaması'}
                 onChange={(e) => updateFormData('stackDescription', e.target.value)}
                 size="small"
                 fullWidth
@@ -355,7 +355,7 @@ const TestPage = () => {
                 startIcon={<Add />}
                 onClick={() => makeApiCall(stacksAPI.create, {
                   title: formData.stackTitle || 'Test Haber Yığını',
-                  description: formData.stackDescription || 'Test seri açıklaması',
+                  description: formData.stackDescription || 'Test yığın açıklaması',
                   tags: (formData.stackTags || 'test, api').split(',').map(tag => tag.trim()),
                   status: 'pending'
                 })}
@@ -367,7 +367,7 @@ const TestPage = () => {
           </Card>
         </Grid>
 
-        {/* ID ile seri getir */}
+        {/* ID ile yığın getir */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
@@ -396,7 +396,7 @@ const TestPage = () => {
           </Card>
         </Grid>
 
-        {/* Öne çıkan serilar */}
+        {/* Öne çıkan yığınlar */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>

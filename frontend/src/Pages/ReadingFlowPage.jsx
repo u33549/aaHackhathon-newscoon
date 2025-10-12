@@ -88,7 +88,7 @@ const generateChronologicalSteps = (stack) => {
     id: 'intro',
     type: 'intro',
     title: stack.title,
-    content: stack.description || 'Bu haber seriında kronolojik olarak gelişen olayları inceleceğiz.',
+    content: stack.description || 'Bu haber serisinde kronolojik olarak gelişen olayları inceleceğiz.',
     image: getStackImage(stack),
     timestamp: null,
     stackData: {
@@ -122,7 +122,7 @@ const generateChronologicalSteps = (stack) => {
     id: 'completion',
     type: 'completion',
     title: 'Tebrikler!',
-    content: `${stack.title} haber seriını başarıyla tamamladınız!`,
+    content: `${stack.title} haber serisini başarıyla tamamladınız!`,
     image: null,
     reward: {
       cp: stackTotalXP, // Sadece stack'in sahip olduğu XP

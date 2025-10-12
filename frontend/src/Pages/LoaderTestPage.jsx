@@ -23,12 +23,12 @@ const LoaderTestPage = () => {
     },
     {
       title: 'Haber Yığını Yükleme',
-      message: 'Haber seriı yükleniyor...',
+      message: 'Haber yığını yükleniyor...',
       description: 'Stack detay sayfası için loader'
     },
     {
       title: 'Haber Yığınları Yükleme',
-      message: 'Haber seriları yükleniyor...',
+      message: 'Haber yığınları yükleniyor...',
       description: 'Tüm haberler sayfası için loader'
     },
     {

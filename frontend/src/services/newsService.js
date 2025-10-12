@@ -8,7 +8,7 @@ import api from './api';
  * Tüm haberleri getir - filtreleme ve sayfalama destekli
  * @param {Object} params - Query parametreleri
  * @param {string} params.pubDate - Yayın tarihi (YYYY-MM-DD)
- * @param {boolean} params.isInAnyStack - Herhangi bir serida mı?
+ * @param {boolean} params.isInAnyStack - Herhangi bir yığında mı?
  * @param {boolean} params.isUsable - Kullanılabilir mi?
  * @param {string} params.category - Haber kategorisi
  * @param {number} params.limit - Maksimum sonuç sayısı

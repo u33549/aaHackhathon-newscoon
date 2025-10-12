@@ -198,7 +198,7 @@ const StackDetailPage = () => {
           Haber Yığını Bulunamadı
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {error || 'İstediğiniz haber seri bulunamadı veya erişilemez durumda.'}
+          {error || 'İstediğiniz haber serisi bulunamadı veya erişilemez durumda.'}
         </Typography>
         <Button
           variant="contained"
@@ -436,7 +436,7 @@ const StackDetailPage = () => {
                   overflow: { xs: 'hidden', md: 'visible' }
                 }}
               >
-                {stack.description || 'Bu haber seriı için açıklama bulunmuyor.'}
+                {stack.description || 'Bu haber serisi için açıklama bulunmuyor.'}
               </Typography>
 
               {/* Action Buttons */}
@@ -747,7 +747,7 @@ const StackDetailPage = () => {
                   fontSize: { xs: '0.875rem', md: '1rem' }
                 }}
               >
-                Bu serida henüz haber bulunmuyor.
+                Bu seride henüz haber bulunmuyor.
               </Typography>
             )}
           </Grid>

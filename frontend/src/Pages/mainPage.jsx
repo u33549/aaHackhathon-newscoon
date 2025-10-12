@@ -331,7 +331,7 @@ const MainPage = () => {
   if (isLoading || stacksLoading) {
     return (
       <LoadingScreen
-        message={isLoading ? 'Haberler yükleniyor...' : 'Haber seriları yükleniyor...'}
+        message={isLoading ? 'Haberler yükleniyor...' : 'Haber serilerı yükleniyor...'}
       />
     );
   }
