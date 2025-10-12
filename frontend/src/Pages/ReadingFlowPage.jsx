@@ -816,9 +816,14 @@ const ReadingFlowPage = () => {
                 {/* Rakun Karakteri */}
                 <Box sx={{
                   position: 'absolute',
-                  // DÜZELTME: Bayrakların hesaplama sistemi ile uyumlu pozisyonlama
-                  // currentStep 0 = başlangıç (0px), currentStep 1 = ilk bayrak (120px), vs.
-                  left: `${40 + currentStep * 80 - 28}px`, // Pozisyon hesaplaması sabit kalsın ama mantığı düzeltelim
+                  // DÜZELTME: Rakun bayrakların tam merkezinde olsun
+                  // Step 0 = başlangıç (sol taraf), Step 1+ = bayrakların merkezinde
+                  // Son step'te sağ tarafa dışarı koş
+                  left: currentStep === 0
+                    ? '12px' // Başlangıç pozisyonu (sol başta)
+                    : currentStep >= steps.length - 1
+                      ? `${40 + (steps.length - 2) * 80 + 80}px` // Son step'te dışarı koş (bayrakların ötesine)
+                      : `${40 + (currentStep - 1) * 80 + 16}px`, // Bayrakların tam merkezinde (16px bayrak merkezine hizalama)
                   top: '50%',
                   transform: 'translateY(-50%)',
                   zIndex: 10,
@@ -840,7 +845,12 @@ const ReadingFlowPage = () => {
                     animation: isTransitioning
                       ? 'raccoonRun 0.3s steps(2) infinite' // Daha hızlı koşma
                       : 'raccoonIdle 2s steps(2) infinite',
-                    transform: currentStep === 0 ? 'scaleX(-1)' : 'scaleX(1)', // İlk pozisyonda sola baksın
+                    // Yön kontrolü: başlangıçta sola bak, son step'te sağa bak (dışarı koşarken)
+                    transform: currentStep === 0
+                      ? 'scaleX(-1)' // Sol tarafa bak
+                      : currentStep >= steps.length - 1
+                        ? 'scaleX(1)' // Sağa bak (dışarı koşarken)
+                        : 'scaleX(1)', // Normal yön (sağa)
                     transition: 'transform 0.3s ease'
                   }} />
 
