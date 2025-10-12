@@ -798,20 +798,22 @@ const ReadingFlowPage = () => {
                         animation: isCurrent ? 'flagWave 2s ease-in-out infinite' : 'none',
                         position: 'relative'
                       }}>
-                        {/* Bayrak üzerindeki sayı */}
-                        <Box sx={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          fontSize: '11px', // Biraz daha büyük
-                          color: isCompleted || isCurrent ? '#000' : 'rgba(255, 255, 255, 0.8)',
-                          fontWeight: 'bold',
-                          textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                          zIndex: 1
-                        }}>
-                          {isCompleted ? '✓' : index + 1}
-                        </Box>
+                        {/* Bayrak üzerindeki işaret */}
+                        {isCompleted && (
+                          <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            fontSize: '11px',
+                            color: '#000',
+                            fontWeight: 'bold',
+                            textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                            zIndex: 1
+                          }}>
+                            ✓
+                          </Box>
+                        )}
                       </Box>
                     </Box>
                   );
