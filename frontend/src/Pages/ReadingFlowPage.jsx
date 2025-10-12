@@ -848,7 +848,7 @@ const ReadingFlowPage = () => {
                       : 'raccoonIdle 2s steps(2) infinite',
                     // Yön kontrolü düzeltildi:
                     // - Başlangıçta (step 0) sağa bak (normal yön)
-                    // - Geri giderken (önceki step'e) sola bak (scaleX(-1))
+                    // - Geri giderken (önceki step'e) sola bak ve varış noktasında da sola bak
                     // - İleri giderken sağa bak (normal yön)
                     // - Son step'te sağa bak (dışarı koşarken)
                     transform: (() => {
@@ -856,19 +856,26 @@ const ReadingFlowPage = () => {
                       if (isTransitioning) {
                         // lastDirection state'ini kullanarak yön belirle
                         if (lastDirection === 'backward') {
-                          return 'scaleX(-1) rotateY(0deg)'; // Geri giderken sadece yatay çevir (180°)
+                          return 'scaleX(-1) rotateY(0deg)'; // Geri giderken sola bak
                         } else {
-                          return 'scaleX(1) rotateY(0deg)'; // İleri giderken normal yön
+                          return 'scaleX(1) rotateY(0deg)'; // İleri giderken sağa bak
                         }
                       }
 
                       // Durgun haldeyken pozisyona göre yön belirle
+                      // Son hareket yönüne göre yönelim belirle
                       if (currentStep === 0) {
-                        return 'scaleX(1) rotateY(0deg)'; // Başlangıçta sağa bak
+                        return 'scaleX(1) rotateY(0deg)'; // Başlangıçta her zaman sağa bak
                       } else if (currentStep >= steps.length - 1) {
-                        return 'scaleX(1) rotateY(0deg)'; // Son step'te sağa bak (dışarı koşarken)
+                        return 'scaleX(1) rotateY(0deg)'; // Son step'te her zaman sağa bak (çıkış)
                       } else {
-                        return 'scaleX(1) rotateY(0deg)'; // Ortada sağa bak
+                        // Ortada - son hareket yönüne bak
+                        // Eğer son hareket geri ise sola bak, ileri ise sağa bak
+                        if (lastDirection === 'backward') {
+                          return 'scaleX(-1) rotateY(0deg)'; // Geri geldiyse sola bak
+                        } else {
+                          return 'scaleX(1) rotateY(0deg)'; // İleri gittiyse sağa bak
+                        }
                       }
                     })(),
                     transition: 'transform 0.3s ease-in-out'
