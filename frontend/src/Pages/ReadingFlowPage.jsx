@@ -47,6 +47,9 @@ import LoadingScreen from '../components/common/LoadingScreen';
 // Constants
 import { XP_CONSTANTS, allBadges } from '../constants/index.jsx';
 
+// Utils
+import { formatNewsText, textStyles, formatNewsForJSX, richTextStyles } from '../utils/textFormatter';
+
 // Görüntülenme sayısını kısaltılmış formatta göstermek için yardımcı fonksiyon
 const formatViewCount = (count) => {
   if (!count || count === 0) return '0';
@@ -89,7 +92,7 @@ const generateChronologicalSteps = (stack) => {
     id: 'intro',
     type: 'intro',
     title: stack.title,
-    content: stack.description || 'Bu haber yığınında kronolojik olarak gelişen olayları inceleceğiz.',
+    content: stack.description || 'Bu haber seriında kronolojik olarak gelişen olayları inceleceğiz.',
     image: getStackImage(stack),
     timestamp: null,
     stackData: {
@@ -125,7 +128,7 @@ const generateChronologicalSteps = (stack) => {
     id: 'completion',
     type: 'completion',
     title: 'Tebrikler!',
-    content: `${stack.title} haber yığınını başarıyla tamamladınız!`,
+    content: `${stack.title} haber seriını başarıyla tamamladınız!`,
     image: null,
     reward: {
       cp: stackTotalXP, // Sadece stack'in sahip olduğu XP
@@ -1229,8 +1232,7 @@ const ReadingFlowPage = () => {
                 )}
 
                 {/* Açıklama Metni */}
-                <Typography
-                  variant={isMobile ? 'body1' : 'h6'}
+                <Box
                   sx={{
                     color: 'rgba(255,255,255,0.9)',
                     mb: { xs: 4, md: 6 },
@@ -1239,11 +1241,16 @@ const ReadingFlowPage = () => {
                     lineHeight: 1.6,
                     fontSize: { xs: '1rem', md: '1.2rem' },
                     textAlign: 'left',
-                    width: '100%'
+                    width: '100%',
+                    '& .drop-cap': richTextStyles['.drop-cap'],
+                    '& .quote-box': richTextStyles['.quote-box'],
+                    '& .paragraph-divider': richTextStyles['.paragraph-divider'],
+                    '& .news-paragraph': richTextStyles['.news-paragraph']
                   }}
-                >
-                  {currentStepData.content}
-                </Typography>
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatNewsForJSX(currentStepData.content) 
+                  }}
+                />
 
                 {/* Mobil için kaydırma ipucu - daha prominent */}
                 {isMobile && (
@@ -1615,21 +1622,25 @@ const ReadingFlowPage = () => {
                   )}
 
                   {/* News Content */}
-                  <Typography
-                    variant={isMobile ? 'body1' : 'h6'}
-                    sx={{
-                      color: 'text.primary',
-                      lineHeight: 1.8,
-                      fontSize: { xs: '1rem', md: '1.1rem' },
-                      fontWeight: 400,
-                      mb: { xs: 4, md: 6 },
-                      flex: 1,
-                      minHeight: 'fit-content',
-                      letterSpacing: '0.01em'
-                    }}
-                  >
-                    {currentStepData.content}
-                  </Typography>
+                <Box
+                  sx={{
+                    color: 'text.primary',
+                    lineHeight: 1.8,
+                    fontSize: { xs: '1rem', md: '1.1rem' },
+                    fontWeight: 400,
+                    mb: { xs: 4, md: 6 },
+                    flex: 1,
+                    minHeight: 'fit-content',
+                    letterSpacing: '0.01em',
+                    '& .drop-cap': richTextStyles['.drop-cap'],
+                    '& .quote-box': richTextStyles['.quote-box'],
+                    '& .paragraph-divider': richTextStyles['.paragraph-divider'],
+                    '& .news-paragraph': richTextStyles['.news-paragraph']
+                  }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatNewsForJSX(currentStepData.content) 
+                  }}
+                />
 
                 </Box>
               </Box>
@@ -1659,17 +1670,21 @@ const ReadingFlowPage = () => {
                   {currentStepData.title}
                 </Typography>
                 
-                <Typography
-                  variant={isMobile ? 'h6' : 'h5'}
+                <Box
                   sx={{
                     color: 'rgba(255,255,255,0.95)',
                     mb: 4,
                     textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
-                    maxWidth: { xs: '100%', md: '90%' }
+                    maxWidth: { xs: '100%', md: '90%' },
+                    '& .drop-cap': richTextStyles['.drop-cap'],
+                    '& .quote-box': richTextStyles['.quote-box'],
+                    '& .paragraph-divider': richTextStyles['.paragraph-divider'],
+                    '& .news-paragraph': richTextStyles['.news-paragraph']
                   }}
-                >
-                  {currentStepData.content}
-                </Typography>
+                  dangerouslySetInnerHTML={{ 
+                    __html: formatNewsForJSX(currentStepData.content) 
+                  }}
+                />
 
                 {currentStepData.reward && (
                   <Box sx={{

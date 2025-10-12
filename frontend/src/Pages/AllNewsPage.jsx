@@ -44,14 +44,14 @@ const AllNewsPage = () => {
   const searchQuery = useSearchQuery();
   const selectedCategory = useActiveCategory();
 
-  // Component mount olduğunda haber yığınlarını getir
+  // Component mount olduğunda haber serilarını getir
   useEffect(() => {
     if (stacks.length === 0) {
       dispatch(fetchAllStacks());
     }
   }, [dispatch, stacks.length]);
 
-  // Timeline'a göre sıralanan tüm haber yığınları (Redux'tan gelen gerçek veriler)
+  // Timeline'a göre sıralanan tüm haber seriları (Redux'tan gelen gerçek veriler)
   const allStacks = [...stacks].sort((a, b) =>
     new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now())
   );
@@ -118,7 +118,7 @@ const AllNewsPage = () => {
 
   if (isLoading && stacks.length === 0) {
     return (
-      <LoadingScreen message="Haber yığınları yükleniyor..." />
+      <LoadingScreen message="Haber seriları yükleniyor..." />
     );
   }
 
@@ -139,7 +139,7 @@ const AllNewsPage = () => {
         </Typography>
         
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {filteredStacks.length} haber yığını bulundu
+          {filteredStacks.length} haber seriı bulundu
         </Typography>
       </Box>
 
@@ -148,7 +148,7 @@ const AllNewsPage = () => {
         <SearchBar
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
-          placeholder="Haber yığınlarında ara..."
+          placeholder="Haber serilarında ara..."
         />
         
         <CategoryPills
@@ -293,7 +293,7 @@ const AllNewsPage = () => {
               }}
             >
               <Typography variant="h6" gutterBottom>
-                Arama kriterlerinize uygun haber yığını bulunamadı
+                Arama kriterlerinize uygun haber seriı bulunamadı
               </Typography>
               <Typography variant="body2">
                 Farklı anahtar kelimeler deneyin veya kategori filtresini değiştirin

@@ -174,7 +174,7 @@ export const allBadges = [
     {
       id: 'stack_master',
       name: 'Yığın Ustası',
-      description: '10 haber yığını tamamladın.',
+      description: '10 haber seriı tamamladın.',
       icon: 'EmojiEvents',
       color: '#4CAF50',
       checkType: 'stacksCompleted',
@@ -327,7 +327,7 @@ export const allAchievements = [
     {
         id: 'stack_beginner',
         name: 'Yığın Başlangıcı',
-        description: 'İlk haber yığınını tamamla.',
+        description: 'İlk haber seriını tamamla.',
         icon: 'EmojiEvents',
         xpReward: 100,
         checkType: 'stacksCompleted',
@@ -336,7 +336,7 @@ export const allAchievements = [
     {
         id: 'stack_enthusiast',
         name: 'Yığın Meraklısı',
-        description: '5 haber yığını tamamla.',
+        description: '5 haber seriı tamamla.',
         icon: 'EmojiEvents',
         xpReward: 200,
         checkType: 'stacksCompleted',
@@ -345,7 +345,7 @@ export const allAchievements = [
     {
         id: 'stack_pro',
         name: 'Yığın Profesyoneli',
-        description: '20 haber yığını tamamla.',
+        description: '20 haber seriı tamamla.',
         icon: 'EmojiEvents',
         xpReward: 500,
         checkType: 'stacksCompleted',
