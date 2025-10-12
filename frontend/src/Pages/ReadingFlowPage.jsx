@@ -1071,7 +1071,8 @@ const ReadingFlowPage = () => {
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
                 pb: { xs: 6, md: 8 }, // Alt kısımda boşluk bırak
-                position: 'relative' // Pull feedback için
+                position: 'relative', // Pull feedback için
+                mb: '-120px' // İçeriği yukarı çek
               }}>
                 {/* Pull feedback UI - Bottom - Intro için */}
                 {pullState.isPulling && pullState.pullDirection === 'up' && (
