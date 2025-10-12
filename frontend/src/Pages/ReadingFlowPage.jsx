@@ -823,7 +823,7 @@ const ReadingFlowPage = () => {
                     ? '12px' // Başlangıç pozisyonu (sol başta)
                     : currentStep >= steps.length - 1
                       ? `${40 + (steps.length - 2) * 80 + 80}px` // Son step'te dışarı koş (bayrakların ötesine)
-                      : `${40 + (currentStep - 1) * 80 + 16}px`, // Bayrakların tam merkezinde (16px bayrak merkezine hizalama)
+                      : `${40 + (currentStep - 1) * 80}px`, // Bayrakların tam merkezinde (offset kaldırıldı)
                   top: '50%',
                   transform: 'translateY(-50%)',
                   zIndex: 10,
