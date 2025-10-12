@@ -31,20 +31,13 @@ import { useAppDispatch } from '../hooks/redux';
 import {
   useSelectedStack,
   useCurrentlyReading,
-  useReadingProgress
-  useUserXP,
-  useUserLevel,
-  useUserLevelProgress,
   useUserAchievements
 } from '../hooks/redux';
 import { fetchStackById } from '../store/slices/stackSlice';
 import {
-  readNewsInStack,
   completeStack,
-  addXP,
   addBadge,
-  updateReadingProgress,
-  clearLevelUpFlag
+  updateReadingProgress
 } from '../store/slices/userSlice';
 import { addCelebrationToQueue } from '../store/slices/uiSlice';
 
@@ -152,14 +145,7 @@ const ReadingFlowPage = () => {
   
   const selectedStack = useSelectedStack();
   const currentlyReading = useCurrentlyReading();
-<<<<<<< HEAD
-  const readingProgress = useReadingProgress();
-=======
-  const userXP = useUserXP();
-  const userLevel = useUserLevel();
-  const levelProgress = useUserLevelProgress();
   const userAchievements = useUserAchievements();
->>>>>>> 5841ec102fedfaac60276cbc81f7b6cf6119c4c6
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
