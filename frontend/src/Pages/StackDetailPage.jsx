@@ -187,7 +187,7 @@ const StackDetailPage = () => {
 
   if (loading) {
     return (
-      <LoadingScreen message="Haber seriı yükleniyor..." />
+      <LoadingScreen message="Haber serisi yükleniyor..." />
     );
   }
 
@@ -198,7 +198,7 @@ const StackDetailPage = () => {
           Haber Yığını Bulunamadı
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          {error || 'İstediğiniz haber seriı bulunamadı veya erişilemez durumda.'}
+          {error || 'İstediğiniz haber seri bulunamadı veya erişilemez durumda.'}
         </Typography>
         <Button
           variant="contained"
